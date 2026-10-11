@@ -853,20 +853,20 @@
         </div>
       </div>
 
-      <!-- CARD 2: MACOS (SẮP RA MẮT) -->
+      <!-- CARD 2: MACOS (BẢN CHÍNH THỨC) -->
       <div class="card-focusee" id="cardMac" onclick="switchPlatform('mac')">
-        <div class="corner-badge" id="t-badge-mac" style="background:linear-gradient(135deg, #0284c7, #38bdf8);">🍏 SẮP RA MẮT • MACOS</div>
+        <div class="corner-badge" id="t-badge-mac" style="background:linear-gradient(135deg, #0284c7, #38bdf8);">🍏 BẢN CHÍNH THỨC • MACOS</div>
         <div class="card-title" id="t-title-mac">Record-AutoZoom Cho macOS</div>
         
         <div class="price-area">
-          <span class="price-number" style="color:#64748b;" id="t-status-mac">Sắp Ra Mắt</span>
-          <span class="price-period" id="t-period-mac">• Đang Hoàn Thiện</span>
+          <span class="price-number" style="color:#0284c7;" id="t-status-mac">Miễn Phí</span>
+          <span class="price-period" id="t-period-mac">• Tải Về Trực Tiếp</span>
         </div>
-        <p class="price-subtext" id="t-subtext-mac">Dành cho Apple Silicon (M1/M2/M3) & Intel • macOS 12+</p>
+        <p class="price-subtext" id="t-subtext-mac">Dành cho Apple Silicon (M1/M2/M3/M4) & Intel • macOS 12+</p>
 
-        <button type="button" class="btn-buy-focusee" style="background:#e2e8f0;color:#475569;cursor:pointer;" onclick="showMacNotice()">
-          <span id="t-btn-mac-card">🍏 Bản macOS (Sắp Có)</span> →
-        </button>
+        <a href="https://github.com/congzg9/C-ngz/releases/download/v1.3.0/Record-AutoZoom-arm64.dmg" download class="btn-buy-focusee" id="btnDownloadMacCard" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#fff;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span id="t-btn-mac-card">🍏 Tải Cho macOS (.dmg)</span> →
+        </a>
 
         <div class="guarantee-note" style="color:#0284c7;">
           <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -893,68 +893,13 @@
         </ul>
 
         <div class="card-bottom-badge" style="background:#f0f9ff;border-color:#e0f2fe;color:#0369a1;">
-          ✨ <span id="t-bottom-mac">Bản macOS sẽ sớm có mặt trong đợt phát hành tới</span>
+          ✨ <span id="t-bottom-mac">Tải xuống gói cài đặt macOS chính thức tốc độ cao</span>
         </div>
       </div>
 
     </div>
 
-    <!-- BOTTOM INSTALLATION & DIRECT LINK PANEL -->
-    <div class="checkout-section" id="checkoutSection">
-      
-      <div class="section-headline">
-        <div class="section-title">
-          <span>⚡</span> <span id="t-sec-title">Hướng Dẫn Cài Đặt & Link Tải Trực Tiếp</span>
-        </div>
-        <div class="selected-summary-pill" id="selectedPlanPill">
-          Phiên bản: Windows 64-bit (v1.3.0)
-        </div>
-      </div>
 
-      <!-- INPUT GRID: DIRECT LINK & INSTALL STEPS -->
-      <div class="input-row-grid">
-        
-        <!-- Ô Link Tải Trực Tiếp -->
-        <div class="form-group">
-          <label class="form-label" for="downloadUrlInput">
-            <span id="t-label-dlurl">🔗 Đường dẫn tải trực tiếp (Direct Link)</span>
-            <span style="font-size:11px;color:#059669;font-weight:700;" id="t-sub-dlurl">Tốc độ cao Cloudflare R2</span>
-          </label>
-          <div class="form-input-box">
-            <input type="text" id="downloadUrlInput" class="custom-input" readonly value="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" />
-            <button type="button" class="btn-small-action btn-coupon-apply" onclick="copyDownloadUrl()">
-              📋 <span id="t-btn-copy-url">Sao chép link</span>
-            </button>
-          </div>
-          <div id="copySuccessMsg" class="coupon-msg success" style="margin-top:6px;display:none;">
-            <span>🎉 Đã sao chép đường dẫn tải vào bộ nhớ tạm!</span>
-          </div>
-        </div>
-
-        <!-- Ô 3 Bước Cài Đặt -->
-        <div class="form-group">
-          <label class="form-label">
-            <span id="t-label-steps">🚀 3 Bước bắt đầu sử dụng</span>
-            <span style="font-size:11px;color:#f97316;font-weight:700;" id="t-sub-steps">Chỉ 10 giây</span>
-          </label>
-          <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:11px 16px;font-size:13px;line-height:1.65;color:#334155;">
-            <div><strong style="color:#f97316;">1.</strong> Nhấn nút <strong>Tải Cho Windows (.exe)</strong> để tải bộ cài.</div>
-            <div><strong style="color:#f97316;">2.</strong> Mở file <code>.exe</code> và nhấn Cài đặt (mất khoảng 10 giây).</div>
-            <div><strong style="color:#f97316;">3.</strong> Mở <strong>Record-AutoZoom</strong> và bắt đầu quay video tự động zoom!</div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- BIG DOWNLOAD BUTTON IN PANEL -->
-      <div class="paypal-wrap-box" style="text-align:center;padding-top:16px;">
-        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" download style="display:inline-flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#f97316 0%,#ea580c 100%);color:#fff;font-size:16px;font-weight:800;padding:15px 36px;border-radius:16px;text-decoration:none;box-shadow:0 8px 24px rgba(249,115,22,0.4);transition:all 0.25s ease;">
-          <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-          <span id="t-btn-big-download">Tải Bản Cài Đặt Cho Windows Ngay (.exe)</span>
-        </a>
-      </div>
-
-    </div>
 
     <!-- SUPPORT FOOTER BAR (EMAIL & FACEBOOK) -->
     <div class="support-bar">
@@ -968,12 +913,7 @@
         <span id="t-sup-title">Cần hỗ trợ kỹ thuật hoặc góp ý tính năng?</span>
       </div>
       <div class="support-contacts">
-        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" class="support-item-link" download title="Tải file cài đặt Record-AutoZoom cho Windows">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-          </svg>
-          <span id="t-sup-dl">Tải Bản Cài Windows (.exe)</span>
-        </a>
+
         <a href="mailto:Giangcong1089@gmail.com" class="support-item-link link-email" title="Gửi email cho tác giả">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="20" height="16" x="2" y="4" rx="3"></rect>
@@ -997,40 +937,42 @@
     const I18N = {
       vi: {
         tabWindows: "🪟 Windows (v1.3.0)",
-        tabMac: "🍏 macOS (Sắp Ra Mắt)",
+        tabMac: "🍏 macOS (v1.3.0)",
         badgeWin: "🔥 BẢN CHÍNH THỨC • V1.3.0",
-        badgeMac: "🍏 SẮP RA MẮT • MACOS",
+        badgeMac: "🍏 BẢN CHÍNH THỨC • MACOS",
         titleWin: "Record-AutoZoom Cho Windows",
         titleMac: "Record-AutoZoom Cho macOS",
         statusWin: "Miễn Phí",
-        statusMac: "Sắp Ra Mắt",
+        statusMac: "Miễn Phí",
         periodWin: "• Tải Về Trực Tiếp",
-        periodMac: "• Đang Hoàn Thiện",
+        periodMac: "• Tải Về Trực Tiếp",
         subtextWin: "Tương thích Windows 10 & 11 (64-bit) • Dung lượng ~358 MB",
-        subtextMac: "Dành cho Apple Silicon (M1/M2/M3) & Intel • macOS 12+",
+        subtextMac: "Dành cho Apple Silicon (M1/M2/M3/M4) & Intel • macOS 12+",
         btnDownloadWin: "⬇️ Tải Cho Windows (.exe)",
-        btnMacCard: "🍏 Bản macOS (Sắp Có)",
+        btnMacCard: "🍏 Tải Cho macOS (.dmg)",
         guaranteeWin: "Bản cài an toàn • 100% Không mã độc • Tải trực tiếp",
-        guaranteeMac: "Tối ưu hoá đặc biệt cho màn hình Retina & chip Apple",
+        guaranteeMac: "Tối ưu hoá đặc biệt cho màn hình Retina & chip Apple M-Series",
         wf1: "Hỗ trợ <strong>Windows 10 / Windows 11</strong> (64-bit)",
         wf2: "Xuất video <strong>4K & 60 FPS</strong> sắc nét không giới hạn",
         wf3: "Tự động bắt tiêu điểm & <strong>zoom theo chuột</strong> cực mượt",
         wf4: "Hiệu ứng kính mờ (Glassmorphism) & hình nền đa dạng",
         bottomWin: "Tải xuống trực tiếp từ máy chủ Cloudflare CDN tốc độ cao",
-        mf1: "Tương thích <strong>Apple Silicon M-Series</strong> & Intel Mac",
+        mf1: "Tương thích <strong>Apple Silicon M-Series (M1/M2/M3/M4)</strong> & Intel Mac",
         mf2: "Tự động nhận diện cửa sổ và zoom con trỏ mượt mà",
         mf3: "Ghi âm micro lọc tạp âm & âm thanh hệ thống",
         mf4: "Xuất video chuẩn ProRes & MP4 60 FPS chất lượng cao",
-        bottomMac: "Bản macOS sẽ sớm có mặt trong đợt phát hành tới",
+        bottomMac: "Tải xuống gói cài đặt macOS chính thức tốc độ cao",
         secTitle: "Hướng Dẫn Cài Đặt & Link Tải Trực Tiếp",
         selectedWin: "Phiên bản: Windows 64-bit (v1.3.0)",
-        selectedMac: "Phiên bản: macOS (Đang phát triển)",
+        selectedMac: "Phiên bản: macOS Apple Silicon / Intel (v1.3.0)",
         labelDlUrl: "🔗 Đường dẫn tải trực tiếp (Direct Link)",
         subDlUrl: "Tốc độ cao Cloudflare R2",
+        subDlUrlMac: "Máy chủ phát hành GitHub Release",
         btnCopyUrl: "Sao chép link",
         labelSteps: "🚀 3 Bước bắt đầu sử dụng",
         subSteps: "Chỉ 10 giây",
         btnBigDownload: "Tải Bản Cài Đặt Cho Windows Ngay (.exe)",
+        btnBigDownloadMac: "Tải Bản Cài Đặt Cho macOS Ngay (.dmg)",
         supTitle: "Cần hỗ trợ kỹ thuật hoặc góp ý tính năng?",
         navDownload: "Tải Cho Windows (.exe)",
         navPro: "Bản Quyền PRO",
@@ -1038,40 +980,42 @@
       },
       en: {
         tabWindows: "🪟 Windows (v1.3.0)",
-        tabMac: "🍏 macOS (Coming Soon)",
+        tabMac: "🍏 macOS (v1.3.0)",
         badgeWin: "🔥 OFFICIAL RELEASE • V1.3.0",
-        badgeMac: "🍏 COMING SOON • MACOS",
+        badgeMac: "🍏 OFFICIAL RELEASE • MACOS",
         titleWin: "Record-AutoZoom for Windows",
         titleMac: "Record-AutoZoom for macOS",
         statusWin: "Free",
-        statusMac: "Coming Soon",
+        statusMac: "Free",
         periodWin: "• Direct Download",
-        periodMac: "• In Development",
+        periodMac: "• Direct Download",
         subtextWin: "Compatible with Windows 10 & 11 (64-bit) • Size ~358 MB",
-        subtextMac: "For Apple Silicon (M1/M2/M3) & Intel • macOS 12+",
+        subtextMac: "For Apple Silicon (M1/M2/M3/M4) & Intel • macOS 12+",
         btnDownloadWin: "⬇️ Download for Windows (.exe)",
-        btnMacCard: "🍏 macOS (Coming Soon)",
+        btnMacCard: "🍏 Download for macOS (.dmg)",
         guaranteeWin: "Clean installer • 100% Virus-free • Direct Download",
-        guaranteeMac: "Optimized for Retina displays & Apple Silicon chips",
+        guaranteeMac: "Optimized for Retina displays & Apple Silicon M-Series",
         wf1: "Supports <strong>Windows 10 / Windows 11</strong> (64-bit)",
         wf2: "Export <strong>4K & 60 FPS</strong> high-definition video",
         wf3: "Intelligent auto focus & <strong>cursor zoom</strong> tracking",
         wf4: "Glassmorphism effects & rich customizable backgrounds",
         bottomWin: "High-speed download powered by Cloudflare CDN",
-        mf1: "Compatible with <strong>Apple Silicon M-Series</strong> & Intel Mac",
+        mf1: "Compatible with <strong>Apple Silicon M-Series (M1/M2/M3/M4)</strong> & Intel Mac",
         mf2: "Real-time window focus & smooth cursor tracking",
         mf3: "Crisp microphone audio & system sound recording",
         mf4: "Export in ProRes & MP4 60 FPS format",
-        bottomMac: "macOS version will be available in upcoming releases",
+        bottomMac: "High-speed official macOS installer release",
         secTitle: "Installation Guide & Direct Download Link",
         selectedWin: "Edition: Windows 64-bit (v1.3.0)",
-        selectedMac: "Edition: macOS (In Development)",
+        selectedMac: "Edition: macOS Apple Silicon / Intel (v1.3.0)",
         labelDlUrl: "🔗 Direct Download Link",
         subDlUrl: "Cloudflare R2 High Speed",
+        subDlUrlMac: "GitHub Release Server",
         btnCopyUrl: "Copy link",
         labelSteps: "🚀 3 Easy Steps to Start",
         subSteps: "Takes 10s",
         btnBigDownload: "Download Windows Installer Now (.exe)",
+        btnBigDownloadMac: "Download macOS Installer Now (.dmg)",
         supTitle: "Need technical assistance or feature suggestions?",
         navDownload: "Download for Windows (.exe)",
         navPro: "PRO Pricing",
@@ -1114,24 +1058,23 @@
       document.getElementById("t-mf2").innerHTML = t.mf2;
       document.getElementById("t-mf3").innerHTML = t.mf3;
       document.getElementById("t-mf4").innerHTML = t.mf4;
-      document.getElementById("t-bottom-mac").textContent = t.bottomMac;
-      document.getElementById("t-sec-title").textContent = t.secTitle;
-      document.getElementById("t-label-dlurl").textContent = t.labelDlUrl;
-      document.getElementById("t-sub-dlurl").textContent = t.subDlUrl;
-      document.getElementById("t-btn-copy-url").textContent = t.btnCopyUrl;
-      document.getElementById("t-label-steps").textContent = t.labelSteps;
-      document.getElementById("t-sub-steps").textContent = t.subSteps;
-      document.getElementById("t-btn-big-download").textContent = t.btnBigDownload;
+      const secTitle = document.getElementById("t-sec-title");
+      if (secTitle) secTitle.textContent = t.secTitle;
+      const labelDl = document.getElementById("t-label-dlurl");
+      if (labelDl) labelDl.textContent = t.labelDlUrl;
+      const copyBtn = document.getElementById("t-btn-copy-url");
+      if (copyBtn) copyBtn.textContent = t.btnCopyUrl;
+      const labelSteps = document.getElementById("t-label-steps");
+      if (labelSteps) labelSteps.textContent = t.labelSteps;
+      const subSteps = document.getElementById("t-sub-steps");
+      if (subSteps) subSteps.textContent = t.subSteps;
       document.getElementById("t-sup-title").textContent = t.supTitle;
       const navDl = document.getElementById("t-nav-download");
       if (navDl) navDl.textContent = t.navDownload;
       const supDl = document.getElementById("t-sup-dl");
       if (supDl) supDl.textContent = t.supDl;
 
-      const pill = document.getElementById("selectedPlanPill");
-      if (pill) {
-        pill.textContent = activePlatform === "windows" ? t.selectedWin : t.selectedMac;
-      }
+      switchPlatform(activePlatform);
     }
 
     function switchPlatform(platform) {
@@ -1147,13 +1090,49 @@
       if (pill) {
         pill.textContent = platform === "windows" ? t.selectedWin : t.selectedMac;
       }
-    }
 
-    function showMacNotice() {
-      const msg = currentLang === 'vi' 
-        ? "Phiên bản Record-AutoZoom dành cho macOS (Apple Silicon M-series & Intel) đang trong giai đoạn hoàn thiện cuối cùng và sẽ được phát hành sớm!" 
-        : "Record-AutoZoom for macOS (Apple Silicon M-series & Intel) is in final testing and will be released very soon!";
-      alert(msg);
+      const input = document.getElementById("downloadUrlInput");
+      const bigBtn = document.getElementById("btnBigDownloadLink");
+      const btnText = document.getElementById("t-btn-big-download");
+      const icon = document.getElementById("btnBigDownloadIcon");
+      const subDl = document.getElementById("t-sub-dlurl");
+      const steps = document.getElementById("stepsContainer");
+
+      if (platform === "windows") {
+        if (input) input.value = "https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe";
+        if (bigBtn) {
+          bigBtn.href = "https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe";
+          bigBtn.removeAttribute("target");
+          bigBtn.removeAttribute("rel");
+          bigBtn.style.background = "linear-gradient(135deg,#f97316 0%,#ea580c 100%)";
+          bigBtn.style.boxShadow = "0 8px 24px rgba(249,115,22,0.4)";
+        }
+        if (btnText) btnText.textContent = t.btnBigDownload;
+        if (subDl) subDl.textContent = t.subDlUrl;
+        if (icon) icon.innerHTML = '<svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>';
+        if (steps) {
+          steps.innerHTML = currentLang === 'vi'
+            ? '<div><strong style="color:#f97316;">1.</strong> Nhấn nút <strong>Tải Bản Cài Đặt (.exe)</strong> để tải bộ cài.</div><div><strong style="color:#f97316;">2.</strong> Mở file <code>.exe</code> và nhấn Cài đặt (mất khoảng 10 giây).</div><div><strong style="color:#f97316;">3.</strong> Mở <strong>Record-AutoZoom</strong> và bắt đầu quay video tự động zoom!</div>'
+            : '<div><strong style="color:#f97316;">1.</strong> Click <strong>Download Installer (.exe)</strong> to download.</div><div><strong style="color:#f97316;">2.</strong> Open the <code>.exe</code> file and install (takes 10s).</div><div><strong style="color:#f97316;">3.</strong> Launch <strong>Record-AutoZoom</strong> and start recording!</div>';
+        }
+      } else {
+        if (input) input.value = "https://github.com/congzg9/C-ngz/releases/tag/v1.3.0";
+        if (bigBtn) {
+          bigBtn.href = "https://github.com/congzg9/C-ngz/releases/tag/v1.3.0";
+          bigBtn.target = "_blank";
+          bigBtn.rel = "noopener noreferrer";
+          bigBtn.style.background = "linear-gradient(135deg,#0284c7 0%,#0369a1 100%)";
+          bigBtn.style.boxShadow = "0 8px 24px rgba(2,132,199,0.4)";
+        }
+        if (btnText) btnText.textContent = t.btnBigDownloadMac;
+        if (subDl) subDl.textContent = t.subDlUrlMac;
+        if (icon) icon.innerHTML = '<svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.76 1.05-1.82.93-2.88-1 .04-2.17.67-2.81 1.42-.56.64-.99 1.68-.86 2.7 1.12.09 2.11-.48 2.74-1.24z"/></svg>';
+        if (steps) {
+          steps.innerHTML = currentLang === 'vi'
+            ? '<div><strong style="color:#0284c7;">1.</strong> Nhấn nút <strong>Tải Bản Cài Đặt Cho macOS (.dmg)</strong>.</div><div><strong style="color:#0284c7;">2.</strong> Mở file <code>.dmg</code> và kéo biểu tượng vào thư mục <strong>Applications</strong>.</div><div><strong style="color:#0284c7;">3.</strong> Mở <strong>Record-AutoZoom</strong> từ Launchpad và cấp quyền ghi màn hình!</div>'
+            : '<div><strong style="color:#0284c7;">1.</strong> Click <strong>Download for macOS (.dmg)</strong>.</div><div><strong style="color:#0284c7;">2.</strong> Open the <code>.dmg</code> file and drag the icon into <strong>Applications</strong>.</div><div><strong style="color:#0284c7;">3.</strong> Open <strong>Record-AutoZoom</strong> and grant screen capture permissions!</div>';
+        }
+      }
     }
 
     function copyDownloadUrl() {
