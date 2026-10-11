@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Record-AutoZoom • High-Energy 9:16 Promo (12s Fast Paced)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070a;
+      --primary: #f97316;
+      --accent: #38bdf8;
+      --purple: #c084fc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background: #040407;
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* TOP CONTROLLER BAR */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(24, 24, 27, 0.9);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 26px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      z-index: 100;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.45);
+    }
+    .btn:hover { transform: scale(1.06); }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .status-text {
+      font-size: 13px;
+      color: #f97316;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+    }
+
+    .speed-badge {
+      font-size: 11px;
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid #f97316;
+      color: #fdba74;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+
+    /* 9:16 PREVIEW FRAME */
+    .phone-container {
+      position: relative;
+      width: 405px;
+      height: 720px;
+      border-radius: 36px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px -15px rgba(249, 115, 22, 0.45), 0 0 0 8px rgba(255, 255, 255, 0.12);
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CONTROLS -->
+  <div class="controls-bar">
+    <button class="btn" id="btnPlay" onclick="togglePlay()">
+      <span id="playIcon">▶</span> <span id="playText">Phát Video (12s Siêu Cuốn)</span>
+    </button>
+    <button class="btn" id="btnRecord" onclick="recordAndExport()" style="background:linear-gradient(135deg, #06b6d4, #0284c7);box-shadow:0 4px 18px rgba(2,132,199,0.5);">
+      <span>⚡</span> <span>Xuất File Video 60 FPS</span>
+    </button>
+    <button class="btn btn-secondary" onclick="restartVideo()">
+      <span>🔄</span> <span>Xem lại</span>
+    </button>
+    <div class="status-text" id="timeDisplay">00:00 / 00:12</div>
+    <div class="speed-badge">🔥 12 NGUYÊN LÝ DIỄN HOẠT • NHỊP NHANH TIKTOK</div>
+  </div>
+
+  <!-- PHONE CANVAS (1080 x 1920 native) -->
+  <div class="phone-container">
+    <canvas id="videoCanvas" width="1080" height="1920"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = 1080;
+    const H = 1920;
+    const TOTAL_DURATION = 12.0; // Rút ngắn thành 12s chuẩn pacing TikTok
+    let currentTime = 0;
+    let isPlaying = false;
+    let lastTimestamp = 0;
+    let audioCtx = null;
+
+    // Load App Logo
+    const logoImg = new Image();
+    logoImg.src = './app-icon.png';
+
+    // ─── THƯ VIỆN NGUYÊN LÝ DIỄN HOẠT (ANIMATION EASING & SPRINGS) ─────────
+    
+    // Overshoot (Văng quá đà rồi nảy lại)
+    function easeOutBack(x, s = 1.70158) {
+      const c1 = s;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    }
+
+    // Anticipation (Lấy đà lùi lại trước khi phóng tới)
+    function easeInOutBack(x, s = 1.70158) {
+      const c1 = s;
+      const c2 = c1 * 1.525;
+      return x < 0.5
+        ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+        : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+    }
+
+    // Elastic (Nảy tưng tưng lò xo)
+    function easeOutElastic(x) {
+      const c4 = (2 * Math.PI) / 3;
+      return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+    }
+
+    // Smooth Expo Out (Phóng nhanh rồi phanh êm)
+    function easeOutExpo(x) {
+      return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+    }
+
+    // Damped Spring Simulation
+    function spring(t, freq = 12, damp = 6) {
+      return 1 - Math.exp(-damp * t) * Math.cos(freq * t);
+    }
+
+    // Camera Shake
+    let cameraShake = { x: 0, y: 0, intensity: 0 };
+    function triggerShake(intensity) {
+      cameraShake.intensity = intensity;
+    }
+
+    // ÂM THANH SYNTHESIZER (Tạo tiếng va đập Impact, Whoosh gió, Click đanh)
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playImpact() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.35);
+    }
+
+    function playWhooshFast() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+    }
+
+    function playPopTight() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    let playedSFX = {};
+    function checkSFX(t) {
+      if (!audioCtx) return;
+      if (t >= 0.1 && !playedSFX['hit0']) { playImpact(); playedSFX['hit0'] = true; }
+      if (t >= 1.2 && !playedSFX['hit1']) { playImpact(); playedSFX['hit1'] = true; }
+      if (t >= 2.4 && !playedSFX['whoosh1']) { playWhooshFast(); playedSFX['whoosh1'] = true; }
+      if (t >= 4.2 && !playedSFX['click_zoom']) { playPopTight(); playedSFX['click_zoom'] = true; }
+      if (t >= 6.4 && !playedSFX['card1']) { playPopTight(); playedSFX['card1'] = true; }
+      if (t >= 7.0 && !playedSFX['card2']) { playPopTight(); playedSFX['card2'] = true; }
+      if (t >= 7.6 && !playedSFX['card3']) { playPopTight(); playedSFX['card3'] = true; }
+      if (t >= 8.2 && !playedSFX['card4']) { playPopTight(); playedSFX['card4'] = true; }
+      if (t >= 9.2 && !playedSFX['cta_hit']) { playImpact(); playedSFX['cta_hit'] = true; }
+    }
+
+    // ─── RENDER ENGINE (60 FPS) ───────────────────────────────────────────
+    function render(t) {
+      ctx.clearRect(0, 0, W, H);
+
+      // Camera Shake decay
+      if (cameraShake.intensity > 0) {
+        cameraShake.x = (Math.random() - 0.5) * cameraShake.intensity;
+        cameraShake.y = (Math.random() - 0.5) * cameraShake.intensity;
+        cameraShake.intensity *= 0.88;
+      } else {
+        cameraShake.x = 0; cameraShake.y = 0;
+      }
+
+      ctx.save();
+      ctx.translate(cameraShake.x, cameraShake.y);
+
+      // ─── NỀN CYBER GRADIENT SỐNG ĐỘNG (DOPAMINE BACKGROUND) ───
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      bgGrad.addColorStop(0, '#0c0217');
+      bgGrad.addColorStop(0.35, '#1e0738');
+      bgGrad.addColorStop(0.75, '#3b0764');
+      bgGrad.addColorStop(1, '#05020c');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Moving Ambient Neon Glow (Follow Through)
+      const glowX = W * 0.5 + Math.sin(t * 3.5) * 160;
+      const glowY = H * 0.45 + Math.cos(t * 2.8) * 140;
+      const radialGlow = ctx.createRadialGradient(glowX, glowY, 40, glowX, glowY, 650);
+      radialGlow.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
+      radialGlow.addColorStop(0.5, 'rgba(168, 85, 247, 0.2)');
+      radialGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = radialGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Floating Neon Sparkles (Secondary Action)
+      for (let i = 0; i < 30; i++) {
+        const px = ((i * 137.5 + t * 90) % (W + 100)) - 50;
+        const py = ((i * 219.3 + Math.sin(t * 4 + i) * 60) % (H + 100)) - 50;
+        const size = (i % 3) + 2.5;
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(249, 115, 22, 0.6)' : 'rgba(56, 189, 248, 0.6)';
+        ctx.beginPath();
+        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // SCENE 1: HOOK ĐẬP MẠNH VÀO TÂM TRÍ (0.0s - 2.5s)
+      // Nguyên lý: Squash & Stretch + Impact Shake + Overshoot
+      // ═══════════════════════════════════════════════════════════════════════
+      if (t < 2.5) {
+        if (t < 0.15) triggerShake(25); // Va đập đầu video
+
+        ctx.save();
+        
+        // Tagline trên đầu
+        const tagProgress = Math.min(1, t / 0.3);
+        const tagScale = easeOutBack(tagProgress, 2.5);
+        ctx.save();
+        ctx.translate(W * 0.5, 340);
+        ctx.scale(tagScale, tagScale);
+        drawBadge("⚠️ MẤT 3 TIẾNG EDIT VIDEO?", 0, 0, '#ef4444');
+        ctx.restore();
+
+        // Chữ HOOK đập từ trên xuống với Squash & Stretch
+        const textIn = Math.min(1, Math.max(0, (t - 0.1) / 0.35));
+        const textScaleX = textIn < 0.8 ? 0.8 + textIn * 0.4 : 1.0;
+        const textScaleY = textIn < 0.8 ? 1.4 - textIn * 0.4 : 1.0;
+        const textY = 480 + (1 - easeOutBack(textIn, 3.0)) * -300;
+
+        ctx.save();
+        ctx.translate(W * 0.5, textY);
+        ctx.scale(textScaleX, textScaleY);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 86px "Plus Jakarta Sans"';
+        ctx.fillText("BẠN VẪN ĐANG", 0, 0);
+
+        ctx.fillStyle = '#f87171';
+        ctx.fillText("ZOOM THỦ CÔNG?", 0, 100);
+        ctx.restore();
+
+        // ❌ DẤU GẠCH CHÉO ĐẬP MẠNH (Impact tại t = 1.2s)
+        if (t >= 0.7) {
+          const crossT = Math.min(1, (t - 0.7) / 0.3);
+          const crossScale = easeOutBack(crossT, 4.0);
+          if (t >= 1.2 && t < 1.3) triggerShake(30);
+
+          const boxX = 140, boxY = 720, boxW = 800, boxH = 680;
+          drawSquircle(ctx, boxX, boxY, boxW, boxH, 36, 'rgba(255,255,255,0.06)', 'rgba(239,68,68,0.5)');
+
+          // Mock timeline
+          ctx.fillStyle = 'rgba(255,255,255,0.1)';
+          ctx.fillRect(boxX + 50, boxY + 120, boxW - 100, 60);
+          ctx.fillRect(boxX + 50, boxY + 220, boxW - 100, 60);
+          // Keyframes dày đặc
+          for (let k = 0; k < 14; k++) {
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(boxX + 90 + k * 48, boxY + 250, 10, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // GIÁT DẤU X ĐỎ KHỔNG LỒ NẢY BUNG LÊN
+          ctx.save();
+          ctx.translate(W * 0.5, boxY + boxH * 0.5);
+          ctx.scale(crossScale, crossScale);
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 32;
+          ctx.lineCap = 'round';
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 40;
+          ctx.beginPath();
+          ctx.moveTo(-180, -180); ctx.lineTo(180, 180);
+          ctx.moveTo(180, -180); ctx.lineTo(-180, 180);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Dòng chữ chốt Scene 1
+        if (t >= 1.3) {
+          const punchT = Math.min(1, (t - 1.3) / 0.25);
+          ctx.save();
+          ctx.translate(W * 0.5, 1550);
+          ctx.scale(easeOutBack(punchT, 2.5), easeOutBack(punchT, 2.5));
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fef08a';
+          ctx.font = '900 52px "Plus Jakarta Sans"';
+          ctx.fillText("QUÊN NGAY ĐI! 🛑", 0, 0);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // SCENE 2: GIẢI PHÁP & DEMO AUTO-ZOOM THẦN THÁNH (2.5s - 6.5s)
+      // Nguyên lý: Arcs (Đường cong chuột) + Anticipation + Spring Zoom Camera
+      // ═══════════════════════════════════════════════════════════════════════
+      else if (t >= 2.5 && t < 6.5) {
+        const localT = t - 2.5; // 0s -> 4s
+        
+        ctx.save();
+
+        // Header xuất hiện với Overshoot
+        const headProg = Math.min(1, localT / 0.4);
+        const headScale = easeOutBack(headProg, 2.0);
+        ctx.save();
+        ctx.translate(W * 0.5, 260);
+        ctx.scale(headScale, headScale);
+        drawBadge("✨ BÍ QUYẾT PRO CREATOR", 0, 0, '#10b981');
+        ctx.restore();
+
+        // Logo bung tỏa với Elastic Spring
+        const logoProg = Math.min(1, Math.max(0, (localT - 0.15) / 0.6));
+        const logoScale = easeOutElastic(logoProg);
+        ctx.save();
+        ctx.translate(W * 0.5, 420);
+        ctx.scale(logoScale, logoScale);
+        if (logoImg.complete) {
+          ctx.shadowColor = '#f97316'; ctx.shadowBlur = 40;
+          ctx.drawImage(logoImg, -90, -90, 180, 180);
+        }
+        ctx.restore();
+
+        // Tên App Punchy
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 74px "Plus Jakarta Sans"';
+        ctx.fillText("RECORD-AUTOZOOM", W * 0.5, 580);
+
+        const gradSub = ctx.createLinearGradient(200, 0, 880, 0);
+        gradSub.addColorStop(0, '#f97316'); gradSub.addColorStop(1, '#facc15');
+        ctx.fillStyle = gradSub;
+        ctx.font = '800 48px "Plus Jakarta Sans"';
+        ctx.fillText("TỰ ĐỘNG BẮT NÉT THEO CHUỘT", W * 0.5, 655);
+
+        // ─── CỬA SỔ DEMO VỚI HIỆU ỨNG SPRING PHYSICS AUTO-ZOOM ───
+        const winX = 100, winY = 740, winW = 880, winH = 760;
+        
+        // Window xuất hiện nảy lên
+        const winProg = Math.min(1, Math.max(0, (localT - 0.3) / 0.5));
+        const winScale = easeOutBack(winProg, 1.8);
+        
+        ctx.save();
+        ctx.translate(W * 0.5, winY + winH * 0.5);
+        ctx.scale(winScale, winScale);
+        ctx.translate(-W * 0.5, -(winY + winH * 0.5));
+
+        drawSquircle(ctx, winX, winY, winW, winH, 36, 'rgba(255,255,255,0.08)', 'rgba(249,115,22,0.6)');
+
+        // Window Titlebar
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(winX, winY, winW, 58);
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(winX + 35, winY + 29, 8, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(winX + 65, winY + 29, 8, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(winX + 95, winY + 29, 8, 0, Math.PI*2); ctx.fill();
+
+        // NỘI DUNG BÊN TRONG CỬA SỔ + CAMERA ZOOM THEO CHUỘT
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(winX, winY + 58, winW, winH - 58);
+        ctx.clip();
+
+        // CHUỘT DI CHUYỂN THEO ĐƯỜNG CONG (ARC PRINCIPLE)
+        // Giai đoạn 1 (0 -> 1.5s): Lướt vòng cung đến nút
+        // Giai đoạn 2 (1.5s -> 4s): Click & Zoom cực mạnh!
+        const movePhase = Math.min(1, (localT - 0.6) / 1.1);
+        const arcT = easeInOutBack(movePhase, 1.4);
+        
+        const curStartX = winX + 180, curStartY = winY + 620;
+        const curTargetX = winX + 440, curTargetY = winY + 380;
+        // Arc curvature:
+        const curX = curStartX + (curTargetX - curStartX) * arcT + Math.sin(arcT * Math.PI) * 90;
+        const curY = curStartY + (curTargetY - curStartY) * arcT - Math.sin(arcT * Math.PI) * 110;
+
+        // CLICK & SPRING ZOOM (Xảy ra tại localT >= 1.7s)
+        const isZoomTime = localT >= 1.7;
+        const zoomDelta = Math.max(0, localT - 1.7);
+        // Spring bounce zoom (Phóng to 2.2x có độ dập lò xo):
+        const zoomFactor = isZoomTime ? (1.0 + (1.2 * spring(zoomDelta, 14, 5))) : 1.0;
+
+        ctx.translate(curTargetX, curTargetY);
+        ctx.scale(zoomFactor, zoomFactor);
+        ctx.translate(-curTargetX, -curTargetY);
+
+        // Nút bấm demo trong app
+        const btnDemoX = winX + 240, btnDemoY = winY + 320, btnDemoW = 400, btnDemoH = 120;
+        drawSquircle(ctx, btnDemoX, btnDemoY, btnDemoW, btnDemoH, 24, '#1e1b4b', '#38bdf8');
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '800 36px "Plus Jakarta Sans"';
+        ctx.textAlign = 'center';
+        ctx.fillText("⚡ BẤM MUA NGAY", btnDemoX + btnDemoW * 0.5, btnDemoY + 74);
+
+        // VÒNG TRÒN SHOCKWAVE KHI CLICK CHUỘT
+        if (isZoomTime) {
+          const shockProgress = (zoomDelta * 2.5) % 1.5;
+          ctx.strokeStyle = `rgba(249, 115, 22, ${Math.max(0, 1 - shockProgress)})`;
+          ctx.lineWidth = 12;
+          ctx.beginPath();
+          ctx.arc(curTargetX, curTargetY, shockProgress * 180, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Vẽ con trỏ chuột với Squash & Stretch khi click
+        const clicking = isZoomTime && zoomDelta < 0.25;
+        drawCursor(ctx, curX, curY, clicking);
+
+        ctx.restore(); // Clip window
+        ctx.restore(); // Window scale
+
+        // Banner nhịp tim dưới cửa sổ
+        drawBadge("🔥 Zoom Mượt Mà Như Phim • Không Cần Edit!", W * 0.5, 1620, '#f97316');
+
+        ctx.restore();
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // SCENE 3: TÍNH NĂNG VĂNG RA DỒN DẬP (6.5s - 9.2s)
+      // Nguyên lý: Staggered Overlapping Action + Rotation Inertia
+      // ═══════════════════════════════════════════════════════════════════════
+      else if (t >= 6.5 && t < 9.2) {
+        const localT = t - 6.5;
+
+        ctx.save();
+
+        drawBadge("⚡ TÍNH NĂNG ĐỘT PHÁ", W * 0.5, 240, '#a855f7');
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 78px "Plus Jakarta Sans"';
+        ctx.fillText("SIÊU VŨ KHÍ", W * 0.5, 360);
+        
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText("CHO CREATOR!", W * 0.5, 450);
+
+        // 4 Thẻ tính năng văng ra với Overlapping Delay (0.2s mỗi thẻ)
+        const features = [
+          { icon: "🎯", title: "Auto-Focus & Smooth Zoom", desc: "Tự động bắt nét theo chuột mượt 60 FPS", delay: 0 },
+          { icon: "💎", title: "Glassmorphism & Bo Góc", desc: "Viền cong sang chảnh chuẩn phong cách Apple", delay: 0.2 },
+          { icon: "🚀", title: "GPU Hardware Export 4K", desc: "Xuất video nhanh gấp 5 lần không giật lag", delay: 0.4 },
+          { icon: "🍏", title: "Hỗ Trợ macOS & Windows", desc: "Bản cài riêng cho chip Apple M và PC Win 11", delay: 0.6 }
+        ];
+
+        features.forEach((feat, index) => {
+          const cardT = Math.max(0, localT - feat.delay);
+          const enterProg = Math.min(1, cardT / 0.35);
+          
+          if (enterProg > 0) {
+            // Easing với Overshoot + Quán tính góc xoay (Rotation inertia)
+            const scale = easeOutBack(enterProg, 2.2);
+            const rot = (1 - enterProg) * (index % 2 === 0 ? 0.15 : -0.15); // Nghiêng rồi trả về thẳng
+            const cardY = 560 + index * 230;
+            const cardX = W * 0.5;
+
+            ctx.save();
+            ctx.translate(cardX, cardY + 95);
+            ctx.rotate(rot);
+            ctx.scale(scale, scale);
+            ctx.translate(-cardX, -(cardY + 95));
+
+            drawSquircle(ctx, 90, cardY, 900, 190, 28, 'rgba(255,255,255,0.08)', 'rgba(56,189,248,0.4)');
+
+            // Icon
+            ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
+            ctx.beginPath();
+            ctx.arc(180, cardY + 95, 55, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '54px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText(feat.icon, 180, cardY + 114);
+
+            // Text
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 40px "Plus Jakarta Sans"';
+            ctx.fillText(feat.title, 270, cardY + 80);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '600 28px "Plus Jakarta Sans"';
+            ctx.fillText(feat.desc, 270, cardY + 130);
+
+            ctx.restore();
+          }
+        });
+
+        ctx.restore();
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // SCENE 4: CALL TO ACTION BÙNG NỔ (9.2s - 12.0s)
+      // Nguyên lý: Secondary Action (God Rays) + Heartbeat Pulse CTA
+      // ═══════════════════════════════════════════════════════════════════════
+      else {
+        const localT = t - 9.2;
+        if (localT < 0.15) triggerShake(35); // Va đập mạnh lúc đổi cảnh CTA!
+
+        ctx.save();
+
+        // Vòng tia sáng xoay tròn phía sau (God Rays rotating)
+        ctx.save();
+        ctx.translate(W * 0.5, 780);
+        ctx.rotate(localT * 1.5);
+        for (let r = 0; r < 12; r++) {
+          ctx.fillStyle = 'rgba(249, 115, 22, 0.06)';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, 900, (r * Math.PI) / 6, ((r + 0.5) * Math.PI) / 6);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        drawBadge("🎁 HOÀN TOÀN MIỄN PHÍ", W * 0.5, 240, '#10b981');
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 86px "Plus Jakarta Sans"';
+        ctx.fillText("NÂNG TẦM VIDEO", W * 0.5, 380);
+
+        const ctaGrad = ctx.createLinearGradient(120, 0, 960, 0);
+        ctaGrad.addColorStop(0, '#f97316');
+        ctaGrad.addColorStop(0.5, '#fb923c');
+        ctaGrad.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = ctaGrad;
+        ctx.fillText("NGAY HÔM NAY!", W * 0.5, 480);
+
+        // Hộp thiết bị trung tâm bung nở
+        const devT = Math.min(1, localT / 0.4);
+        const devScale = easeOutBack(devT, 2.5);
+        const devX = 130, devY = 560, devW = 820, devH = 680;
+
+        ctx.save();
+        ctx.translate(W * 0.5, devY + devH * 0.5);
+        ctx.scale(devScale, devScale);
+        ctx.translate(-W * 0.5, -(devY + devH * 0.5));
+
+        drawSquircle(ctx, devX, devY, devW, devH, 40, 'rgba(255,255,255,0.07)', 'rgba(168,85,247,0.5)');
+
+        if (logoImg.complete) {
+          ctx.shadowColor = '#f97316'; ctx.shadowBlur = 50;
+          ctx.drawImage(logoImg, W * 0.5 - 130, devY + 80, 260, 260);
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 56px "Plus Jakarta Sans"';
+        ctx.fillText("Record-AutoZoom PRO", W * 0.5, devY + 415);
+
+        ctx.fillStyle = '#10b981';
+        ctx.font = '800 38px "Plus Jakarta Sans"';
+        ctx.fillText("🍏 macOS (M-Series)  •  🪟 Windows 11", W * 0.5, devY + 490);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 30px "Plus Jakarta Sans"';
+        ctx.fillText("Tải trực tiếp • Cài đặt chỉ trong 10 giây", W * 0.5, devY + 560);
+        ctx.restore();
+
+        // ─── NÚT BẤM CTA ĐẬP THEO NHỊP TIM (HEARTBEAT PULSE) ───
+        const pulseCycle = (localT * 4) % 1;
+        const pulseScale = 1.0 + (pulseCycle < 0.25 ? Math.sin(pulseCycle * Math.PI * 4) * 0.08 : 0);
+        
+        const btnW = 840 * pulseScale;
+        const btnH = 145 * pulseScale;
+        const btnX = (W - btnW) / 2;
+        const btnY = 1340;
+
+        ctx.save();
+        ctx.shadowColor = '#f97316';
+        ctx.shadowBlur = 55;
+        drawSquircle(ctx, btnX, btnY, btnW, btnH, 36, 'linear-gradient', '#ffffff');
+        
+        const bGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
+        bGrad.addColorStop(0, '#f97316');
+        bGrad.addColorStop(1, '#ea580c');
+        ctx.fillStyle = bGrad;
+        ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 50px "Plus Jakarta Sans"';
+        ctx.fillText("⬇️ TẢI MIỄN PHÍ NGAY", W * 0.5, btnY + 92);
+
+        // Khung URL Website
+        drawSquircle(ctx, 150, 1540, 780, 115, 26, 'rgba(0,0,0,0.65)', 'rgba(56,189,248,0.6)');
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '900 46px "JetBrains Mono"';
+        ctx.fillText("record-autozoom.pages.dev", W * 0.5, 1615);
+
+        ctx.restore();
+      }
+
+      ctx.restore(); // Camera shake
+
+      // THANH TIẾN TRÌNH TRÔI DƯỚI ĐÁY
+      const pWidth = (t / TOTAL_DURATION) * W;
+      ctx.fillStyle = '#f97316';
+      ctx.fillRect(0, H - 18, pWidth, 18);
+    }
+
+    // ─── UTILS VẼ ĐỒ HỌA ──────────────────────────────────────────────────
+    function drawBadge(text, x, y, color) {
+      ctx.save();
+      ctx.font = '800 30px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      const textW = ctx.measureText(text).width;
+      const bW = textW + 64;
+      const bH = 68;
+      const bX = x - bW / 2;
+      const bY = y - bH / 2;
+
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3.5;
+      drawSquircle(ctx, bX, bY, bW, bH, 22);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y + 11);
+      ctx.restore();
+    }
+
+    function drawSquircle(ctx, x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+
+      if (fill && fill !== 'linear-gradient') {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+      }
+    }
+
+    function drawCursor(ctx, x, y, clicking) {
+      ctx.save();
+      // Squash & Stretch: Click chuột thì co dẹt lại
+      const scaleX = clicking ? 0.8 : 1.0;
+      const scaleY = clicking ? 1.25 : 1.0;
+      
+      ctx.translate(x, y);
+      ctx.scale(scaleX, scaleY);
+      ctx.translate(-x, -y);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + 42);
+      ctx.lineTo(x + 11, y + 31);
+      ctx.lineTo(x + 26, y + 48);
+      ctx.lineTo(x + 35, y + 40);
+      ctx.lineTo(x + 21, y + 23);
+      ctx.lineTo(x + 32, y + 23);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ─── VÒNG LẶP ANIMATION (ANIMATION LOOP) ───────────────────────────────
+    function loop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTime += delta;
+        checkSFX(currentTime);
+        if (currentTime >= TOTAL_DURATION) {
+          currentTime = TOTAL_DURATION;
+          isPlaying = false;
+          updatePlayUI();
+        }
+      }
+
+      render(currentTime);
+      updateTimeDisplay();
+
+      if (isPlaying || currentTime < TOTAL_DURATION) {
+        requestAnimationFrame(loop);
+      }
+    }
+
+    function togglePlay() {
+      initAudio();
+      isPlaying = !isPlaying;
+      if (isPlaying && currentTime >= TOTAL_DURATION) {
+        currentTime = 0;
+        playedSFX = {};
+      }
+      lastTimestamp = performance.now();
+      updatePlayUI();
+      if (isPlaying) requestAnimationFrame(loop);
+    }
+
+    function restartVideo() {
+      initAudio();
+      currentTime = 0;
+      playedSFX = {};
+      isPlaying = true;
+      lastTimestamp = performance.now();
+      updatePlayUI();
+      requestAnimationFrame(loop);
+    }
+
+    function updatePlayUI() {
+      document.getElementById('playIcon').textContent = isPlaying ? '⏸' : '▶';
+      document.getElementById('playText').textContent = isPlaying ? 'Tạm dừng' : 'Phát Video (12s Siêu Cuốn)';
+    }
+
+    function updateTimeDisplay() {
+      const curSec = Math.floor(currentTime).toString().padStart(2, '0');
+      const totSec = Math.floor(TOTAL_DURATION).toString().padStart(2, '0');
+      document.getElementById('timeDisplay').textContent = `00:${curSec} / 00:${totSec}`;
+    }
+
+    // XUẤT VIDEO 60 FPS
+    function recordAndExport() {
+      initAudio();
+      const stream = canvas.captureStream(60);
+      let mimeType = 'video/webm;codecs=vp9';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm';
+      }
+
+      const recorder = new MediaRecorder(stream, {
+        mimeType: mimeType,
+        videoBitsPerSecond: 16000000 // 16 Mbps siêu nét
+      });
+
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Record-AutoZoom-Promo-9x16-Fast.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('🎉 ĐÃ XUẤT VIDEO THÀNH CÔNG!\nTệp "Record-AutoZoom-Promo-9x16-Fast.webm" (1080x1920 60 FPS) đã tải về máy của bạn!');
+        document.getElementById('btnRecord').innerHTML = '<span>⚡</span> <span>Xuất File Video 60 FPS</span>';
+      };
+
+      currentTime = 0;
+      playedSFX = {};
+      isPlaying = true;
+      lastTimestamp = performance.now();
+      recorder.start();
+      document.getElementById('btnRecord').innerHTML = '<span>🔴</span> <span>Đang render 60 FPS...</span>';
+
+      const recordInterval = setInterval(() => {
+        if (!isPlaying || currentTime >= TOTAL_DURATION) {
+          clearInterval(recordInterval);
+          recorder.stop();
+          isPlaying = false;
+          updatePlayUI();
+        }
+      }, 300);
+
+      requestAnimationFrame(loop);
+    }
+
+    // Render frame đầu
+    logoImg.onload = () => render(0);
+    render(0);
+  </script>
+</body>
+</html>

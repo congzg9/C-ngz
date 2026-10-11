@@ -4,10 +4,24 @@ import {
 	shouldRestoreHudMousePassthroughAfterDrag,
 } from "../hudMousePassthrough";
 
+const HUD_OFFSET_STORAGE_KEY = "recordly_recording_hud_offset";
 const DEFAULT_RECORDING_HUD_OFFSET = { x: 0, y: 0 };
 
+function getSavedHudOffset(): { x: number; y: number } {
+	try {
+		const raw = localStorage.getItem(HUD_OFFSET_STORAGE_KEY);
+		if (raw) {
+			const parsed = JSON.parse(raw);
+			if (typeof parsed.x === "number" && typeof parsed.y === "number") {
+				return parsed;
+			}
+		}
+	} catch {}
+	return DEFAULT_RECORDING_HUD_OFFSET;
+}
+
 export function useHudBarDrag({
-	hudContentRef,
+	hudContentRef: _hudContentRef,
 	hudBarRef,
 	recordingWebcamPreviewContainerRef,
 }: {
@@ -15,7 +29,7 @@ export function useHudBarDrag({
 	hudBarRef: RefObject<HTMLDivElement>;
 	recordingWebcamPreviewContainerRef: RefObject<HTMLDivElement>;
 }) {
-	const [recordingHudOffset, setRecordingHudOffset] = useState(DEFAULT_RECORDING_HUD_OFFSET);
+	const [recordingHudOffset, setRecordingHudOffset] = useState(getSavedHudOffset);
 	const [isHudDragging, setIsHudDragging] = useState(false);
 	const hudBarTransformRef = useRef<HTMLDivElement | null>(null);
 	const recordingHudOffsetRef = useRef(DEFAULT_RECORDING_HUD_OFFSET);
@@ -155,14 +169,17 @@ export function useHudBarDrag({
 			hudDragStartRef.current = null;
 			const wasDragging = isHudDraggingRef.current;
 			isHudDraggingRef.current = false;
-			setRecordingHudOffset({ ...recordingHudOffsetRef.current });
+			const nextOffset = { ...recordingHudOffsetRef.current };
+			setRecordingHudOffset(nextOffset);
+			try {
+				localStorage.setItem(HUD_OFFSET_STORAGE_KEY, JSON.stringify(nextOffset));
+			} catch {}
 			setIsHudDragging(false);
 			if (event.currentTarget.hasPointerCapture(event.pointerId)) {
 				event.currentTarget.releasePointerCapture(event.pointerId);
 			}
 			const hudBounds = mergeHudInteractiveBounds(
 				[
-					hudContentRef.current?.getBoundingClientRect(),
 					hudBarRef.current?.getBoundingClientRect(),
 					recordingWebcamPreviewContainerRef.current?.getBoundingClientRect(),
 				].map((bounds) =>
@@ -183,7 +200,7 @@ export function useHudBarDrag({
 				window.electronAPI?.hudOverlaySetIgnoreMouse?.(true);
 			}
 		},
-		[hudBarRef, hudContentRef, recordingWebcamPreviewContainerRef],
+		[hudBarRef, recordingWebcamPreviewContainerRef],
 	);
 
 	useEffect(() => {

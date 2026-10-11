@@ -538,22 +538,20 @@ function LaunchWindowContent() {
 					ref={hudContentRef}
 					className="flex items-center overflow-visible flex-col-reverse pointer-events-none"
 				>
-					<div
-						className="flex flex-col items-center pointer-events-auto p-2"
-						onMouseEnter={onHudMouseEnter}
-						onMouseLeave={onHudMouseLeave}
-					>
+					<div className="flex flex-col items-center pointer-events-none p-2">
 						<div
 							ref={hudBarTransformRef}
+							className="pointer-events-none"
 							style={{
 								transform: `translate3d(${recordingHudOffset.x}px, ${recordingHudOffset.y}px, 0)`,
 							}}
 						>
 							<motion.div
 								ref={hudBarRef}
+								data-hud-interactive
 								layout={!showRecordingWebcamPreview && !isHudDragging}
 								transition={hudStateTransition}
-								className={`${styles.bar} ${recording ? styles.barRecording : ""} ${isHudHovered ? styles.barHovered : ""} launch-theme mb-2`}
+								className={`${styles.bar} ${recording ? styles.barRecording : ""} ${isHudHovered ? styles.barHovered : ""} launch-theme mb-2 pointer-events-auto`}
 								onMouseEnter={onHudMouseEnter}
 								onMouseLeave={onHudMouseLeave}
 							>

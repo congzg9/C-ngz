@@ -28,12 +28,17 @@ export function useLaunchHudInteractionState({
 	}, [openId]);
 
 	useEffect(() => {
+		const isInteractiveTarget = (target: HTMLElement | null) => {
+			if (!target) return false;
+			return !!target.closest(
+				"[data-hud-interactive], [data-radix-popper-content-wrapper], [data-radix-dialog-content], [data-radix-dialog-overlay], [role='dialog'], [role='alertdialog']",
+			);
+		};
+
 		const handleMouseOver = (e: globalThis.MouseEvent) => {
 			const target = e.target as HTMLElement | null;
 			if (!target) return;
-			const isInteractive = !!target.closest(
-				".pointer-events-auto, [data-hud-interactive], [data-radix-popper-content-wrapper], [data-radix-dialog-content], [data-radix-dialog-overlay], [role='dialog'], [role='alertdialog']",
-			);
+			const isInteractive = isInteractiveTarget(target);
 
 			if (isInteractive) {
 				isMouseOverHudRef.current = true;
@@ -47,17 +52,38 @@ export function useLaunchHudInteractionState({
 						!isHudDraggingRef.current &&
 						!isWebcamPreviewDraggingRef.current &&
 						!webcamPreviewDragStartRef.current &&
-						!isMouseOverHudRef.current
+						!isMouseOverHudRef.current &&
+						openId === null
 					) {
 						window.electronAPI?.hudOverlaySetIgnoreMouse?.(true);
 					}
-				}, 300);
+				}, 40);
+			}
+		};
+
+		const handleMouseMove = (e: globalThis.MouseEvent) => {
+			if (
+				!isHudDraggingRef.current &&
+				!isWebcamPreviewDraggingRef.current &&
+				!webcamPreviewDragStartRef.current &&
+				openId === null
+			) {
+				const target = e.target as HTMLElement | null;
+				if (!isInteractiveTarget(target) && isMouseOverHudRef.current) {
+					isMouseOverHudRef.current = false;
+					if (timeoutRef.current) clearTimeout(timeoutRef.current);
+					window.electronAPI?.hudOverlaySetIgnoreMouse?.(true);
+				}
 			}
 		};
 
 		window.addEventListener("mouseover", handleMouseOver);
-		return () => window.removeEventListener("mouseover", handleMouseOver);
-	}, [isHudDraggingRef, isWebcamPreviewDraggingRef, webcamPreviewDragStartRef]);
+		window.addEventListener("mousemove", handleMouseMove, { passive: true });
+		return () => {
+			window.removeEventListener("mouseover", handleMouseOver);
+			window.removeEventListener("mousemove", handleMouseMove);
+		};
+	}, [isHudDraggingRef, isWebcamPreviewDraggingRef, webcamPreviewDragStartRef, openId]);
 
 	const beginInteractiveHudAction = useCallback(() => {
 		isMouseOverHudRef.current = true;
@@ -86,13 +112,14 @@ export function useLaunchHudInteractionState({
 					!isHudDraggingRef.current &&
 					!isWebcamPreviewDraggingRef.current &&
 					!webcamPreviewDragStartRef.current &&
-					!isMouseOverHudRef.current
+					!isMouseOverHudRef.current &&
+					openId === null
 				) {
 					window.electronAPI?.hudOverlaySetIgnoreMouse?.(true);
 				}
-			}, 300);
+			}, 40);
 		},
-		[isHudDraggingRef, isWebcamPreviewDraggingRef, webcamPreviewDragStartRef],
+		[isHudDraggingRef, isWebcamPreviewDraggingRef, webcamPreviewDragStartRef, openId],
 	);
 
 	return {

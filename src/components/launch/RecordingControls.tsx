@@ -1,4 +1,5 @@
 import {
+	CaretUpIcon,
 	MicrophoneIcon,
 	MicrophoneSlashIcon,
 	MinusIcon,
@@ -7,7 +8,7 @@ import {
 	SquareIcon,
 	XIcon,
 } from "@phosphor-icons/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useScopedT } from "@/contexts/I18nContext";
@@ -32,13 +33,75 @@ export const RecordingControls = ({
 	onToggleMicrophone,
 	onPauseResume,
 	onStopRecording,
-	onHideHud,
+	onHideHud: _onHideHud,
 	onCancelRecording,
 	formatTime,
 }: RecordingControlsProps) => {
 	const t = useScopedT("launch");
+	const [isCompact, setIsCompact] = useState(false);
 
 	const memoizedControls = useMemo(() => {
+		if (isCompact) {
+			return (
+				<div className="flex items-center gap-2 px-1 py-0.5 select-none">
+					<div
+						className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity px-1"
+						onClick={() => setIsCompact(false)}
+						title="Bấm để mở rộng bảng điều khiển"
+					>
+						<div
+							className={`w-2 h-2 rounded-full ${
+								paused ? "bg-[#fbbf24]" : `bg-[#f43f5e] ${styles.recDotBlink}`
+							}`}
+						/>
+						<span
+							className={`font-mono text-xs font-bold tracking-tight ${
+								paused ? "text-[#fbbf24]" : "text-white"
+							}`}
+						>
+							{formatTime(elapsed)}
+						</span>
+					</div>
+
+					<Button
+						variant={paused ? "default" : "ghost"}
+						size="icon"
+						className={`w-7 h-7 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 active:scale-95 ${
+							paused ? styles.ibGreen : ""
+						}`}
+						onClick={onPauseResume}
+						title={paused ? t("recording.resume") : t("recording.pause")}
+					>
+						{paused ? (
+							<PlayIcon size={14} fill="currentColor" strokeWidth={0} />
+						) : (
+							<PauseIcon size={14} />
+						)}
+					</Button>
+
+					<Button
+						variant="ghost"
+						size="icon"
+						className="w-7 h-7 rounded-lg text-rose-400 hover:text-white hover:bg-rose-500/20 active:scale-95"
+						onClick={onStopRecording}
+						title={t("recording.stop")}
+					>
+						<SquareIcon size={13} fill="currentColor" strokeWidth={0} />
+					</Button>
+
+					<Button
+						variant="ghost"
+						size="icon"
+						className="w-6 h-6 rounded-md text-zinc-400 hover:text-white hover:bg-white/10 active:scale-95"
+						onClick={() => setIsCompact(false)}
+						title="Mở rộng đầy đủ"
+					>
+						<CaretUpIcon size={13} className="rotate-180" />
+					</Button>
+				</div>
+			);
+		}
+
 		return (
 			<>
 				<div className="flex items-center gap-[5px]">
@@ -118,9 +181,9 @@ export const RecordingControls = ({
 					variant="ghost"
 					size="icon"
 					iconSize="lg"
-					onClick={onHideHud}
-					title={t("recording.hideHud")}
-					aria-label={t("recording.hideHud")}
+					onClick={() => setIsCompact(true)}
+					title="Thu nhỏ thanh REC (tránh che màn hình)"
+					aria-label="Thu nhỏ thanh REC"
 				>
 					<MinusIcon size={16} />
 				</Button>
@@ -138,13 +201,13 @@ export const RecordingControls = ({
 			</>
 		);
 	}, [
+		isCompact,
 		paused,
 		microphoneEnabled,
 		elapsed,
 		onToggleMicrophone,
 		onPauseResume,
 		onStopRecording,
-		onHideHud,
 		onCancelRecording,
 		formatTime,
 		t,
