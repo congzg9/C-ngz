@@ -1,0 +1,173 @@
+{
+  "playback": {
+    "play": "Phát",
+    "pause": "Tạm dừng",
+    "skipBack": "Tua lại",
+    "skipForward": "Tua đi",
+    "muteUnmute": "Tắt/Bật tiếng"
+  },
+  "annotations": {
+    "settings": "Cài đặt Chú thích",
+    "active": "Kích hoạt",
+    "text": "Văn bản",
+    "image": "Hình ảnh",
+    "arrow": "Mũi tên",
+    "blur": "Làm mờ",
+    "textContent": "Nội dung văn bản",
+    "textPlaceholder": "Nhập chữ ở đây...",
+    "fontStyle": "Kiểu chữ",
+    "selectStyle": "Chọn kiểu",
+    "size": "Kích thước",
+    "toggleBold": "In đậm",
+    "toggleItalic": "In nghiêng",
+    "toggleUnderline": "Gạch chân",
+    "alignLeft": "Căn trái",
+    "alignCenter": "Căn giữa",
+    "alignRight": "Căn phải",
+    "textColor": "Màu chữ",
+    "background": "Nền chữ",
+    "none": "Không có",
+    "clearBackground": "Xóa nền chữ",
+    "uploadImage": "Tải ảnh lên",
+    "supportedFormats": "Định dạng hỗ trợ: JPG, PNG, GIF, WebP",
+    "arrowDirection": "Hướng mũi tên",
+    "strokeWidth": "Độ dày nét: {{width}}px",
+    "arrowColor": "Màu mũi tên",
+    "deleteAnnotation": "Xóa chú thích",
+    "shortcutsAndTips": "Mẹo & Phím tắt",
+    "tipSelectAnnotation": "Di chuyển thanh trượt phát video đến vùng chú thích đè nhau và chọn một mục.",
+    "tipCycleForward": "Dùng phím Tab để chuyển đổi qua lại giữa các mục đè lên nhau.",
+    "tipCycleBackward": "Dùng phím Shift+Tab để chuyển ngược lại.",
+    "imageUploadSuccess": "Đã tải hình ảnh lên thành công!",
+    "imageUploadError": "Vui lòng chọn tệp hình ảnh định dạng JPG, PNG, GIF hoặc WebP.",
+    "blurStrength": "Độ mờ: {{strength}}",
+    "blurLabel": "Độ mờ",
+    "solidColor": "Màu đơn (Che)",
+    "borderRadius": "Bo góc viền"
+  },
+  "fontStyles": {
+    "classic": "Cổ điển",
+    "editor": "Trình soạn thảo",
+    "strong": "Mạnh mẽ",
+    "typewriter": "Máy đánh chữ",
+    "deco": "Nghệ thuật",
+    "simple": "Đơn giản",
+    "modern": "Hiện đại",
+    "clean": "Sạch sẽ"
+  },
+  "format": {
+    "mp4Video": "Video MP4",
+    "mp4Description": "Định dạng video chất lượng cao",
+    "gifAnimation": "Ảnh động GIF",
+    "gifDescription": "Ảnh động dễ dàng chia sẻ"
+  },
+  "gifOptions": {
+    "frameRate": "Số khung hình",
+    "outputSize": "Kích thước đầu ra",
+    "outputDimensions": "Kích thước: {{width}} × {{height}}px",
+    "loopAnimation": "Lặp lại liên tục",
+    "loopDescription": "Ảnh GIF sẽ phát lặp đi lặp lại"
+  },
+  "tutorial": {
+    "howTrimmingWorks": "Cách hoạt động của cắt video",
+    "title": "Hướng dẫn cắt video",
+    "understanding": "Tìm hiểu cách cắt bỏ những phần không mong muốn khỏi video của bạn.",
+    "descriptionP1": "Công cụ Trim hoạt động bằng cách xác định các phân đoạn bạn muốn",
+    "descriptionRemove": "loại bỏ",
+    "descriptionP2": "khỏi video.",
+    "descriptionP3": "Bất kỳ phần nào trên dòng thời gian bị phủ bởi phân đoạn màu đỏ sẽ bị cắt bỏ khi bạn xuất video.",
+    "visualExample": "Ví dụ minh họa",
+    "removed": "BỊ LOẠI BỎ",
+    "kept": "Giữ lại",
+    "finalVideo": "Video kết quả",
+    "part": "Phần {{number}}",
+    "addTrimStep": "1. Thêm phân đoạn Cắt",
+    "addTrimDesc": "Nhấn phím T hoặc nhấp vào biểu tượng kéo để đánh dấu đoạn cần xóa bỏ.",
+    "adjustStep": "2. Điều chỉnh",
+    "adjustDesc": "Kéo các cạnh của vùng màu đỏ để bao phủ chính xác đoạn bạn muốn loại bỏ."
+  },
+  "feedback": {
+    "trigger": "Phản hồi",
+    "title": "Phản hồi & Liên hệ",
+    "description": "Liên hệ trực tiếp với chúng tôi hoặc báo lỗi trực tiếp nếu phần mềm thiếu hoặc hỏng tính năng nào đó.",
+    "emailLabel": "Email",
+    "xLabel": "Mạng xã hội X",
+    "reportIssue": "Báo cáo lỗi / gửi phản hồi",
+    "openFailed": "Không thể mở liên kết."
+  },
+  "keyboardShortcuts": {
+    "trigger": "Phím tắt",
+    "title": "Phím tắt bàn phím",
+    "description": "Tra cứu nhanh phím tắt điều khiển timeline và editor.",
+    "customizeTooltip": "Tùy chỉnh phím tắt",
+    "customize": "Tùy chỉnh",
+    "panTimeline": "Di chuyển Timeline",
+    "zoomTimeline": "Thu phóng Timeline",
+    "cycleAnnotations": "Chuyển đổi chú thích",
+    "tab": "Phím Tab"
+  },
+  "actions": {
+    "saveAgain": "Lưu lại lần nữa",
+    "showInFolder": "Hiển thị trong thư mục"
+  },
+  "project": {
+    "untitled": "Dự án chưa đặt tên",
+    "savedProjects": "Dự án đã lưu",
+    "noSavedProjects": "Chưa có dự án nào",
+    "loadingPreview": "Đang tải xem trước...",
+    "noPreview": "Chưa có xem trước",
+    "currentProject": "Hiện tại"
+  },
+  "nativeCaptureUnavailable": {
+    "title": "Không có lỗi nghiêm trọng nào, nhưng chúng tôi không thể hiển thị hiệu ứng con trỏ chuột.",
+    "description": "Thiết bị của bạn không hỗ trợ cơ chế ghi native. Record Auto-Zoom vẫn hoạt động bình thường, nhưng tính năng làm mượt và hiệu ứng con trỏ chuột sẽ không thể áp dụng.",
+    "confirm": "Tôi đã hiểu"
+  },
+  "theme": {
+    "appearance": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+  "exportStatus": {
+    "exporting": "Đang xuất video",
+    "renderingFile": "Đang ghi dữ liệu vào tệp của bạn.",
+    "preparing": "Đang chuẩn bị xuất...",
+    "completePercent": "Đã hoàn thành {{percent}}%",
+    "issue": "Lỗi khi xuất video",
+    "complete": "Xuất video hoàn tất",
+    "savedSuccessfully": "Tệp của bạn đã được lưu thành công."
+  },
+  "export": {
+    "processingAudioEdits": "Đang xử lý âm thanh với các điều chỉnh tốc độ/webcam"
+  },
+  "toolbar": {
+    "addLayer": "Thêm lớp",
+    "splitClip": "Tách Clip"
+  },
+  "timeline": {
+    "expand": "Mở rộng Timeline",
+    "collapse": "Thu nhỏ Timeline"
+  },
+  "openRecordingsFolder": "Mở thư mục video đã quay",
+  "presets": {
+    "open": "Mở danh sách mẫu",
+    "label": "Mẫu cài đặt",
+    "saveCurrentAs": "Lưu mẫu hiện tại thành",
+    "namePlaceholder": "Tên mẫu cài đặt",
+    "savedList": "Mẫu đã lưu",
+    "empty": "Chưa có mẫu nào.",
+    "deleteAriaLabel": "Xóa mẫu {{name}}",
+    "toasts": {
+      "applied": "Đã áp dụng mẫu \"{{name}}\"",
+      "saved": "Đã lưu mẫu \"{{name}}\"",
+      "deleted": "Đã xóa mẫu \"{{name}}\""
+    },
+    "errors": {
+      "nameRequired": "Vui lòng nhập tên mẫu cài đặt.",
+      "duplicateName": "Đã có mẫu cài đặt trùng tên này.",
+      "saveFailed": "Không thể lưu mẫu cài đặt. Vui lòng kiểm tra dung lượng trình duyệt và thử lại.",
+      "deleteFailed": "Không thể xóa mẫu cài đặt. Vui lòng thử lại."
+    }
+  }
+}

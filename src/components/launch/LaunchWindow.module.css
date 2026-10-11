@@ -1,0 +1,343 @@
+.electronDrag {
+	-webkit-app-region: drag;
+}
+
+.electronNoDrag {
+	-webkit-app-region: no-drag;
+}
+
+.bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: max-content;
+	max-width: 1200px;
+	background: var(--launch-bar-bg);
+	border: 1px solid var(--launch-bar-border);
+	border-radius: 26px;
+	padding: 8px 16px 8px 14px;
+	box-shadow: var(--launch-bar-shadow);
+	backdrop-filter: blur(var(--launch-popover-blur, 40px)) saturate(var(--launch-popover-saturate, 200%));
+	-webkit-backdrop-filter: blur(var(--launch-popover-blur, 40px)) saturate(var(--launch-popover-saturate, 200%));
+	overflow: visible;
+	position: relative;
+	transform-origin: center bottom;
+	transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.25s ease, box-shadow 0.25s ease;
+}
+
+.barRecording {
+	opacity: 0.35;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+}
+
+.barRecording:hover,
+.barRecording:focus-within,
+.barRecording.barHovered {
+	opacity: 1;
+	backdrop-filter: blur(var(--launch-popover-blur, 40px)) saturate(var(--launch-popover-saturate, 200%));
+	-webkit-backdrop-filter: blur(var(--launch-popover-blur, 40px)) saturate(var(--launch-popover-saturate, 200%));
+	box-shadow: var(--launch-bar-shadow), 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.bar::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 10%;
+	right: 10%;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.7), rgba(249, 115, 22, 0.75), rgba(251, 146, 60, 0.5), transparent);
+	pointer-events: none;
+}
+
+.barStateViewport {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex: 0 1 auto;
+	min-height: 46px;
+	min-width: fit-content;
+	padding-right: 2px;
+}
+
+.barState {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 0 1 auto;
+	white-space: nowrap;
+	min-width: fit-content;
+	pointer-events: auto;
+}
+
+.sep {
+	width: 1px;
+	height: 26px;
+	background: var(--launch-border-strong);
+	margin: 0 6px;
+	flex-shrink: 0;
+}
+
+.ib {
+	position: relative;
+	width: 40px;
+	height: 40px;
+	border-radius: 11px;
+	border: none;
+	background: transparent;
+	color: var(--launch-text-muted);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.15s ease;
+	flex-shrink: 0;
+}
+
+.ib:hover {
+	background: var(--launch-hover);
+	color: var(--launch-text);
+}
+
+.ibActive {
+	color: #3d8bff;
+}
+
+.ibActive:hover {
+	color: #62a4ff;
+}
+
+.ibRed {
+	color: #f43f5e;
+}
+
+.ibRed:hover {
+	color: #ff5a75;
+}
+
+.ibGreen {
+	color: #34d399;
+}
+
+.ibGreen:hover {
+	color: #4eeeb0;
+}
+
+.menuCard {
+	width: 300px;
+	max-height: 400px;
+	overflow-y: auto;
+	background: var(--launch-surface);
+	border: 1px solid var(--launch-border);
+	border-radius: 16px;
+	backdrop-filter: blur(var(--launch-popover-blur, 24px))
+		saturate(var(--launch-popover-saturate, 145%));
+	-webkit-backdrop-filter: blur(var(--launch-popover-blur, 24px))
+		saturate(var(--launch-popover-saturate, 145%));
+	padding: 8px;
+	margin-top: auto;
+	margin-bottom: 8px;
+	box-shadow: var(--launch-bar-shadow);
+	pointer-events: auto;
+	animation: menuCardIn 0.18s ease;
+}
+
+@keyframes menuCardIn {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.menuCard::-webkit-scrollbar {
+	width: 4px;
+}
+
+.menuCard::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.menuCard::-webkit-scrollbar-thumb {
+	background: var(--launch-border-strong);
+	border-radius: 10px;
+}
+
+.ddLabel {
+	font-size: 9px;
+	font-weight: 600;
+	color: var(--launch-label);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	padding: 6px 10px 4px;
+}
+
+.ddItem {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 8px 10px;
+	border-radius: 8px;
+	border: none;
+	background: transparent;
+	font-size: 12px;
+	color: var(--launch-text-muted);
+	cursor: pointer;
+	transition: all 0.12s ease;
+	text-align: left;
+}
+
+.ddItem:hover {
+	background: var(--launch-hover);
+	color: var(--launch-text);
+}
+
+.ddItemSelected {
+	background: var(--launch-selected);
+	color: var(--launch-accent);
+}
+
+.finalizingState {
+	display: inline-flex;
+	align-items: center;
+	gap: 11px;
+	min-width: 238px;
+	color: #eeeef2;
+}
+
+.finalizingSpin {
+	color: #3d8bff;
+	animation: finalizingSpin 0.9s linear infinite;
+}
+
+.finalizingCopy {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.15;
+}
+
+.finalizingCopy small {
+	color: #8a8a96;
+	font-size: 10px;
+	font-weight: 600;
+}
+
+@keyframes finalizingSpin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.recBtn {
+	position: relative;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: none;
+	background: #e11d48;
+	color: #fff;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+	box-shadow: none;
+}
+
+.recBtn:hover {
+	transform: scale(1.05);
+	background: #f43f5e;
+	box-shadow: none;
+}
+
+.recBtn:active {
+	transform: scale(0.95);
+}
+
+.recBtn:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.recBtn:disabled:hover {
+	background: #e11d48;
+	box-shadow: none;
+	transform: none;
+}
+
+.recDot {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: #ffffff;
+	box-shadow: none;
+	transition: all 0.2s ease;
+}
+
+.recDotBlink {
+	animation: blink 1.2s ease-in-out infinite;
+}
+
+.recordingWebcamPreview {
+	position: fixed;
+	right: 32px;
+	bottom: 120px;
+	height: 288px;
+	width: 288px;
+	overflow: hidden;
+	border-radius: 24px;
+	background: var(--launch-surface);
+	border: 1px solid var(--launch-border-strong);
+	box-shadow: var(--launch-bar-shadow);
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+	will-change: transform;
+	z-index: 120;
+}
+
+.recordingWebcamPreview:active {
+	cursor: grabbing;
+}
+
+.recordingWebcamPreviewVideo {
+	display: block;
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	border-radius: inherit;
+	overflow: hidden;
+	transform: translateZ(0);
+}
+
+@keyframes blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.2;
+	}
+}
+
+.micSelect {
+	color-scheme: dark;
+}
+
+.micSelect option {
+	background-color: #1a1a22;
+	color: #eeeef2;
+}

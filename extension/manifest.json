@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Recordly - Screen Recorder & Auto-Zoom",
+  "version": "1.0.0",
+  "description": "Capture screen, tabs, webcam, and mouse cursor telemetry with auto-zoom. Directly edit and export on Cloudflare Pages.",
+  "permissions": [
+    "desktopCapture",
+    "tabCapture",
+    "storage",
+    "activeTab",
+    "scripting",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Recordly Screen Recorder",
+    "default_icon": {
+      "16": "icons/recordly-16.png",
+      "32": "icons/recordly-32.png",
+      "128": "icons/recordly-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "icons": {
+    "16": "icons/recordly-16.png",
+    "32": "icons/recordly-32.png",
+    "128": "icons/recordly-128.png"
+  }
+}

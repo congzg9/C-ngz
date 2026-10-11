@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400..700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	/* Disable Electron/Chromium focus highlight (yellow/orange ring) */
+	*:focus:not(:focus-visible) {
+		outline: none !important;
+	}
+
+	*:focus-visible {
+		outline: 2px solid rgb(var(--brand-accent-rgb));
+		outline-offset: 2px;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	html,
+	body,
+	#root {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+
+	html.hud-overlay-window,
+	body.hud-overlay-window,
+	#root.hud-overlay-window {
+		overflow: hidden;
+	}
+
+	:root {
+		--app-font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		--app-font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+		--brand-accent: #2563eb;
+		--brand-accent-rgb: 37, 99, 235;
+		--background: 0 0% 100%;
+		--foreground: 20 14.3% 4.1%;
+		--card: 0 0% 100%;
+		--card-foreground: 20 14.3% 4.1%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 20 14.3% 4.1%;
+		--primary: 221 83% 53%;
+		--primary-foreground: 210 40% 98%;
+		--secondary: 60 4.8% 95.9%;
+		--secondary-foreground: 24 9.8% 10%;
+		--muted: 60 4.8% 95.9%;
+		--muted-foreground: 25 5.3% 44.7%;
+		--accent: 214 100% 97%;
+		--accent-foreground: 221 83% 40%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 60 9.1% 97.8%;
+		--border: 20 5.9% 90%;
+		--input: 20 5.9% 90%;
+		--ring: 221 83% 53%;
+		--chart-1: 12 76% 61%;
+		--chart-2: 173 58% 39%;
+		--chart-3: 197 37% 24%;
+		--chart-4: 43 74% 66%;
+		--chart-5: 27 87% 67%;
+		--radius: 0.5rem;
+
+		/* Editor surface colors — Apple Light Frosted Glass */
+		--editor-bg: 210 20% 96%;
+		--editor-header: 0 0% 100%;
+		--editor-panel: 0 0% 100%;
+		--editor-surface: 210 25% 97%;
+		--editor-surface-alt: 210 20% 93%;
+		--editor-dialog: 0 0% 100%;
+		--editor-dialog-alt: 210 20% 96%;
+		--editor-timeline: 210 20% 95%;
+		--editor-row: 210 25% 98%;
+		--editor-subrow: 210 20% 93%;
+
+		/* Slider track colors — light mode */
+		--slider-track: 220 13% 60% / 0.25;
+		--slider-thumb: 221 83% 53%;
+		--slider-thumb-shadow: 221 83% 53% / 0.35;
+		--slider-glow: 221 83% 53% / 0.2;
+	}
+	.dark {
+		--background: 240 16% 5%;
+		--foreground: 0 0% 98%;
+		--card: 240 16% 7%;
+		--card-foreground: 0 0% 98%;
+		--popover: 240 16% 7%;
+		--popover-foreground: 0 0% 98%;
+		--primary: 221 83% 53%;
+		--primary-foreground: 210 40% 98%;
+		--secondary: 240 12% 12%;
+		--secondary-foreground: 0 0% 98%;
+		--muted: 240 12% 12%;
+		--muted-foreground: 240 5% 65%;
+		--accent: 270 50% 20%;
+		--accent-foreground: 210 40% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 60 9.1% 97.8%;
+		--border: 240 10% 18%;
+		--input: 240 10% 18%;
+		--ring: 260 83% 65%;
+		--chart-1: 220 70% 50%;
+		--chart-2: 160 60% 45%;
+		--chart-3: 30 80% 55%;
+		--chart-4: 280 65% 60%;
+		--chart-5: 340 75% 55%;
+
+		/* Editor surface colors — Apple Dark Glass */
+		--editor-bg: 240 16% 5%;
+		--editor-header: 240 16% 7%;
+		--editor-panel: 240 16% 8%;
+		--editor-surface: 240 14% 9%;
+		--editor-surface-alt: 240 14% 11%;
+		--editor-dialog: 240 16% 4%;
+		--editor-dialog-alt: 237 14% 6%;
+		--editor-timeline: 240 16% 6%;
+		--editor-row: 240 12% 8%;
+		--editor-subrow: 240 12% 11%;
+
+		/* Slider track colors — dark mode */
+		--slider-track: 0 0% 100% / 0.12;
+		--slider-thumb: 0 0% 100%;
+		--slider-thumb-shadow: 0 0% 100% / 0.32;
+		--slider-glow: 0 0% 100% / 0.5;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+
+		-webkit-user-select: none;
+		user-select: none;
+		font-family: var(--app-font-sans);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+
+	button,
+	input,
+	textarea,
+	select {
+		font: inherit;
+	}
+
+	body .font-mono,
+	body kbd {
+		font-family: var(--app-font-mono);
+	}
+}
+
+/* Smooth timeline cursor animations */
+@layer utilities {
+	.timeline-cursor-smooth {
+		will-change: transform;
+		transition:
+			left 33ms linear,
+			right 33ms linear;
+	}
+
+	.indeterminate-progress {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.indeterminate-progress::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		width: 38%;
+		min-width: 3.5rem;
+		border-radius: inherit;
+		background: linear-gradient(
+			90deg,
+			rgba(37, 99, 235, 0) 0%,
+			rgba(37, 99, 235, 0.35) 18%,
+			rgba(96, 165, 250, 0.92) 52%,
+			rgba(37, 99, 235, 0.3) 82%,
+			rgba(37, 99, 235, 0) 100%
+		);
+		animation: indeterminate-progress 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+	}
+
+	/* Hidden scrollbar - still scrollable but invisible */
+	.custom-scrollbar {
+		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none; /* IE/Edge */
+	}
+
+	.custom-scrollbar::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Opera */
+	}
+
+	/* Smooth playback scrubber */
+	input[type="range"] {
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	input[type="range"]::-webkit-slider-runnable-track {
+		border-radius: 100px;
+		height: 4px;
+		background: hsl(var(--slider-track));
+	}
+
+	input[type="range"]::-moz-range-track {
+		border-radius: 100px;
+		height: 4px;
+		background: hsl(var(--slider-track));
+	}
+
+	input[type="range"]::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: hsl(var(--slider-thumb));
+		cursor: pointer;
+		box-shadow: 0 2px 8px hsl(var(--slider-thumb-shadow));
+		border: 2px solid hsl(var(--slider-thumb));
+		transition: all 0.08s ease-out;
+	}
+
+	input[type="range"]::-webkit-slider-thumb:hover {
+		background: hsl(var(--slider-thumb));
+		transform: scale(1.15);
+		box-shadow: 0 3px 10px hsl(var(--slider-glow));
+		border-color: var(--brand-accent);
+	}
+
+	input[type="range"]::-webkit-slider-thumb:active {
+		transform: scale(1.25);
+	}
+
+	input[type="range"]::-moz-range-thumb {
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: hsl(var(--slider-thumb));
+		cursor: pointer;
+		border: 2px solid hsl(var(--slider-thumb));
+		box-shadow: 0 2px 8px hsl(var(--slider-thumb-shadow));
+		transition: all 0.08s ease-out;
+	}
+
+	input[type="range"]::-moz-range-thumb:hover {
+		background: hsl(var(--slider-thumb));
+		transform: scale(1.15);
+		box-shadow: 0 3px 10px hsl(var(--slider-glow));
+		border-color: var(--brand-accent);
+	}
+
+	input[type="range"]::-moz-range-thumb:active {
+		transform: scale(1.25);
+	}
+}
+
+@keyframes indeterminate-progress {
+	0% {
+		transform: translateX(-150%);
+	}
+
+	60% {
+		transform: translateX(270%);
+	}
+
+	100% {
+		transform: translateX(270%);
+	}
+}
+
+body.timeline-alt-duplicate,
+body.timeline-alt-duplicate * {
+	cursor: copy !important;
+}

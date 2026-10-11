@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Record-AutoZoom • Quay Video Màn Hình Tự Động Zoom Chuyên Nghiệp</title>
+  <link rel="icon" type="image/png" href="./app-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #f59e0b 100%);
+      --accent-purple: #8b5cf6;
+      --bg-gradient-top: #3b0764;
+      --bg-gradient-mid: #6b21a8;
+      --bg-gradient-sunset: #f97316;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(255, 255, 255, 0.4);
+      --card-shadow: 0 20px 45px -10px rgba(88, 28, 135, 0.18), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+      --text-dark: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      color: var(--text-dark);
+      background: linear-gradient(180deg, 
+        #2e0854 0%, 
+        #4c1d95 18%, 
+        #7c3aed 38%, 
+        #c084fc 58%, 
+        #fbcfe8 75%, 
+        #fef3c7 90%, 
+        #fffbeb 100%);
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glow Behind */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 550px;
+      background: radial-gradient(ellipse, rgba(249, 115, 22, 0.28) 0%, rgba(192, 132, 252, 0.15) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      width: 100%;
+      max-width: 1180px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 30;
+    }
+    .brand-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .brand-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+      flex-shrink: 0;
+    }
+    .brand-icon-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-os-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 6px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+    }
+
+    /* Language Switcher & Nav Actions */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+    .nav-download-btn svg {
+      color: #0078d4;
+    }
+    .nav-download-btn:hover {
+      background: #f8fafc;
+      color: #ea580c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.28);
+    }
+    @media (max-width: 640px) {
+      .nav-download-btn span { display: none; }
+      .nav-download-btn { padding: 7px 12px; }
+    }
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    .lang-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+    .lang-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Main Container */
+    .main-wrap {
+      width: 100%;
+      max-width: 1060px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Hero Headline */
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      color: #ffffff;
+      max-width: 780px;
+      line-height: 1.22;
+      letter-spacing: -0.8px;
+      margin-top: 14px;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
+    }
+    @media (max-width: 640px) {
+      .hero-title { font-size: 26px; }
+    }
+    .hero-sub {
+      font-size: 15px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+
+    /* Billing Toggle Pill (Monthly / Yearly/Lifetime) with hand-drawn Save badge */
+    .toggle-wrapper {
+      position: relative;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .toggle-pill {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 5px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .toggle-item {
+      padding: 9px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #64748b;
+      transition: all 0.25s ease;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+    }
+    .toggle-item.active {
+      background: #fef08a;
+      color: #854d0e;
+      box-shadow: 0 2px 8px rgba(133, 77, 14, 0.12);
+    }
+    /* Hand-drawn save arrow text */
+    .save-arrow-badge {
+      position: absolute;
+      top: -30px;
+      right: -110px;
+      font-family: 'Patrick Hand', 'Dancing Script', cursive;
+      font-size: 23px;
+      font-weight: 700;
+      color: #fef08a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transform: rotate(5deg);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+    .save-arrow-badge svg {
+      width: 32px;
+      height: 32px;
+      transform: scaleX(-1) rotate(65deg);
+      fill: none;
+      stroke: #fef08a;
+      stroke-width: 2.2;
+    }
+    @media (max-width: 600px) {
+      .save-arrow-badge { display: none; }
+    }
+
+    /* Pricing Cards Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
+    }
+
+    /* FocuSee Style Cards */
+    .card-focusee {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border);
+      border-radius: 28px;
+      padding: 34px 28px 28px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .card-focusee:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 28px 60px -10px rgba(88, 28, 135, 0.28);
+    }
+    .card-focusee.popular {
+      border: 2.5px solid #f97316;
+      box-shadow: 0 24px 60px -8px rgba(249, 115, 22, 0.35);
+    }
+
+    /* Corner Discount Badge */
+    .corner-badge {
+      position: absolute;
+      top: -12px;
+      left: 24px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .corner-badge.popular-badge {
+      background: linear-gradient(135deg, #f97316, #e11d48);
+    }
+
+    /* Card Details */
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .price-area {
+      text-align: center;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+    }
+    .price-currency {
+      font-size: 24px;
+      font-weight: 800;
+      color: #f97316;
+    }
+    .price-number {
+      font-size: 34px;
+      font-weight: 900;
+      color: #f97316;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .price-period {
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .price-original {
+      font-size: 15px;
+      color: #94a3b8;
+      text-decoration: line-through;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+    .price-subtext {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    /* Buy Button FocuSee style */
+    .btn-buy-focusee {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      background: #fed7aa;
+      color: #9a3412;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .btn-buy-focusee:hover {
+      background: #fdba74;
+      transform: translateY(-1px);
+    }
+    .card-focusee.popular .btn-buy-focusee {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+    }
+    .card-focusee.popular .btn-buy-focusee:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.5);
+    }
+
+    /* Guarantee Pill */
+    .guarantee-note {
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #059669;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    /* Features List */
+    .features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .feature-item svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #10b981;
+    }
+    .feature-item strong {
+      color: #0f172a;
+    }
+
+    /* FocuSee Bottom Upgrade Pill Badge */
+    .card-bottom-badge {
+      margin-top: auto;
+      padding: 9px 14px;
+      background: #fff7ed;
+      border: 1px solid #ffedd5;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c2410c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .card-focusee.popular .card-bottom-badge {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    /* Bottom Section: Machine ID, Coupon & PayPal Area */
+    .checkout-section {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 32px 30px;
+      box-shadow: 0 25px 60px -12px rgba(88, 28, 135, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+    }
+
+    .section-headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .selected-summary-pill {
+      background: #fff7ed;
+      border: 1px solid #ffedd5;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #c2410c;
+    }
+
+    /* Machine ID & Coupon Rows */
+    .input-row-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 680px) {
+      .input-row-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-input-box {
+      display: flex;
+      gap: 8px;
+    }
+    .custom-input {
+      flex: 1;
+      padding: 11px 14px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .custom-input:focus {
+      border-color: #f97316;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+    .btn-small-action {
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-small-action:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .btn-coupon-apply {
+      background: #f97316;
+      color: #fff;
+      border-color: #f97316;
+    }
+    .btn-coupon-apply:hover {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+
+    /* Coupon Alert Message */
+    .coupon-msg {
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      margin-top: 4px;
+    }
+    .coupon-msg.success {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #16a34a;
+    }
+    .coupon-msg.error {
+      display: block;
+      color: #dc2626;
+    }
+
+    /* PayPal Area */
+    .paypal-wrap-box {
+      margin-top: 10px;
+      padding-top: 20px;
+      border-top: 1px solid #f1f5f9;
+    }
+    #paypal-button-container {
+      min-height: 110px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* SUCCESS CARD (KHI THANH TOÁN XONG) */
+    .success-card {
+      display: none;
+      background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+      border: 2px solid #10b981;
+      border-radius: 24px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(16, 185, 129, 0.2);
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success-icon { font-size: 48px; margin-bottom: 10px; }
+    .success-title { font-size: 22px; font-weight: 800; color: #065f46; margin-bottom: 6px; }
+    .success-desc { font-size: 13.5px; color: #047857; margin-bottom: 16px; }
+    .key-display {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 14px 18px;
+      border-radius: 12px;
+      word-break: break-all;
+      user-select: all;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+    .btn-copy-success {
+      background: #10b981;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-copy-success:hover { background: #059669; }
+
+    /* Support Footer Card */
+    .support-bar {
+      margin-top: 28px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1060px;
+      flex-wrap: wrap;
+      gap: 14px;
+      color: #0f172a;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+    }
+    .support-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .support-icon-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .support-contacts {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .support-item-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .support-item-link:hover {
+      background: #ffffff;
+      border-color: #f97316;
+      color: #ea580c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+    .support-item-link svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+    .support-item-link.link-email svg {
+      color: #ea580c;
+    }
+    .support-item-link.link-fb svg {
+      color: #1877f2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR (CÓ CHỌN NGÔN NGỮ EN / VI) -->
+  <header class="top-nav">
+    <a href="#" class="brand-logo-area">
+      <div class="brand-icon-box">
+        <img src="./app-icon.png" alt="Record-AutoZoom Logo" class="brand-icon-img" />
+      </div>
+      <div class="brand-name">
+        <span>Record-AutoZoom</span>
+        <span class="brand-os-icons" title="Hỗ trợ macOS & Windows">
+          <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.64 1.36-.57.65-1.07 1.72-.94 2.74 1.01.08 2.04-.5 2.66-1.25z"/></svg>
+          <svg style="width:15px;height:15px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- Nút Tải Windows & Đổi ngôn ngữ Anh - Việt -->
+    <div class="nav-actions">
+      <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" class="nav-download-btn" id="btnNavDownload" download title="Tải bản cài đặt cho Windows (x64)">
+        <svg style="width:15px;height:15px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        <span id="t-nav-download">Tải Cho Windows (.exe)</span>
+      </a>
+
+      <a href="/checkout" class="nav-download-btn" id="btnNavPricing" style="background:rgba(255,255,255,0.22);color:#fff;border-color:rgba(255,255,255,0.45);backdrop-filter:blur(10px);" title="Xem bảng giá nâng cấp PRO">
+        <span>💎</span> <span id="t-nav-pro">Bản Quyền PRO</span>
+      </a>
+
+      <!-- Nút đổi ngôn ngữ Anh - Việt -->
+      <div class="lang-switcher">
+        <button type="button" class="lang-btn active" id="btnLangVi" onclick="setLanguage('vi')">
+          <span>🇻🇳</span> <span>Tiếng Việt</span>
+        </button>
+        <button type="button" class="lang-btn" id="btnLangEn" onclick="setLanguage('en')">
+          <span>🇺🇸</span> <span>English</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT WRAPPER -->
+  <main class="main-wrap">
+
+    <!-- PLATFORM TOGGLE (WINDOWS / MACOS) -->
+    <div class="toggle-wrapper" style="margin-top: 20px;">
+      <div class="toggle-pill">
+        <button type="button" class="toggle-item active" id="tabWindows" onclick="switchPlatform('windows')">
+          <span id="t-tab-windows">🪟 Windows (v1.3.0)</span>
+        </button>
+        <button type="button" class="toggle-item" id="tabMac" onclick="switchPlatform('mac')">
+          <span id="t-tab-mac">🍏 macOS (Sắp Ra Mắt)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD CARDS GRID (PHONG CÁCH FOCUSEE SANG TRỌNG) -->
+    <div class="pricing-grid" id="pricingGrid">
+      
+      <!-- CARD 1: WINDOWS (BẢN CHÍNH THỨC - NỔI BẬT NHẤT) -->
+      <div class="card-focusee popular" id="cardWindows" onclick="switchPlatform('windows')">
+        <div class="corner-badge popular-badge" id="t-badge-win">🔥 BẢN CHÍNH THỨC • V1.3.0</div>
+        <div class="card-title" id="t-title-win">Record-AutoZoom Cho Windows</div>
+        
+        <div class="price-area">
+          <span class="price-number" id="t-status-win">Miễn Phí</span>
+          <span class="price-period" id="t-period-win">• Tải Về Trực Tiếp</span>
+        </div>
+        <p class="price-subtext" id="t-subtext-win">Tương thích Windows 10 & 11 (64-bit) • Dung lượng ~358 MB</p>
+
+        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" class="btn-buy-focusee" id="btnDownloadWinCard" download style="text-decoration:none;">
+          <span id="t-btn-download-win">⬇️ Tải Cho Windows (.exe)</span> →
+        </a>
+
+        <div class="guarantee-note">
+          <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span id="t-guarantee-win">Bản cài an toàn • 100% Không mã độc • Tải trực tiếp</span>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-wf1">Hỗ trợ <strong>Windows 10 / Windows 11</strong> (64-bit)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-wf2">Xuất video <strong>4K & 60 FPS</strong> sắc nét không giới hạn</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-wf3">Tự động bắt tiêu điểm & <strong>zoom theo chuột</strong> cực mượt</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-wf4">Hiệu ứng kính mờ (Glassmorphism) & hình nền đa dạng</span>
+          </li>
+        </ul>
+
+        <div class="card-bottom-badge">
+          🚀 <span id="t-bottom-win">Tải xuống trực tiếp từ máy chủ Cloudflare CDN tốc độ cao</span>
+        </div>
+      </div>
+
+      <!-- CARD 2: MACOS (SẮP RA MẮT) -->
+      <div class="card-focusee" id="cardMac" onclick="switchPlatform('mac')">
+        <div class="corner-badge" id="t-badge-mac" style="background:linear-gradient(135deg, #0284c7, #38bdf8);">🍏 SẮP RA MẮT • MACOS</div>
+        <div class="card-title" id="t-title-mac">Record-AutoZoom Cho macOS</div>
+        
+        <div class="price-area">
+          <span class="price-number" style="color:#64748b;" id="t-status-mac">Sắp Ra Mắt</span>
+          <span class="price-period" id="t-period-mac">• Đang Hoàn Thiện</span>
+        </div>
+        <p class="price-subtext" id="t-subtext-mac">Dành cho Apple Silicon (M1/M2/M3) & Intel • macOS 12+</p>
+
+        <button type="button" class="btn-buy-focusee" style="background:#e2e8f0;color:#475569;cursor:pointer;" onclick="showMacNotice()">
+          <span id="t-btn-mac-card">🍏 Bản macOS (Sắp Có)</span> →
+        </button>
+
+        <div class="guarantee-note" style="color:#0284c7;">
+          <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span id="t-guarantee-mac">Tối ưu hoá đặc biệt cho màn hình Retina & chip Apple</span>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-mf1">Tương thích <strong>Apple Silicon M-Series</strong> & Intel Mac</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-mf2">Tự động nhận diện cửa sổ và zoom con trỏ mượt mà</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-mf3">Ghi âm micro lọc tạp âm & âm thanh hệ thống</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-mf4">Xuất video chuẩn ProRes & MP4 60 FPS chất lượng cao</span>
+          </li>
+        </ul>
+
+        <div class="card-bottom-badge" style="background:#f0f9ff;border-color:#e0f2fe;color:#0369a1;">
+          ✨ <span id="t-bottom-mac">Bản macOS sẽ sớm có mặt trong đợt phát hành tới</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM INSTALLATION & DIRECT LINK PANEL -->
+    <div class="checkout-section" id="checkoutSection">
+      
+      <div class="section-headline">
+        <div class="section-title">
+          <span>⚡</span> <span id="t-sec-title">Hướng Dẫn Cài Đặt & Link Tải Trực Tiếp</span>
+        </div>
+        <div class="selected-summary-pill" id="selectedPlanPill">
+          Phiên bản: Windows 64-bit (v1.3.0)
+        </div>
+      </div>
+
+      <!-- INPUT GRID: DIRECT LINK & INSTALL STEPS -->
+      <div class="input-row-grid">
+        
+        <!-- Ô Link Tải Trực Tiếp -->
+        <div class="form-group">
+          <label class="form-label" for="downloadUrlInput">
+            <span id="t-label-dlurl">🔗 Đường dẫn tải trực tiếp (Direct Link)</span>
+            <span style="font-size:11px;color:#059669;font-weight:700;" id="t-sub-dlurl">Tốc độ cao Cloudflare R2</span>
+          </label>
+          <div class="form-input-box">
+            <input type="text" id="downloadUrlInput" class="custom-input" readonly value="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" />
+            <button type="button" class="btn-small-action btn-coupon-apply" onclick="copyDownloadUrl()">
+              📋 <span id="t-btn-copy-url">Sao chép link</span>
+            </button>
+          </div>
+          <div id="copySuccessMsg" class="coupon-msg success" style="margin-top:6px;display:none;">
+            <span>🎉 Đã sao chép đường dẫn tải vào bộ nhớ tạm!</span>
+          </div>
+        </div>
+
+        <!-- Ô 3 Bước Cài Đặt -->
+        <div class="form-group">
+          <label class="form-label">
+            <span id="t-label-steps">🚀 3 Bước bắt đầu sử dụng</span>
+            <span style="font-size:11px;color:#f97316;font-weight:700;" id="t-sub-steps">Chỉ 10 giây</span>
+          </label>
+          <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:11px 16px;font-size:13px;line-height:1.65;color:#334155;">
+            <div><strong style="color:#f97316;">1.</strong> Nhấn nút <strong>Tải Cho Windows (.exe)</strong> để tải bộ cài.</div>
+            <div><strong style="color:#f97316;">2.</strong> Mở file <code>.exe</code> và nhấn Cài đặt (mất khoảng 10 giây).</div>
+            <div><strong style="color:#f97316;">3.</strong> Mở <strong>Record-AutoZoom</strong> và bắt đầu quay video tự động zoom!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BIG DOWNLOAD BUTTON IN PANEL -->
+      <div class="paypal-wrap-box" style="text-align:center;padding-top:16px;">
+        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" download style="display:inline-flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#f97316 0%,#ea580c 100%);color:#fff;font-size:16px;font-weight:800;padding:15px 36px;border-radius:16px;text-decoration:none;box-shadow:0 8px 24px rgba(249,115,22,0.4);transition:all 0.25s ease;">
+          <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+          <span id="t-btn-big-download">Tải Bản Cài Đặt Cho Windows Ngay (.exe)</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- SUPPORT FOOTER BAR (EMAIL & FACEBOOK) -->
+    <div class="support-bar">
+      <div class="support-title-wrap">
+        <div class="support-icon-badge">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          </svg>
+        </div>
+        <span id="t-sup-title">Cần hỗ trợ kỹ thuật hoặc góp ý tính năng?</span>
+      </div>
+      <div class="support-contacts">
+        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" class="support-item-link" download title="Tải file cài đặt Record-AutoZoom cho Windows">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+          </svg>
+          <span id="t-sup-dl">Tải Bản Cài Windows (.exe)</span>
+        </a>
+        <a href="mailto:Giangcong1089@gmail.com" class="support-item-link link-email" title="Gửi email cho tác giả">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="16" x="2" y="4" rx="3"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+          <span>Giangcong1089@gmail.com</span>
+        </a>
+        <a href="https://www.facebook.com/congz9g/" target="_blank" rel="noopener noreferrer" class="support-item-link link-fb" title="Nhắn tin Facebook cá nhân">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span>Facebook: facebook.com/congz9g</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ─── 1. BẢNG DỊCH SONG NGỮ ANH - VIỆT (I18N) ───────────────────────────
+    const I18N = {
+      vi: {
+        tabWindows: "🪟 Windows (v1.3.0)",
+        tabMac: "🍏 macOS (Sắp Ra Mắt)",
+        badgeWin: "🔥 BẢN CHÍNH THỨC • V1.3.0",
+        badgeMac: "🍏 SẮP RA MẮT • MACOS",
+        titleWin: "Record-AutoZoom Cho Windows",
+        titleMac: "Record-AutoZoom Cho macOS",
+        statusWin: "Miễn Phí",
+        statusMac: "Sắp Ra Mắt",
+        periodWin: "• Tải Về Trực Tiếp",
+        periodMac: "• Đang Hoàn Thiện",
+        subtextWin: "Tương thích Windows 10 & 11 (64-bit) • Dung lượng ~358 MB",
+        subtextMac: "Dành cho Apple Silicon (M1/M2/M3) & Intel • macOS 12+",
+        btnDownloadWin: "⬇️ Tải Cho Windows (.exe)",
+        btnMacCard: "🍏 Bản macOS (Sắp Có)",
+        guaranteeWin: "Bản cài an toàn • 100% Không mã độc • Tải trực tiếp",
+        guaranteeMac: "Tối ưu hoá đặc biệt cho màn hình Retina & chip Apple",
+        wf1: "Hỗ trợ <strong>Windows 10 / Windows 11</strong> (64-bit)",
+        wf2: "Xuất video <strong>4K & 60 FPS</strong> sắc nét không giới hạn",
+        wf3: "Tự động bắt tiêu điểm & <strong>zoom theo chuột</strong> cực mượt",
+        wf4: "Hiệu ứng kính mờ (Glassmorphism) & hình nền đa dạng",
+        bottomWin: "Tải xuống trực tiếp từ máy chủ Cloudflare CDN tốc độ cao",
+        mf1: "Tương thích <strong>Apple Silicon M-Series</strong> & Intel Mac",
+        mf2: "Tự động nhận diện cửa sổ và zoom con trỏ mượt mà",
+        mf3: "Ghi âm micro lọc tạp âm & âm thanh hệ thống",
+        mf4: "Xuất video chuẩn ProRes & MP4 60 FPS chất lượng cao",
+        bottomMac: "Bản macOS sẽ sớm có mặt trong đợt phát hành tới",
+        secTitle: "Hướng Dẫn Cài Đặt & Link Tải Trực Tiếp",
+        selectedWin: "Phiên bản: Windows 64-bit (v1.3.0)",
+        selectedMac: "Phiên bản: macOS (Đang phát triển)",
+        labelDlUrl: "🔗 Đường dẫn tải trực tiếp (Direct Link)",
+        subDlUrl: "Tốc độ cao Cloudflare R2",
+        btnCopyUrl: "Sao chép link",
+        labelSteps: "🚀 3 Bước bắt đầu sử dụng",
+        subSteps: "Chỉ 10 giây",
+        btnBigDownload: "Tải Bản Cài Đặt Cho Windows Ngay (.exe)",
+        supTitle: "Cần hỗ trợ kỹ thuật hoặc góp ý tính năng?",
+        navDownload: "Tải Cho Windows (.exe)",
+        navPro: "Bản Quyền PRO",
+        supDl: "Tải Bản Cài Windows (.exe)"
+      },
+      en: {
+        tabWindows: "🪟 Windows (v1.3.0)",
+        tabMac: "🍏 macOS (Coming Soon)",
+        badgeWin: "🔥 OFFICIAL RELEASE • V1.3.0",
+        badgeMac: "🍏 COMING SOON • MACOS",
+        titleWin: "Record-AutoZoom for Windows",
+        titleMac: "Record-AutoZoom for macOS",
+        statusWin: "Free",
+        statusMac: "Coming Soon",
+        periodWin: "• Direct Download",
+        periodMac: "• In Development",
+        subtextWin: "Compatible with Windows 10 & 11 (64-bit) • Size ~358 MB",
+        subtextMac: "For Apple Silicon (M1/M2/M3) & Intel • macOS 12+",
+        btnDownloadWin: "⬇️ Download for Windows (.exe)",
+        btnMacCard: "🍏 macOS (Coming Soon)",
+        guaranteeWin: "Clean installer • 100% Virus-free • Direct Download",
+        guaranteeMac: "Optimized for Retina displays & Apple Silicon chips",
+        wf1: "Supports <strong>Windows 10 / Windows 11</strong> (64-bit)",
+        wf2: "Export <strong>4K & 60 FPS</strong> high-definition video",
+        wf3: "Intelligent auto focus & <strong>cursor zoom</strong> tracking",
+        wf4: "Glassmorphism effects & rich customizable backgrounds",
+        bottomWin: "High-speed download powered by Cloudflare CDN",
+        mf1: "Compatible with <strong>Apple Silicon M-Series</strong> & Intel Mac",
+        mf2: "Real-time window focus & smooth cursor tracking",
+        mf3: "Crisp microphone audio & system sound recording",
+        mf4: "Export in ProRes & MP4 60 FPS format",
+        bottomMac: "macOS version will be available in upcoming releases",
+        secTitle: "Installation Guide & Direct Download Link",
+        selectedWin: "Edition: Windows 64-bit (v1.3.0)",
+        selectedMac: "Edition: macOS (In Development)",
+        labelDlUrl: "🔗 Direct Download Link",
+        subDlUrl: "Cloudflare R2 High Speed",
+        btnCopyUrl: "Copy link",
+        labelSteps: "🚀 3 Easy Steps to Start",
+        subSteps: "Takes 10s",
+        btnBigDownload: "Download Windows Installer Now (.exe)",
+        supTitle: "Need technical assistance or feature suggestions?",
+        navDownload: "Download for Windows (.exe)",
+        navPro: "PRO Pricing",
+        supDl: "Download for Windows (.exe)"
+      }
+    };
+
+    let currentLang = localStorage.getItem("recordly_pay_lang") || "vi";
+    let activePlatform = "windows";
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("recordly_pay_lang", lang);
+      document.getElementById("btnLangVi").classList.toggle("active", lang === "vi");
+      document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
+      
+      const t = I18N[lang];
+      document.getElementById("t-tab-windows").textContent = t.tabWindows;
+      document.getElementById("t-tab-mac").textContent = t.tabMac;
+      document.getElementById("t-badge-win").textContent = t.badgeWin;
+      document.getElementById("t-badge-mac").textContent = t.badgeMac;
+      document.getElementById("t-title-win").textContent = t.titleWin;
+      document.getElementById("t-title-mac").textContent = t.titleMac;
+      document.getElementById("t-status-win").textContent = t.statusWin;
+      document.getElementById("t-status-mac").textContent = t.statusMac;
+      document.getElementById("t-period-win").textContent = t.periodWin;
+      document.getElementById("t-period-mac").textContent = t.periodMac;
+      document.getElementById("t-subtext-win").textContent = t.subtextWin;
+      document.getElementById("t-subtext-mac").textContent = t.subtextMac;
+      document.getElementById("t-btn-download-win").textContent = t.btnDownloadWin;
+      document.getElementById("t-btn-mac-card").textContent = t.btnMacCard;
+      document.getElementById("t-guarantee-win").textContent = t.guaranteeWin;
+      document.getElementById("t-guarantee-mac").textContent = t.guaranteeMac;
+      document.getElementById("t-wf1").innerHTML = t.wf1;
+      document.getElementById("t-wf2").innerHTML = t.wf2;
+      document.getElementById("t-wf3").innerHTML = t.wf3;
+      document.getElementById("t-wf4").innerHTML = t.wf4;
+      document.getElementById("t-bottom-win").textContent = t.bottomWin;
+      document.getElementById("t-mf1").innerHTML = t.mf1;
+      document.getElementById("t-mf2").innerHTML = t.mf2;
+      document.getElementById("t-mf3").innerHTML = t.mf3;
+      document.getElementById("t-mf4").innerHTML = t.mf4;
+      document.getElementById("t-bottom-mac").textContent = t.bottomMac;
+      document.getElementById("t-sec-title").textContent = t.secTitle;
+      document.getElementById("t-label-dlurl").textContent = t.labelDlUrl;
+      document.getElementById("t-sub-dlurl").textContent = t.subDlUrl;
+      document.getElementById("t-btn-copy-url").textContent = t.btnCopyUrl;
+      document.getElementById("t-label-steps").textContent = t.labelSteps;
+      document.getElementById("t-sub-steps").textContent = t.subSteps;
+      document.getElementById("t-btn-big-download").textContent = t.btnBigDownload;
+      document.getElementById("t-sup-title").textContent = t.supTitle;
+      const navDl = document.getElementById("t-nav-download");
+      if (navDl) navDl.textContent = t.navDownload;
+      const supDl = document.getElementById("t-sup-dl");
+      if (supDl) supDl.textContent = t.supDl;
+
+      const pill = document.getElementById("selectedPlanPill");
+      if (pill) {
+        pill.textContent = activePlatform === "windows" ? t.selectedWin : t.selectedMac;
+      }
+    }
+
+    function switchPlatform(platform) {
+      activePlatform = platform;
+      document.getElementById("tabWindows").classList.toggle("active", platform === "windows");
+      document.getElementById("tabMac").classList.toggle("active", platform === "mac");
+      
+      document.getElementById("cardWindows").classList.toggle("popular", platform === "windows");
+      document.getElementById("cardMac").classList.toggle("popular", platform === "mac");
+
+      const t = I18N[currentLang];
+      const pill = document.getElementById("selectedPlanPill");
+      if (pill) {
+        pill.textContent = platform === "windows" ? t.selectedWin : t.selectedMac;
+      }
+    }
+
+    function showMacNotice() {
+      const msg = currentLang === 'vi' 
+        ? "Phiên bản Record-AutoZoom dành cho macOS (Apple Silicon M-series & Intel) đang trong giai đoạn hoàn thiện cuối cùng và sẽ được phát hành sớm!" 
+        : "Record-AutoZoom for macOS (Apple Silicon M-series & Intel) is in final testing and will be released very soon!";
+      alert(msg);
+    }
+
+    function copyDownloadUrl() {
+      const input = document.getElementById("downloadUrlInput");
+      if (!input) return;
+      navigator.clipboard.writeText(input.value);
+      
+      const successEl = document.getElementById("copySuccessMsg");
+      if (successEl) {
+        successEl.style.display = "flex";
+        setTimeout(() => {
+          successEl.style.display = "none";
+        }, 3500);
+      }
+    }
+
+    // Khởi tạo
+    setLanguage(currentLang);
+  </script>
+</body>
+</html>

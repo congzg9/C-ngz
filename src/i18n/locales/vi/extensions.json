@@ -1,0 +1,60 @@
+{
+  "title": "Tiện ích mở rộng (Extensions)",
+  "tabs": {
+    "browse": "Khám phá",
+    "installed": "Đã cài đặt"
+  },
+  "actions": {
+    "submit": "Gửi một tiện ích",
+    "docs": "Tài liệu Extension",
+    "refresh": "Tải lại",
+    "openFolder": "Mở thư mục chứa extension",
+    "uninstall": "Gỡ cài đặt",
+    "install": "Cài đặt",
+    "installing": "Đang cài đặt",
+    "add": "Thêm",
+    "retry": "Thử lại",
+    "close": "Đóng",
+    "folder": "Thư mục"
+  },
+  "status": {
+    "enabled": "Đã bật",
+    "disabled": "Đã tắt",
+    "installed": "Đã cài đặt"
+  },
+  "detail": {
+    "by": "Bởi {{author}}",
+    "unknownAuthor": "Tác giả ẩn danh",
+    "noDescription": "Không có mô tả",
+    "downloads": "{{count}} lượt tải",
+    "preview": "Xem trước",
+    "screenshotAlt": "Ảnh chụp màn hình {{number}}",
+    "description": "Mô tả",
+    "tags": "Thẻ",
+    "permissions": "Quyền hạn",
+    "location": "Vị trí lưu",
+    "error": "Lỗi: {{message}}"
+  },
+  "empty": {
+    "title": "Chưa cài đặt tiện ích nào",
+    "description": "Hãy cài đặt các tiện ích để bổ sung thêm khung hình, hiệu ứng chuột, và công cụ chỉnh sửa."
+  },
+  "search": {
+    "placeholder": "Tìm kiếm tiện ích...",
+    "noResults": "Không tìm thấy tiện ích nào",
+    "noMarketplace": "Chưa có tiện ích nào trên chợ ứng dụng",
+    "count": "{{count}} tiện ích",
+    "countPlural": "{{count}} tiện ích"
+  },
+  "toast": {
+    "installedAndEnabled": "Extension đã được cài đặt và kích hoạt",
+    "uninstalled": "Đã gỡ cài đặt {{name}}",
+    "uninstallFailed": "Không thể gỡ cài đặt {{name}}",
+    "searchFailed": "Không thể tìm kiếm trên chợ ứng dụng",
+    "refreshed": "Đã làm mới danh sách tiện ích",
+    "refreshFailed": "Không thể làm mới danh sách tiện ích",
+    "marketplaceInstalled": "Đã cài đặt và kích hoạt {{name}}",
+    "marketplaceInstallFailed": "Không thể cài đặt {{name}}",
+    "enableFailed": "Không thể kích hoạt tiện ích"
+  }
+}

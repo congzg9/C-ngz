@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" fill="none">
+  <defs>
+    <filter id="glow" x="-50%" y="-30%" width="200%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Outer glow ring -->
+  <path filter="url(#glow)"
+    d="M5 5L5 85L75 35Z"
+    fill="rgba(0,255,240,0.1)"
+    stroke="#00fff0" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Inner triangle -->
+  <path d="M11 20L11 70L55 40Z"
+    fill="none" stroke="rgba(0,255,240,0.55)" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Tip dot -->
+  <circle cx="5" cy="5" r="2.5" fill="#00fff0" filter="url(#glow)"/>
+</svg>

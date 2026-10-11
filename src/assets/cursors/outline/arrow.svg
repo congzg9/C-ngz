@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" fill="none">
+  <defs>
+    <filter id="shadow" x="-20%" y="-15%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+  </defs>
+  <!-- Shadow -->
+  <path d="M5 5L5 85L75 35Z" fill="rgba(0,0,0,0.45)" filter="url(#shadow)"/>
+  <!-- Dark body -->
+  <path d="M5 5L5 85L75 35Z" fill="#080c18" stroke="#2563eb" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Inner accent triangle -->
+  <path d="M12 22L12 70L54 40Z" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round" opacity="0.8"/>
+  <!-- Top highlight -->
+  <path d="M5 5L28 8L10 26Z" fill="rgba(59,130,246,0.35)"/>
+  <!-- Tip highlight -->
+  <circle cx="5" cy="5" r="2" fill="#60a5fa"/>
+</svg>

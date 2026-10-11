@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Record-AutoZoom PRO • Cổng Thanh Toán & Bản Quyền Quốc Tế</title>
+  <link rel="icon" type="image/png" href="./app-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=BAAbR4nlF1tCn5UpHmxYEiQB-DZmJdCARb_n9h-V85UKTh8qLfc1A0k2IojpVP6YwRd-oEWsVPe4vugSr4&currency=USD"></script>
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #f59e0b 100%);
+      --accent-purple: #8b5cf6;
+      --bg-gradient-top: #3b0764;
+      --bg-gradient-mid: #6b21a8;
+      --bg-gradient-sunset: #f97316;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(255, 255, 255, 0.4);
+      --card-shadow: 0 20px 45px -10px rgba(88, 28, 135, 0.18), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+      --text-dark: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      color: var(--text-dark);
+      background: linear-gradient(180deg, 
+        #2e0854 0%, 
+        #4c1d95 18%, 
+        #7c3aed 38%, 
+        #c084fc 58%, 
+        #fbcfe8 75%, 
+        #fef3c7 90%, 
+        #fffbeb 100%);
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glow Behind */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 550px;
+      background: radial-gradient(ellipse, rgba(249, 115, 22, 0.28) 0%, rgba(192, 132, 252, 0.15) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      width: 100%;
+      max-width: 1180px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 30;
+    }
+    .brand-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .brand-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+      flex-shrink: 0;
+    }
+    .brand-icon-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-os-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 6px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+    }
+
+    /* Language Switcher & Nav Actions */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+    .nav-download-btn svg {
+      color: #0078d4;
+    }
+    .nav-download-btn:hover {
+      background: #f8fafc;
+      color: #ea580c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.28);
+    }
+    @media (max-width: 640px) {
+      .nav-download-btn span { display: none; }
+      .nav-download-btn { padding: 7px 12px; }
+    }
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    .lang-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+    .lang-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Main Container */
+    .main-wrap {
+      width: 100%;
+      max-width: 1060px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Hero Headline */
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      color: #ffffff;
+      max-width: 780px;
+      line-height: 1.22;
+      letter-spacing: -0.8px;
+      margin-top: 14px;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
+    }
+    @media (max-width: 640px) {
+      .hero-title { font-size: 26px; }
+    }
+    .hero-sub {
+      font-size: 15px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+
+    /* Billing Toggle Pill (Monthly / Yearly/Lifetime) with hand-drawn Save badge */
+    .toggle-wrapper {
+      position: relative;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .toggle-pill {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 5px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .toggle-item {
+      padding: 9px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #64748b;
+      transition: all 0.25s ease;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+    }
+    .toggle-item.active {
+      background: #fef08a;
+      color: #854d0e;
+      box-shadow: 0 2px 8px rgba(133, 77, 14, 0.12);
+    }
+    /* Hand-drawn save arrow text */
+    .save-arrow-badge {
+      position: absolute;
+      top: -30px;
+      right: -110px;
+      font-family: 'Patrick Hand', 'Dancing Script', cursive;
+      font-size: 23px;
+      font-weight: 700;
+      color: #fef08a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transform: rotate(5deg);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+    .save-arrow-badge svg {
+      width: 32px;
+      height: 32px;
+      transform: scaleX(-1) rotate(65deg);
+      fill: none;
+      stroke: #fef08a;
+      stroke-width: 2.2;
+    }
+    @media (max-width: 600px) {
+      .save-arrow-badge { display: none; }
+    }
+
+    /* Pricing Cards Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
+    }
+
+    /* FocuSee Style Cards */
+    .card-focusee {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border);
+      border-radius: 28px;
+      padding: 34px 28px 28px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .card-focusee:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 28px 60px -10px rgba(88, 28, 135, 0.28);
+    }
+    .card-focusee.popular {
+      border: 2.5px solid #f97316;
+      box-shadow: 0 24px 60px -8px rgba(249, 115, 22, 0.35);
+    }
+
+    /* Corner Discount Badge */
+    .corner-badge {
+      position: absolute;
+      top: -12px;
+      left: 24px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .corner-badge.popular-badge {
+      background: linear-gradient(135deg, #f97316, #e11d48);
+    }
+
+    /* Card Details */
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .price-area {
+      text-align: center;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+    }
+    .price-currency {
+      font-size: 24px;
+      font-weight: 800;
+      color: #f97316;
+    }
+    .price-number {
+      font-size: 46px;
+      font-weight: 900;
+      color: #f97316;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .price-period {
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .price-original {
+      font-size: 15px;
+      color: #94a3b8;
+      text-decoration: line-through;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+    .price-subtext {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    /* Buy Button FocuSee style */
+    .btn-buy-focusee {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      background: #fed7aa;
+      color: #9a3412;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .btn-buy-focusee:hover {
+      background: #fdba74;
+      transform: translateY(-1px);
+    }
+    .card-focusee.popular .btn-buy-focusee {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+    }
+    .card-focusee.popular .btn-buy-focusee:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.5);
+    }
+
+    /* Guarantee Pill */
+    .guarantee-note {
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #059669;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    /* Features List */
+    .features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .feature-item svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #10b981;
+    }
+    .feature-item strong {
+      color: #0f172a;
+    }
+
+    /* FocuSee Bottom Upgrade Pill Badge */
+    .card-bottom-badge {
+      margin-top: auto;
+      padding: 9px 14px;
+      background: #fff7ed;
+      border: 1px solid #ffedd5;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c2410c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .card-focusee.popular .card-bottom-badge {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    /* Bottom Section: Machine ID, Coupon & PayPal Area */
+    .checkout-section {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 32px 30px;
+      box-shadow: 0 25px 60px -12px rgba(88, 28, 135, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+    }
+
+    .section-headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .selected-summary-pill {
+      background: #fff7ed;
+      border: 1px solid #ffedd5;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #c2410c;
+    }
+
+    /* Machine ID & Coupon Rows */
+    .input-row-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 680px) {
+      .input-row-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-input-box {
+      display: flex;
+      gap: 8px;
+    }
+    .custom-input {
+      flex: 1;
+      padding: 11px 14px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .custom-input:focus {
+      border-color: #f97316;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+    .btn-small-action {
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-small-action:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .btn-coupon-apply {
+      background: #f97316;
+      color: #fff;
+      border-color: #f97316;
+    }
+    .btn-coupon-apply:hover {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+
+    /* Coupon Alert Message */
+    .coupon-msg {
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      margin-top: 4px;
+    }
+    .coupon-msg.success {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #16a34a;
+    }
+    .coupon-msg.error {
+      display: block;
+      color: #dc2626;
+    }
+
+    /* PayPal Area */
+    .paypal-wrap-box {
+      margin-top: 10px;
+      padding-top: 20px;
+      border-top: 1px solid #f1f5f9;
+    }
+    #paypal-button-container {
+      min-height: 110px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* SUCCESS CARD (KHI THANH TOÁN XONG) */
+    .success-card {
+      display: none;
+      background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+      border: 2px solid #10b981;
+      border-radius: 24px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(16, 185, 129, 0.2);
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success-icon { font-size: 48px; margin-bottom: 10px; }
+    .success-title { font-size: 22px; font-weight: 800; color: #065f46; margin-bottom: 6px; }
+    .success-desc { font-size: 13.5px; color: #047857; margin-bottom: 16px; }
+    .key-display {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 14px 18px;
+      border-radius: 12px;
+      word-break: break-all;
+      user-select: all;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+    .btn-copy-success {
+      background: #10b981;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-copy-success:hover { background: #059669; }
+
+    /* Support Footer Card */
+    .support-bar {
+      margin-top: 28px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1060px;
+      flex-wrap: wrap;
+      gap: 14px;
+      color: #0f172a;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+    }
+    .support-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .support-icon-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .support-contacts {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .support-item-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .support-item-link:hover {
+      background: #ffffff;
+      border-color: #f97316;
+      color: #ea580c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+    .support-item-link svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+    .support-item-link.link-email svg {
+      color: #ea580c;
+    }
+    .support-item-link.link-fb svg {
+      color: #1877f2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR (CÓ CHỌN NGÔN NGỮ EN / VI) -->
+  <header class="top-nav">
+    <a href="#" class="brand-logo-area">
+      <div class="brand-icon-box">
+        <img src="./app-icon.png" alt="Record-AutoZoom Logo" class="brand-icon-img" />
+      </div>
+      <div class="brand-name">
+        <span>Record-AutoZoom</span>
+        <span class="brand-os-icons" title="Hỗ trợ macOS & Windows">
+          <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.64 1.36-.57.65-1.07 1.72-.94 2.74 1.01.08 2.04-.5 2.66-1.25z"/></svg>
+          <svg style="width:15px;height:15px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- Nút Về Trang Tải & Đổi ngôn ngữ Anh - Việt -->
+    <div class="nav-actions">
+      <a href="/" class="nav-download-btn" id="btnNavHome" style="background:rgba(255,255,255,0.22);color:#fff;border-color:rgba(255,255,255,0.45);backdrop-filter:blur(10px);" title="Về trang giới thiệu & tải ứng dụng">
+        <span>🏠</span> <span id="t-nav-home">Trang Tải App</span>
+      </a>
+
+      <!-- Nút đổi ngôn ngữ Anh - Việt -->
+      <div class="lang-switcher">
+        <button type="button" class="lang-btn active" id="btnLangVi" onclick="setLanguage('vi')">
+          <span>🇻🇳</span> <span>Tiếng Việt</span>
+        </button>
+        <button type="button" class="lang-btn" id="btnLangEn" onclick="setLanguage('en')">
+          <span>🇺🇸</span> <span>English</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT WRAPPER -->
+  <main class="main-wrap">
+
+    <!-- BILLING TOGGLE (MONTHLY / LIFETIME) WITH SAVE ARROW -->
+    <div class="toggle-wrapper" style="margin-top: 20px;">
+      <div class="toggle-pill">
+        <button type="button" class="toggle-item" id="tabMonthly" onclick="selectPlan('month')">
+          <span id="t-tab-monthly">Gói 1 Tháng</span>
+        </button>
+        <button type="button" class="toggle-item active" id="tabLifetime" onclick="selectPlan('lifetime')">
+          <span id="t-tab-lifetime">Gói Vĩnh Viễn</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS POPUP (WHEN PAID) -->
+    <div id="successCard" class="success-card">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title" id="t-success-title">THANH TOÁN THÀNH CÔNG!</h2>
+      <p class="success-desc" id="t-success-desc">Mã bản quyền PRO của bạn đã được khởi tạo và gắn với thiết bị:</p>
+      
+      <div class="key-display" id="displayLicenseKey">REC-PRO-XXXX-XXXX</div>
+      
+      <button class="btn-copy-success" onclick="copySuccessKey()">
+        📋 <span id="t-btn-copy-key">Sao Chép License Key Ngay</span>
+      </button>
+
+      <div style="margin-top: 18px; font-size: 13px; color: #065f46; text-align: left; background: rgba(255,255,255,0.7); padding: 14px 18px; border-radius: 14px;">
+        <p style="font-weight: 700; margin-bottom: 6px;">👉 Cách kích hoạt vào phần mềm trên máy tính:</p>
+        <p>1. Mở phần mềm <strong>Record-AutoZoom</strong> trên máy tính.</p>
+        <p>2. Bấm vào nút <strong>Vương miện vàng (Kích hoạt PRO)</strong> ở thanh tiêu đề trên cùng.</p>
+        <p>3. Dán mã kích hoạt ở trên vào ô License Key và bấm <strong>Kích hoạt</strong>.</p>
+      </div>
+    </div>
+
+    <!-- PRICING CARDS GRID (PHONG CÁCH FOCUSEE SANG TRỌNG) -->
+    <div class="pricing-grid" id="pricingGrid">
+      
+      <!-- CARD 1: GÓI THÁNG -->
+      <div class="card-focusee" id="cardMonth" onclick="selectPlan('month')">
+        <div class="corner-badge" id="t-badge-month">70% OFF</div>
+        <div class="card-title" id="t-title-month">Gói 1 Tháng</div>
+        
+        <div class="price-area">
+          <span class="price-currency">$</span>
+          <span class="price-number" id="priceMonthNum">5</span>
+          <span class="price-period" id="t-period-month">/tháng</span>
+          <span class="price-original" id="origMonthNum">$15.00</span>
+        </div>
+        <p class="price-subtext" id="t-subtext-month">Thanh toán linh hoạt theo từng tháng</p>
+
+        <button type="button" class="btn-buy-focusee">
+          <span id="t-btn-buy-month">Mua Ngay (Buy Now)</span> →
+        </button>
+
+        <div class="guarantee-note">
+          <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span id="t-guarantee-month">Cam kết hoàn tiền trong 30 ngày</span>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-f1">1 Máy tính (Windows hoặc macOS)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-f2">Xuất video <strong>4K & 60 FPS</strong> không giới hạn</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-f3">Tự động bắt tiêu điểm & zoom theo chuột</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-f4">Hiệu ứng kính mờ & hình nền đa dạng</span>
+          </li>
+        </ul>
+
+        <div class="card-bottom-badge">
+          ✨ <span id="t-bottom-month">Miễn phí nâng cấp các bản cập nhật mới</span>
+        </div>
+      </div>
+
+      <!-- CARD 2: GÓI VĨNH VIỄN (POPULAR - CÓ VIỀN SÁNG VÀ NÚT CAM FOCUSEE) -->
+      <div class="card-focusee popular" id="cardLifetime" onclick="selectPlan('lifetime')">
+        <div class="corner-badge popular-badge" id="t-badge-lifetime">🔥 78% OFF • KHUYÊN DÙNG</div>
+        <div class="card-title" id="t-title-lifetime">Gói Vĩnh Viễn (Lifetime)</div>
+        
+        <div class="price-area">
+          <span class="price-currency">$</span>
+          <span class="price-number" id="priceLifetimeNum">35</span>
+          <span class="price-period" id="t-period-lifetime">Một lần</span>
+          <span class="price-original" id="origLifetimeNum">$159.00</span>
+        </div>
+        <p class="price-subtext" id="t-subtext-lifetime">Thanh toán 1 lần duy nhất • Sử dụng mãi mãi</p>
+
+        <button type="button" class="btn-buy-focusee">
+          <span id="t-btn-buy-lifetime">Sở Hữu Trọn Đời (Buy Now)</span> →
+        </button>
+
+        <div class="guarantee-note">
+          <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span id="t-guarantee-lifetime">Cam kết hoàn tiền trong 30 ngày</span>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-lf1"><strong>Bản quyền vĩnh viễn trọn đời</strong> (Không gia hạn)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-lf2"><strong>Miễn phí nâng cấp</strong> toàn bộ tính năng mới tương lai</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-lf3">Xuất video 4K & 60 FPS không watermark</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span id="t-lf4">Hỗ trợ kỹ thuật 1-1 trực tiếp ưu tiên cao</span>
+          </li>
+        </ul>
+
+        <div class="card-bottom-badge">
+          🚀 <span id="t-bottom-lifetime">Sở hữu vĩnh viễn Record-AutoZoom trọn đời</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM CHECKOUT PANEL (MACHINE ID + COUPON + PAYPAL GATEWAY) -->
+    <div class="checkout-section" id="checkoutSection">
+      
+      <div class="section-headline">
+        <div class="section-title">
+          <span>💳</span> <span id="t-sec-title">Thông Tin Thanh Toán & Kích Hoạt</span>
+        </div>
+        <div class="selected-summary-pill" id="selectedPlanPill">
+          Đang chọn: Gói Vĩnh Viễn ($35)
+        </div>
+      </div>
+
+      <!-- INPUT GRID: MACHINE ID & COUPON CODE -->
+      <div class="input-row-grid">
+        
+        <!-- Ô Mã Máy (Machine ID) -->
+        <div class="form-group">
+          <label class="form-label" for="machineIdInput">
+            <span id="t-label-mid">💻 Mã máy của bạn (Machine ID)</span>
+            <span style="font-size:11px;color:#94a3b8;font-weight:500;" id="t-sub-mid">Tự động nhận diện từ app</span>
+          </label>
+          <div class="form-input-box">
+            <input type="text" id="machineIdInput" class="custom-input" placeholder="REC-XXXX-XXXX-XXXX" />
+            <button type="button" class="btn-small-action" onclick="copyMachineId()">
+              📋 <span id="t-btn-copy-mid">Sao chép</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ô Mã Giảm Giá (Coupon) -->
+        <div class="form-group">
+          <label class="form-label" for="couponInput">
+            <span id="t-label-coupon">🎟️ Mã giảm giá (Coupon)</span>
+            <span style="font-size:11px;color:#f97316;font-weight:700;" id="t-sub-coupon">Nhập mã ưu đãi</span>
+          </label>
+          <div class="form-input-box">
+            <input type="text" id="couponInput" class="custom-input" placeholder="Nhập mã giảm giá..." />
+            <button type="button" class="btn-small-action btn-coupon-apply" onclick="applyCoupon()">
+              <span id="t-btn-apply-coupon">Áp dụng</span>
+            </button>
+          </div>
+          <!-- Alert coupon -->
+          <div id="couponStatusSuccess" class="coupon-msg success">
+            <span id="couponSuccessText">🎉 Đã áp dụng mã: Giảm 20%</span>
+            <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:#ef4444;text-decoration:underline;cursor:pointer;font-size:11px;">[Hủy mã]</button>
+          </div>
+          <div id="couponStatusError" class="coupon-msg error">
+            ⚠️ Mã giảm giá không đúng hoặc đã hết hạn!
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PAYPAL GATEWAY -->
+      <div class="paypal-wrap-box">
+        <p style="font-size:12.5px;color:#64748b;text-align:center;margin-bottom:16px;" id="t-paypal-notice">
+          Hệ thống bảo mật SSL quốc tế. License Key sẽ <strong>hiển thị ngay tức thì</strong> trên màn hình và gửi vào email của bạn sau khi thanh toán:
+        </p>
+        <div id="paypal-button-container"></div>
+      </div>
+
+    </div>
+
+    <!-- SUPPORT FOOTER BAR (EMAIL & FACEBOOK) -->
+    <div class="support-bar">
+      <div class="support-title-wrap">
+        <div class="support-icon-badge">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          </svg>
+        </div>
+        <span id="t-sup-title">Cần trợ giúp kích hoạt hoặc hỗ trợ kỹ thuật?</span>
+      </div>
+      <div class="support-contacts">
+        <a href="https://pub-4c232cb201914b09a4118b93c77c37c1.r2.dev/Record-AutoZoom-windows-x64.exe" class="support-item-link" download title="Tải file cài đặt Record-AutoZoom cho Windows">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+          </svg>
+          <span id="t-sup-dl">Tải Bản Cài Windows (.exe)</span>
+        </a>
+        <a href="mailto:Giangcong1089@gmail.com" class="support-item-link link-email" title="Gửi email cho tác giả">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="16" x="2" y="4" rx="3"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+          <span>Giangcong1089@gmail.com</span>
+        </a>
+        <a href="https://www.facebook.com/congz9g/" target="_blank" rel="noopener noreferrer" class="support-item-link link-fb" title="Nhắn tin Facebook cá nhân">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span>Facebook: facebook.com/congz9g</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ─── 1. BẢNG DỊCH SONG NGỮ ANH - VIỆT (I18N) ───────────────────────────
+    const I18N = {
+      vi: {
+        heroTitle: "Tạo video demo & hướng dẫn chuyên nghiệp với tính năng tự động zoom thông minh.",
+        heroSub: "Tặng sẵn 5 lượt xuất video miễn phí. Nâng cấp bản quyền PRO để xuất video 4K sắc nét không giới hạn thời lượng.",
+        tabMonthly: "Gói 1 Tháng",
+        tabLifetime: "Gói Vĩnh Viễn",
+        saveBadge: "Tiết kiệm tới 78%",
+        badgeMonth: "70% OFF",
+        badgeLifetime: "🔥 78% OFF • KHUYÊN DÙNG",
+        titleMonth: "Gói 1 Tháng",
+        titleLifetime: "Gói Vĩnh Viễn (Lifetime)",
+        periodMonth: "/tháng",
+        periodLifetime: "Một lần",
+        subtextMonth: "Thanh toán linh hoạt theo từng tháng",
+        subtextLifetime: "Thanh toán 1 lần duy nhất • Sử dụng mãi mãi",
+        btnBuyMonth: "Mua Ngay (Buy Now)",
+        btnBuyLifetime: "Sở Hữu Trọn Đời (Buy Now)",
+        guarantee: "Cam kết hoàn tiền trong 30 ngày",
+        f1: "1 Máy tính (Windows hoặc macOS)",
+        f2: "Xuất video 4K & 60 FPS không giới hạn",
+        f3: "Tự động bắt tiêu điểm & zoom theo chuột",
+        f4: "Hiệu ứng kính mờ & hình nền đa dạng",
+        lf1: "Bản quyền vĩnh viễn trọn đời (Không gia hạn)",
+        lf2: "Miễn phí nâng cấp toàn bộ tính năng mới tương lai",
+        lf3: "Xuất video 4K & 60 FPS không watermark",
+        lf4: "Hỗ trợ kỹ thuật 1-1 trực tiếp ưu tiên cao",
+        secTitle: "Thông Tin Thanh Toán & Kích Hoạt",
+        labelMid: "💻 Mã máy của bạn (Machine ID)",
+        subMid: "Tự động nhận diện từ app",
+        btnCopyMid: "Sao chép",
+        labelCoupon: "🎟️ Mã giảm giá (Coupon)",
+        subCoupon: "Nhập mã ưu đãi",
+        btnApplyCoupon: "Áp dụng",
+        paypalNotice: "Hệ thống bảo mật SSL quốc tế. License Key sẽ hiển thị ngay tức thì trên màn hình và gửi vào email của bạn sau khi thanh toán:",
+        supTitle: "Cần trợ giúp kích hoạt hoặc hỗ trợ kỹ thuật?",
+        selectedMonth: "Đang chọn: Gói 1 Tháng ($5)",
+        selectedLifetime: "Đang chọn: Gói Vĩnh Viễn ($35)",
+        successTitle: "THANH TOÁN THÀNH CÔNG!",
+        successDesc: "Mã bản quyền PRO của bạn đã được khởi tạo và gắn với thiết bị:",
+        btnCopyKey: "Sao Chép License Key Ngay",
+        bottomMonth: "Miễn phí nâng cấp các bản cập nhật mới",
+        bottomLifetime: "Sở hữu vĩnh viễn Record-AutoZoom trọn đời",
+        couponPlaceholder: "Nhập mã giảm giá...",
+        navHome: "Trang Tải App",
+        supDl: "Tải Bản Cài Windows (.exe)"
+      },
+      en: {
+        heroTitle: "Create polished product demos and tutorials with auto zoom and AI-powered editing.",
+        heroSub: "Includes 5 free exports. Upgrade to Record Auto-Zoom PRO for unlimited 4K high-resolution video exports.",
+        tabMonthly: "Monthly",
+        tabLifetime: "Lifetime Access",
+        saveBadge: "Save up to 78%",
+        badgeMonth: "70% OFF",
+        badgeLifetime: "🔥 78% OFF • POPULAR",
+        titleMonth: "Monthly Plan",
+        titleLifetime: "Lifetime Pro (One-Time)",
+        periodMonth: "/month",
+        periodLifetime: "One-Time Purchase",
+        subtextMonth: "Flexible monthly billing, cancel anytime",
+        subtextLifetime: "Pay once, enjoy lifetime updates & exports forever",
+        btnBuyMonth: "Buy Now (Monthly)",
+        btnBuyLifetime: "Get Lifetime Access",
+        guarantee: "60-Day Money-Back Guarantee",
+        f1: "1 Computer (Windows or macOS)",
+        f2: "Unlimited 4K & 60 FPS Video Exports",
+        f3: "Smart Focus & Cursor Auto Zoom",
+        f4: "Custom Glassmorphism & Backgrounds",
+        lf1: "Lifetime Access (No recurring subscriptions)",
+        lf2: "Free upgrades to all future versions & AI features",
+        lf3: "Export 4K & 60 FPS without watermark",
+        lf4: "Priority 1-on-1 technical & VIP support",
+        secTitle: "Checkout & License Activation",
+        labelMid: "💻 Your Machine ID",
+        subMid: "Auto-detected from desktop app",
+        btnCopyMid: "Copy ID",
+        labelCoupon: "🎟️ Coupon / Promo Code",
+        subCoupon: "Apply discount code",
+        btnApplyCoupon: "Apply",
+        paypalNotice: "Secure 256-bit SSL encryption. Your License Key will be displayed on-screen instantly and sent to your email after checkout:",
+        supTitle: "Need help with activation or technical support?",
+        selectedMonth: "Selected: Monthly Plan ($5)",
+        selectedLifetime: "Selected: Lifetime Pro ($35)",
+        successTitle: "PAYMENT SUCCESSFUL!",
+        successDesc: "Your PRO License Key has been generated and bound to your device:",
+        btnCopyKey: "Copy License Key Now",
+        bottomMonth: "Free upgrade to future updates",
+        bottomLifetime: "Lifetime Access to Record-AutoZoom",
+        couponPlaceholder: "Enter coupon code...",
+        navHome: "Download App",
+        supDl: "Download for Windows (.exe)"
+      }
+    };
+
+    let currentLang = localStorage.getItem("recordly_pay_lang") || "vi";
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("recordly_pay_lang", lang);
+      document.getElementById("btnLangVi").classList.toggle("active", lang === "vi");
+      document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
+      
+      const t = I18N[lang];
+      const navHome = document.getElementById("t-nav-home");
+      if (navHome && t.navHome) navHome.textContent = t.navHome;
+      const hTitle = document.getElementById("t-hero-title");
+      if (hTitle) hTitle.textContent = t.heroTitle;
+      const hSub = document.getElementById("t-hero-sub");
+      if (hSub) hSub.textContent = t.heroSub;
+      document.getElementById("t-tab-monthly").textContent = t.tabMonthly;
+      document.getElementById("t-tab-lifetime").textContent = t.tabLifetime;
+      const saveB = document.getElementById("t-save-badge");
+      if (saveB) saveB.textContent = t.saveBadge;
+      document.getElementById("t-badge-month").textContent = t.badgeMonth;
+      document.getElementById("t-badge-lifetime").textContent = t.badgeLifetime;
+      document.getElementById("t-title-month").textContent = t.titleMonth;
+      document.getElementById("t-title-lifetime").textContent = t.titleLifetime;
+      document.getElementById("t-period-month").textContent = t.periodMonth;
+      document.getElementById("t-period-lifetime").textContent = t.periodLifetime;
+      document.getElementById("t-subtext-month").textContent = t.subtextMonth;
+      document.getElementById("t-subtext-lifetime").textContent = t.subtextLifetime;
+      document.getElementById("t-btn-buy-month").textContent = t.btnBuyMonth;
+      document.getElementById("t-btn-buy-lifetime").textContent = t.btnBuyLifetime;
+      document.getElementById("t-guarantee-month").textContent = t.guarantee;
+      document.getElementById("t-guarantee-lifetime").textContent = t.guarantee;
+      document.getElementById("t-f1").textContent = t.f1;
+      document.getElementById("t-f2").innerHTML = t.f2;
+      document.getElementById("t-f3").textContent = t.f3;
+      document.getElementById("t-f4").textContent = t.f4;
+      document.getElementById("t-lf1").innerHTML = t.lf1;
+      document.getElementById("t-lf2").innerHTML = t.lf2;
+      document.getElementById("t-lf3").textContent = t.lf3;
+      document.getElementById("t-lf4").textContent = t.lf4;
+      const bMonth = document.getElementById("t-bottom-month");
+      if (bMonth) bMonth.textContent = t.bottomMonth;
+      const bLife = document.getElementById("t-bottom-lifetime");
+      if (bLife) bLife.textContent = t.bottomLifetime;
+      const cpInput = document.getElementById("couponInput");
+      if (cpInput) cpInput.placeholder = t.couponPlaceholder;
+      document.getElementById("t-sec-title").textContent = t.secTitle;
+      document.getElementById("t-label-mid").textContent = t.labelMid;
+      document.getElementById("t-sub-mid").textContent = t.subMid;
+      document.getElementById("t-btn-copy-mid").textContent = t.btnCopyMid;
+      document.getElementById("t-label-coupon").textContent = t.labelCoupon;
+      document.getElementById("t-sub-coupon").textContent = t.subCoupon;
+      document.getElementById("t-btn-apply-coupon").textContent = t.btnApplyCoupon;
+      document.getElementById("t-paypal-notice").textContent = t.paypalNotice;
+      document.getElementById("t-sup-title").textContent = t.supTitle;
+      document.getElementById("t-success-title").textContent = t.successTitle;
+      document.getElementById("t-success-desc").textContent = t.successDesc;
+      document.getElementById("t-btn-copy-key").textContent = t.btnCopyKey;
+      const navDl = document.getElementById("t-nav-download");
+      if (navDl && t.navDownload) navDl.textContent = t.navDownload;
+      const supDl = document.getElementById("t-sup-dl");
+      if (supDl && t.supDl) supDl.textContent = t.supDl;
+
+      updateSelectedPlanPill();
+    }
+
+    // ─── 2. LOGIC GIÁ & COUPON ─────────────────────────────────────────────
+    const BASE_PRICES = {
+      month: 5,
+      lifetime: 35,
+    };
+
+    const COUPONS = {
+      "RECORDLY10": { type: "percent", value: 10, label: "10% OFF" },
+      "RECORDLY20": { type: "percent", value: 20, label: "20% OFF" },
+      "GIAM30": { type: "percent", value: 30, label: "30% OFF" },
+      "PRO50": { type: "percent", value: 50, label: "50% OFF" },
+      "VIPCONG": { type: "percent", value: 35, label: "35% OFF" },
+      "GIAM2USD": { type: "amount", value: 2, label: "$2 OFF" },
+      "GIAM5USD": { type: "amount", value: 5, label: "$5 OFF" },
+      "CONGPRO": { type: "percent", value: 25, label: "25% OFF" },
+    };
+
+    let activeCoupon = null;
+    let currentPlanType = "lifetime";
+    let currentUsd = 35;
+
+    function getFinalPrice(basePrice) {
+      if (!activeCoupon) return basePrice;
+      let finalPrice = basePrice;
+      if (activeCoupon.type === "percent") {
+        finalPrice = basePrice * (1 - activeCoupon.value / 100);
+      } else if (activeCoupon.type === "amount") {
+        finalPrice = Math.max(1, basePrice - activeCoupon.value);
+      }
+      return Math.round(finalPrice * 100) / 100;
+    }
+
+    function updatePricingUI() {
+      const monthFinal = getFinalPrice(BASE_PRICES.month);
+      const lifetimeFinal = getFinalPrice(BASE_PRICES.lifetime);
+
+      currentUsd = currentPlanType === "lifetime" ? lifetimeFinal : monthFinal;
+
+      document.getElementById("priceMonthNum").textContent = monthFinal;
+      document.getElementById("priceLifetimeNum").textContent = lifetimeFinal;
+
+      updateSelectedPlanPill();
+    }
+
+    function updateSelectedPlanPill() {
+      const t = I18N[currentLang];
+      const pill = document.getElementById("selectedPlanPill");
+      if (currentPlanType === "lifetime") {
+        pill.textContent = `${currentLang === 'vi' ? 'Đang chọn: Gói Vĩnh Viễn' : 'Selected: Lifetime Pro'} ($${currentUsd})`;
+      } else {
+        pill.textContent = `${currentLang === 'vi' ? 'Đang chọn: Gói 1 Tháng' : 'Selected: Monthly Plan'} ($${currentUsd})`;
+      }
+    }
+
+    function selectPlan(type) {
+      currentPlanType = type;
+      
+      // Update top toggle
+      document.getElementById("tabMonthly").classList.toggle("active", type === "month");
+      document.getElementById("tabLifetime").classList.toggle("active", type === "lifetime");
+
+      // Update cards style
+      document.getElementById("cardMonth").classList.toggle("popular", type === "month");
+      document.getElementById("cardLifetime").classList.toggle("popular", type === "lifetime");
+
+      updatePricingUI();
+      initPayPal();
+
+      // Smooth scroll to checkout if clicked from card
+      const checkoutEl = document.getElementById("checkoutSection");
+      if (checkoutEl && window.innerWidth < 768) {
+        checkoutEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function applyCoupon() {
+      const input = document.getElementById("couponInput");
+      const code = (input.value || "").trim().toUpperCase();
+      const successEl = document.getElementById("couponStatusSuccess");
+      const successText = document.getElementById("couponSuccessText");
+      const errorEl = document.getElementById("couponStatusError");
+
+      if (!code) {
+        if (errorEl) {
+          errorEl.textContent = currentLang === 'vi' ? "⚠️ Vui lòng nhập mã giảm giá!" : "⚠️ Please enter a coupon code!";
+          errorEl.style.display = "block";
+        }
+        if (successEl) successEl.style.display = "none";
+        return;
+      }
+
+      if (COUPONS[code]) {
+        activeCoupon = { ...COUPONS[code], code };
+        if (errorEl) errorEl.style.display = "none";
+        if (successEl && successText) {
+          successText.textContent = `🎉 ${currentLang === 'vi' ? 'Đã áp dụng mã' : 'Coupon applied'} [${code}]: -${activeCoupon.label}`;
+          successEl.style.display = "flex";
+        }
+        updatePricingUI();
+        initPayPal();
+      } else {
+        activeCoupon = null;
+        if (errorEl) {
+          errorEl.textContent = currentLang === 'vi' ? "⚠️ Mã giảm giá không đúng hoặc đã hết hạn!" : "⚠️ Invalid or expired coupon code!";
+          errorEl.style.display = "block";
+        }
+        if (successEl) successEl.style.display = "none";
+        updatePricingUI();
+        initPayPal();
+      }
+    }
+
+    function removeCoupon() {
+      activeCoupon = null;
+      const input = document.getElementById("couponInput");
+      if (input) input.value = "";
+      const successEl = document.getElementById("couponStatusSuccess");
+      const errorEl = document.getElementById("couponStatusError");
+      if (successEl) successEl.style.display = "none";
+      if (errorEl) errorEl.style.display = "none";
+      updatePricingUI();
+      initPayPal();
+    }
+
+    // ─── 3. MACHINE ID & PARAMS ───────────────────────────────────────────
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramMachineId = urlParams.get("machineId") || "";
+
+    const machineIdInput = document.getElementById("machineIdInput");
+    if (paramMachineId) {
+      machineIdInput.value = paramMachineId;
+    }
+
+    machineIdInput.addEventListener("input", () => {
+      initPayPal();
+    });
+
+    const couponInput = document.getElementById("couponInput");
+    if (couponInput) {
+      couponInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          applyCoupon();
+        }
+      });
+    }
+
+    function copyMachineId() {
+      const val = machineIdInput.value.trim();
+      if (!val) {
+        alert(currentLang === 'vi' ? "Vui lòng nhập hoặc mở từ app để lấy Mã máy!" : "Please enter your Machine ID!");
+        return;
+      }
+      navigator.clipboard.writeText(val);
+      alert(currentLang === 'vi' ? "Đã sao chép Mã máy: " + val : "Copied Machine ID: " + val);
+    }
+
+    // ─── 4. PAYPAL BUTTON INTEGRATION ─────────────────────────────────────
+    function initPayPal() {
+      const container = document.getElementById("paypal-button-container");
+      if (!container || typeof paypal === "undefined") return;
+      container.innerHTML = "";
+
+      paypal.Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          height: 48,
+        },
+        createOrder: async () => {
+          const mId = machineIdInput.value.trim();
+          if (!mId) {
+            alert(currentLang === 'vi' 
+              ? "Vui lòng nhập Mã máy (Machine ID) của bạn trước khi thanh toán!" 
+              : "Please enter your Machine ID before paying!");
+            throw new Error("Missing Machine ID");
+          }
+
+          const res = await fetch("/api/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              machineId: mId,
+              price: currentUsd.toFixed(2),
+            }),
+          });
+          const orderData = await res.json();
+          if (!orderData.id) throw new Error(orderData.error || "Cannot create order");
+          return orderData.id;
+        },
+        onApprove: async (data) => {
+          const mId = machineIdInput.value.trim();
+          const days = currentPlanType === "lifetime" ? 0 : 30;
+
+          const res = await fetch("/api/capture-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId: data.orderID,
+              machineId: mId,
+              durationDays: days,
+              price: currentUsd,
+              couponCode: activeCoupon ? activeCoupon.code : null,
+            }),
+          });
+
+          const captureData = await res.json();
+          if (captureData.success && captureData.licenseKey) {
+            showSuccess(captureData.licenseKey);
+          } else {
+            alert("Error: " + (captureData.error || "Unknown error"));
+          }
+        },
+        onError: (err) => {
+          console.error("PayPal Error:", err);
+          alert(currentLang === 'vi' ? "Giao dịch PayPal gặp lỗi hoặc bị hủy." : "PayPal transaction was cancelled or encountered an error.");
+        },
+      }).render("#paypal-button-container");
+    }
+
+    function showSuccess(key) {
+      document.getElementById("successCard").style.display = "block";
+      document.getElementById("displayLicenseKey").textContent = key;
+      document.getElementById("pricingGrid").style.display = "none";
+      document.getElementById("checkoutSection").style.display = "none";
+      
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    }
+
+    function copySuccessKey() {
+      const k = document.getElementById("displayLicenseKey").textContent;
+      if (!k) return;
+      navigator.clipboard.writeText(k);
+      alert(currentLang === 'vi' 
+        ? "Đã sao chép License Key!\n👉 Hãy mở phần mềm Record-AutoZoom trên máy tính, bấm Vương Miện (👑) và dán mã vào để kích hoạt!"
+        : "Copied License Key!\n👉 Open Record-AutoZoom on your computer, click the Crown (👑) icon and paste this key to activate!");
+    }
+
+    // Khởi tạo trang
+    setLanguage(currentLang);
+    updatePricingUI();
+    initPayPal();
+  </script>
+</body>
+</html>

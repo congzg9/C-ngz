@@ -1,0 +1,16 @@
+{
+  "actions": {
+    "addZoom": "Thêm Zoom",
+    "addTrim": "Thêm Cắt (Trim)",
+    "addSpeed": "Thêm Tốc độ",
+    "addAnnotation": "Thêm Chú thích",
+    "addKeyframe": "Thêm Keyframe",
+    "deleteSelected": "Xóa mục đã chọn",
+    "playPause": "Phát / Tạm dừng",
+    "cycleForward": "Chuyển chú thích tiếp theo",
+    "cycleBackward": "Chuyển chú thích trước đó",
+    "deleteSelectedAlt": "Xóa mục đã chọn (alt)",
+    "panTimeline": "Di chuyển Timeline",
+    "zoomTimeline": "Thu phóng Timeline"
+  }
+}

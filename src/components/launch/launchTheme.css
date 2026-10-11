@@ -1,0 +1,42 @@
+.launch-theme {
+	/* Luxury Sunset Obsidian Glass (High-End macOS / VisionOS aesthetic) */
+	--launch-surface: rgba(22, 9, 36, 0.94);
+	--launch-panel: rgba(22, 9, 36, 0.9);
+	--launch-border: rgba(255, 255, 255, 0.14);
+	--launch-border-strong: rgba(255, 255, 255, 0.24);
+	--launch-text: #ffffff;
+	--launch-text-muted: #a1a1aa;
+	--launch-label: #c084fc;
+	--launch-hover: rgba(255, 255, 255, 0.1);
+	--launch-selected: rgba(168, 85, 247, 0.28);
+	--launch-accent: #f97316;
+	--launch-accent-soft: rgba(249, 115, 22, 0.18);
+	--launch-popover-blur: 40px;
+	--launch-popover-saturate: 200%;
+	--launch-bar-bg: linear-gradient(135deg, rgba(34, 12, 54, 0.92) 0%, rgba(22, 8, 38, 0.95) 50%, rgba(14, 3, 24, 0.97) 100%);
+	--launch-bar-border: rgba(255, 255, 255, 0.18);
+	--launch-bar-shadow: 0 24px 65px rgba(0, 0, 0, 0.82), 0 0 45px rgba(124, 58, 237, 0.25), 0 0 25px rgba(249, 115, 22, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+
+	color: var(--launch-text);
+}
+
+.dark .launch-theme,
+.launch-theme.dark {
+	/* Dark Mode values */
+	--launch-surface: rgba(22, 9, 36, 0.94);
+	--launch-panel: rgba(22, 9, 36, 0.9);
+	--launch-border: rgba(255, 255, 255, 0.14);
+	--launch-border-strong: rgba(255, 255, 255, 0.24);
+	--launch-text: #ffffff;
+	--launch-text-muted: #a1a1aa;
+	--launch-label: #c084fc;
+	--launch-hover: rgba(255, 255, 255, 0.1);
+	--launch-selected: rgba(168, 85, 247, 0.28);
+	--launch-accent: #f97316;
+	--launch-accent-soft: rgba(249, 115, 22, 0.18);
+	--launch-popover-blur: 40px;
+	--launch-popover-saturate: 200%;
+	--launch-bar-bg: linear-gradient(135deg, rgba(34, 12, 54, 0.92) 0%, rgba(22, 8, 38, 0.95) 50%, rgba(14, 3, 24, 0.97) 100%);
+	--launch-bar-border: rgba(255, 255, 255, 0.18);
+	--launch-bar-shadow: 0 24px 65px rgba(0, 0, 0, 0.82), 0 0 45px rgba(124, 58, 237, 0.25), 0 0 25px rgba(249, 115, 22, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}

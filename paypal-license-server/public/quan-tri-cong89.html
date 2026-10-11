@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Quản Trị Khóa Bản Quyền • Record Auto-Zoom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg: #07050d;
+      --card-bg: rgba(16, 12, 28, 0.88);
+      --card-border: rgba(168, 85, 247, 0.16);
+      --card-hover: rgba(168, 85, 247, 0.35);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #a855f7;
+      --primary: #7c3aed;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --sky: #38bdf8;
+      --rose: #f43f5e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(ellipse 90% 50% at 50% -10%, rgba(124, 58, 237, 0.25) 0%, rgba(7, 5, 13, 0) 75%),
+        radial-gradient(circle at 10% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 28px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .admin-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-badge {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 18px rgba(124, 58, 237, 0.4);
+    }
+    .title-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .title-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .btn-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .btn-emerald:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
+    /* Auth Box */
+    .auth-card {
+      max-width: 400px;
+      margin: 80px auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+    }
+    .auth-card h2 {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .auth-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .pin-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      letter-spacing: 5px;
+      margin-bottom: 20px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .pin-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+    }
+
+    /* Stats Overview */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+    .stat-card .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* Content Cards */
+    .content-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 26px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Key Generator Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    @media (max-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .form-control {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+    }
+    .form-control.mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    /* Generated Key Popup Box */
+    .gen-result-card {
+      margin-top: 20px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 16px;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .gen-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .key-display {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #34d399;
+      word-break: break-all;
+      margin-bottom: 14px;
+    }
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Table Styles */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    td {
+      padding: 14px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .tag-lifetime {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .tag-month {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .action-btn {
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-copy-tbl {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+    }
+    .btn-copy-tbl:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-del-tbl {
+      background: rgba(244, 63, 94, 0.1);
+      color: #fda4af;
+      margin-left: 6px;
+    }
+    .btn-del-tbl:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+
+    <!-- Auth View -->
+    <div id="authBox" class="auth-card">
+      <div style="font-size: 42px; margin-bottom: 12px;">🛡️</div>
+      <h2>Quản Trị Viên</h2>
+      <p>Hệ thống tự chủ động cấp & quản lý khóa bản quyền Record Auto-Zoom PRO.</p>
+      <input type="password" id="pinInput" class="pin-input" placeholder="Nhập mã PIN bảo mật..." maxlength="20" autofocus />
+      <button id="loginBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;">Vào Trang Quản Trị</button>
+      <div id="authError" style="margin-top: 14px; font-size: 13px; color: var(--rose); display: none;">Mã PIN không đúng, vui lòng thử lại!</div>
+    </div>
+
+    <!-- Main Dashboard View -->
+    <div id="dashBox" style="display: none;">
+      
+      <!-- Top Header -->
+      <div class="header-bar">
+        <div class="header-title">
+          <div class="logo-badge">⚡</div>
+          <div class="title-text">
+            <h1>Quản Lý Bản Quyền Record Auto-Zoom</h1>
+            <p>Tự chủ động tạo và quản lý từng License Key cho khách hàng</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a href="/" target="_blank" class="btn btn-secondary">🌐 Xem Trang Web Bán Hàng</a>
+          <button class="btn btn-secondary" onclick="loadKeys()">🔄 Làm Mới</button>
+          <button class="btn btn-secondary" onclick="logout()">🚪 Thoát</button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Tổng số Key đã cấp</div>
+          <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Bản quyền Vĩnh Viễn</div>
+          <div class="value" id="statLifetime">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Bản quyền 1 Tháng</div>
+          <div class="value" id="statMonth">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Doanh thu ghi nhận</div>
+          <div class="value" id="statRevenue" style="color: #34d399;">0đ</div>
+        </div>
+      </div>
+
+      <!-- Quick Key Generator Tool -->
+      <div class="content-card">
+        <div class="card-title">
+          <span>⚡ Cấp Khóa Bản Quyền Mới Cho Khách Hàng</span>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>1. Mã máy (Machine ID) của khách *</label>
+            <input type="text" id="inpMachineId" class="form-control mono" placeholder="VD: REC-8F92-4A1C-9B3D hoặc 8F924A1C9B3D" />
+          </div>
+          <div class="form-group">
+            <label>2. Tên khách / SĐT / Zalo</label>
+            <input type="text" id="inpCustomerName" class="form-control" placeholder="VD: Anh Nam (0988...)" />
+          </div>
+          <div class="form-group" style="min-width: 200px;">
+            <label>3. Thời hạn gói (Tùy ý số ngày)</label>
+            <div style="display: flex; gap: 8px;">
+              <select id="inpDuration" class="form-control" onchange="handleDurationChange()" style="flex: 1;">
+                <option value="0">Vĩnh viễn (Trọn đời)</option>
+                <option value="1">⏱️ Dùng thử 1 ngày</option>
+                <option value="3">⏱️ Dùng thử 3 ngày</option>
+                <option value="7">⏱️ Dùng thử 7 ngày (1 tuần)</option>
+                <option value="14">⏱️ Dùng thử 14 ngày (2 tuần)</option>
+                <option value="30">1 Tháng (30 ngày)</option>
+                <option value="90">3 Tháng (90 ngày)</option>
+                <option value="365">1 Năm (365 ngày)</option>
+                <option value="custom">✏️ Tùy ý nhập số ngày...</option>
+              </select>
+              <input type="number" id="inpCustomDays" class="form-control" placeholder="Số ngày" min="1" max="3650" style="width: 105px; display: none; text-align: center;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>4. Tiền thu ($ USD hoặc VNĐ)</label>
+            <input type="number" id="inpPrice" class="form-control" placeholder="35" />
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="createLicenseKey()" style="width: 100%; height: 42px;">Tạo & Cấp Key</button>
+          </div>
+        </div>
+
+        <!-- Generated Key Box -->
+        <div id="genResultCard" class="gen-result-card" style="display: none;">
+          <div class="gen-result-header">
+            <span style="font-weight: 700; color: #34d399;">🎉 ĐÃ CẤP MÃ BẢN QUYỀN THÀNH CÔNG!</span>
+            <span id="genCustomerDisplay" style="font-size: 12px; color: var(--text-muted);"></span>
+          </div>
+          <div class="key-display" id="genKeyText"></div>
+          <div class="result-actions">
+            <button class="btn btn-emerald" onclick="copyGenKey()">📋 Sao chép License Key</button>
+            <button class="btn btn-secondary" onclick="copyCustomerMessage()">💬 Sao chép mẫu tin nhắn gửi khách (Zalo/SMS)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders & Keys Table -->
+      <div class="content-card">
+        <div class="table-toolbar">
+          <div class="card-title" style="margin-bottom: 0;">
+            <span>📋 Danh Sách Mã Đã Cấp</span>
+          </div>
+          <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Tìm kiếm theo tên hoặc mã máy..." oninput="handleSearch()" />
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Ngày cấp</th>
+                <th>Khách hàng</th>
+                <th>Mã máy (Machine ID)</th>
+                <th>Gói bản quyền</th>
+                <th>Số tiền</th>
+                <th>License Key</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="keysTableBody">
+              <tr>
+                <td colspan="7" class="empty-state">Đang tải danh sách bản quyền...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const PIN_KEY = "recordly_admin_pin";
+    let cachedPin = localStorage.getItem(PIN_KEY) || "";
+    let allKeys = [];
+    let lastCreatedKey = null;
+
+    const authBox = document.getElementById("authBox");
+    const dashBox = document.getElementById("dashBox");
+    const pinInput = document.getElementById("pinInput");
+    const loginBtn = document.getElementById("loginBtn");
+    const authError = document.getElementById("authError");
+
+    // Init
+    if (cachedPin) {
+      verifyAndLogin(cachedPin);
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const pin = pinInput.value.trim();
+      if (!pin) return;
+      verifyAndLogin(pin);
+    });
+
+    pinInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loginBtn.click();
+    });
+
+    async function verifyAndLogin(pin) {
+      try {
+        const res = await fetch("/api/admin/keys", {
+          headers: { "X-Admin-Pin": pin }
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          localStorage.setItem(PIN_KEY, pin);
+          cachedPin = pin;
+          authBox.style.display = "none";
+          dashBox.style.display = "block";
+          allKeys = data.keys || [];
+          renderStatsAndTable(allKeys);
+        } else {
+          authError.style.display = "block";
+          authError.textContent = data.error || "Mã PIN không đúng, vui lòng thử lại!";
+        }
+      } catch (err) {
+        authError.style.display = "block";
+        authError.textContent = "Lỗi kết nối máy chủ: " + err.message;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem(PIN_KEY);
+      cachedPin = "";
+      location.reload();
+    }
+
+    async function loadKeys() {
+      if (!cachedPin) return;
+      try {
+        const res = await fetch("/api/admin/keys", {
+          headers: { "X-Admin-Pin": cachedPin }
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          allKeys = data.keys || [];
+          renderStatsAndTable(allKeys);
+        } else if (res.status === 401 || res.status === 429) {
+          alert(data.error || "Phiên làm việc hết hạn hoặc bị từ chối!");
+          logout();
+        }
+      } catch (e) {
+        alert("Lỗi tải danh sách: " + e.message);
+      }
+    }
+
+    function renderStatsAndTable(list) {
+      document.getElementById("statTotal").textContent = list.length;
+      
+      let lifetime = 0;
+      let month = 0;
+      let revenueUsd = 0;
+      let revenueVnd = 0;
+
+      list.forEach(k => {
+        if (!k.durationDays || k.durationDays === 0) lifetime++;
+        else month++;
+        const p = Number(k.price || k.amount || 0);
+        if (k.currency === "USD" || (p > 0 && p <= 100)) {
+          revenueUsd += p;
+        } else if (p > 0) {
+          revenueVnd += p;
+        }
+      });
+
+      document.getElementById("statLifetime").textContent = lifetime;
+      document.getElementById("statMonth").textContent = month;
+      
+      let revStr = "0đ";
+      if (revenueUsd > 0 && revenueVnd > 0) {
+        revStr = `$${revenueUsd} USD + ${revenueVnd.toLocaleString("vi-VN")}đ`;
+      } else if (revenueUsd > 0) {
+        revStr = `$${revenueUsd} USD`;
+      } else if (revenueVnd > 0) {
+        revStr = `${revenueVnd.toLocaleString("vi-VN")}đ`;
+      }
+      document.getElementById("statRevenue").textContent = revStr;
+
+      renderTable(list);
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById("keysTableBody");
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Chưa có mã nào được cấp. Bạn hãy điền thông tin bên trên để cấp mã đầu tiên!</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        const dateStr = item.createdAt || item.paidAt ? new Date(item.createdAt || item.paidAt).toLocaleDateString("vi-VN") : "Gần đây";
+        const isLifetime = !item.durationDays || item.durationDays === 0;
+        let tag = `<span class="tag tag-lifetime">Vĩnh Viễn</span>`;
+        if (!isLifetime) {
+          if (item.durationDays <= 14) {
+            tag = `<span class="tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35);">⏱️ Dùng thử ${item.durationDays}N</span>`;
+          } else {
+            tag = `<span class="tag tag-month">${item.durationDays} Ngày</span>`;
+          }
+        }
+
+        let priceStr = "—";
+        if (item.currency === "USD" || (item.price && Number(item.price) <= 100)) {
+          priceStr = `$${Number(item.price || 0)} USD`;
+        } else if (item.price) {
+          priceStr = Number(item.price).toLocaleString("vi-VN") + "đ";
+        } else if (item.amount) {
+          priceStr = Number(item.amount).toLocaleString("vi-VN") + "đ";
+        }
+        const customer = item.customerName || item.email || "Khách hàng";
+        const machine = item.machineId || "—";
+        const key = item.licenseKey || "—";
+
+        return `
+          <tr>
+            <td style="color: var(--text-muted); font-size: 12px; white-space: nowrap;">${dateStr}</td>
+            <td style="font-weight: 600; color: #fff;">${escapeHtml(customer)}</td>
+            <td class="mono" style="color: #cbd5e1;">${machine}</td>
+            <td>${tag}</td>
+            <td style="color: #34d399; font-weight: 600;">${priceStr}</td>
+            <td class="mono" style="color: #a855f7; font-size: 11px;">${key}</td>
+            <td style="white-space: nowrap;">
+              <button class="action-btn btn-copy-tbl" onclick="copyText('${key}', 'Đã sao chép License Key!')">Copy Key</button>
+              <button class="action-btn btn-del-tbl" onclick="deleteKey('${machine}', '${item._kvKey || ""}')">Xóa</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function handleDurationChange() {
+      const dur = document.getElementById("inpDuration").value;
+      const customInp = document.getElementById("inpCustomDays");
+      if (dur === "custom") {
+        customInp.style.display = "block";
+        customInp.focus();
+      } else {
+        customInp.style.display = "none";
+      }
+    }
+
+    function handleSearch() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      if (!query) {
+        renderTable(allKeys);
+        return;
+      }
+      const filtered = allKeys.filter(k => {
+        const name = (k.customerName || k.email || "").toLowerCase();
+        const mId = (k.machineId || "").toLowerCase();
+        const key = (k.licenseKey || "").toLowerCase();
+        return name.includes(query) || mId.includes(query) || key.includes(query);
+      });
+      renderTable(filtered);
+    }
+
+    async function createLicenseKey() {
+      const mId = document.getElementById("inpMachineId").value.trim();
+      const customer = document.getElementById("inpCustomerName").value.trim();
+      let duration = document.getElementById("inpDuration").value;
+      const price = document.getElementById("inpPrice").value.trim();
+
+      if (!mId) {
+        alert("Vui lòng nhập Mã máy (Machine ID) của khách!");
+        return;
+      }
+
+      if (duration === "custom") {
+        const customDays = parseInt(document.getElementById("inpCustomDays").value.trim(), 10);
+        if (!customDays || customDays <= 0) {
+          alert("Vui lòng nhập số ngày dùng thử hợp lệ (lớn hơn 0)!");
+          document.getElementById("inpCustomDays").focus();
+          return;
+        }
+        duration = customDays;
+      }
+
+      try {
+        const res = await fetch("/api/admin/create-key", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "X-Admin-Pin": cachedPin
+          },
+          body: JSON.stringify({
+            pin: cachedPin,
+            machineId: mId,
+            customerName: customer,
+            durationDays: Number(duration),
+            price: Number(price) || 0
+          })
+        });
+
+        const data = await res.json();
+        if (data.success && data.data) {
+          lastCreatedKey = data.data;
+          document.getElementById("genResultCard").style.display = "block";
+          document.getElementById("genKeyText").textContent = data.data.licenseKey;
+          document.getElementById("genCustomerDisplay").textContent = `Dành cho: ${data.data.customerName} (${data.data.machineId})`;
+          
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.75 } });
+          
+          // Reset form
+          document.getElementById("inpMachineId").value = "";
+          document.getElementById("inpCustomerName").value = "";
+          document.getElementById("inpPrice").value = "";
+
+          loadKeys();
+        } else {
+          alert("Lỗi: " + (data.error || "Không thể cấp key"));
+        }
+      } catch (err) {
+        alert("Lỗi kết nối máy chủ: " + err.message);
+      }
+    }
+
+    async function deleteKey(machineId, kvKey) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa bản quyền của máy ${machineId}?`)) return;
+
+      try {
+        const res = await fetch("/api/admin/delete-key", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "X-Admin-Pin": cachedPin
+          },
+          body: JSON.stringify({ pin: cachedPin, machineId, kvKey })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadKeys();
+        } else {
+          alert("Lỗi khi xóa: " + data.error);
+        }
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      }
+    }
+
+    function copyGenKey() {
+      if (!lastCreatedKey) return;
+      copyText(lastCreatedKey.licenseKey, "Đã sao chép License Key vào khay nhớ tạm!");
+    }
+
+    function copyCustomerMessage() {
+      if (!lastCreatedKey) return;
+      let planName = "Vĩnh Viễn (Lifetime)";
+      if (lastCreatedKey.durationDays && lastCreatedKey.durationDays > 0) {
+        if (lastCreatedKey.durationDays <= 14) {
+          planName = `Dùng thử PRO ${lastCreatedKey.durationDays} Ngày`;
+        } else {
+          planName = `${lastCreatedKey.durationDays} Ngày`;
+        }
+      }
+      const msg = `Cảm ơn bạn ${lastCreatedKey.customerName} đã ủng hộ Record Auto-Zoom PRO! 🎉
+
+🔑 Mã kích hoạt (License Key) của bạn:
+${lastCreatedKey.licenseKey}
+
+📌 Hướng dẫn kích hoạt:
+1. Mở phần mềm Record Auto-Zoom trên máy (${lastCreatedKey.machineId}).
+2. Bấm biểu tượng Vương Miện (👑) góc trên thanh công cụ.
+3. Dán mã License Key trên vào và bấm "Kích hoạt bản quyền ngay".
+Gói bản quyền: ${planName}.
+Chúc bạn tạo ra thật nhiều video chất lượng!`;
+
+      copyText(msg, "Đã sao chép mẫu tin nhắn gửi khách! Bạn chỉ việc dán gửi qua Zalo/Facebook.");
+    }
+
+    function copyText(txt, alertMsg) {
+      if (!txt || txt === "—") return;
+      navigator.clipboard.writeText(txt);
+      alert(alertMsg || "Đã sao chép: " + txt);
+    }
+
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+  </script>
+</body>
+</html>

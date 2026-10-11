@@ -1,0 +1,26 @@
+{
+  "app": {
+    "name": "Record-AutoZoom",
+    "editorTitle": "Trình chỉnh sửa Record-AutoZoom",
+    "subtitle": "Ghi hình và chỉnh sửa màn hình",
+    "language": "Ngôn ngữ",
+    "manageRecordings": "Mở thư mục video đã quay"
+  },
+  "actions": {
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "export": "Xuất video",
+    "load": "Tải lên",
+    "redo": "Làm lại",
+    "reset": "Đặt lại",
+    "save": "Lưu",
+    "undo": "Hoàn tác",
+    "delete": "Xóa",
+    "done": "Xong"
+  },
+  "errors": {
+    "invalidFileType": "Định dạng tệp không hợp lệ",
+    "failedToUploadImage": "Không thể tải ảnh lên",
+    "fileReadError": "Có lỗi xảy ra khi đọc tệp."
+  }
+}

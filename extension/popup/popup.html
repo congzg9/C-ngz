@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Recordly Recorder</title>
+	<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+	<div class="popup-container">
+		<!-- Header -->
+		<header class="header">
+			<div class="brand">
+				<img src="../icons/recordly-32.png" alt="Recordly" class="brand-logo" />
+				<div class="brand-info">
+					<span class="brand-title">Recordly</span>
+					<span class="brand-tag">Web & Extension</span>
+				</div>
+			</div>
+			<div class="status-indicator" id="status-indicator">
+				<span class="status-dot"></span>
+				<span class="status-text" id="status-text">Ready</span>
+			</div>
+		</header>
+
+		<!-- Recording Controls -->
+		<div class="content">
+			<!-- Timer Display (Shown when recording) -->
+			<div class="timer-box hidden" id="timer-box">
+				<div class="recording-pulse"></div>
+				<span class="timer-text" id="timer-text">00:00</span>
+			</div>
+
+			<!-- Options List -->
+			<div class="options-group" id="options-group">
+				<div class="option-item">
+					<div class="option-label">
+						<svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+							<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+							<line x1="12" y1="19" x2="12" y2="23"/>
+							<line x1="8" y1="23" x2="16" y2="23"/>
+						</svg>
+						<span>Microphone Audio</span>
+					</div>
+					<label class="switch">
+						<input type="checkbox" id="mic-toggle" checked />
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="option-item">
+					<div class="option-label">
+						<svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M3 3l7 18 3-7 7-3L3 3z"/>
+						</svg>
+						<span>Cursor Auto-Zoom Telemetry</span>
+					</div>
+					<label class="switch">
+						<input type="checkbox" id="telemetry-toggle" checked />
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="option-item">
+					<div class="option-label">
+						<svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polygon points="5 3 19 12 5 21 5 3"/>
+						</svg>
+						<span>Frame Rate</span>
+					</div>
+					<select id="fps-select" class="custom-select">
+						<option value="60" selected>60 FPS</option>
+						<option value="30">30 FPS</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- Cloudflare Pages Editor URL Settings -->
+			<div class="settings-group">
+				<div class="settings-header" id="toggle-settings-btn">
+					<span>Editor Target URL</span>
+					<span class="arrow-icon">▾</span>
+				</div>
+				<div class="settings-body" id="settings-body">
+					<input
+						type="text"
+						id="editor-url-input"
+						class="url-input"
+						placeholder="http://localhost:5173 or https://recordly.pages.dev"
+						spellcheck="false"
+					/>
+					<p class="settings-hint">Editor on Cloudflare Pages where recordings open automatically.</p>
+				</div>
+			</div>
+
+			<!-- Action Buttons -->
+			<div class="actions">
+				<button class="btn btn-record" id="btn-record">
+					<span class="btn-icon-circle"></span>
+					<span id="btn-record-text">Start Recording</span>
+				</button>
+
+				<button class="btn btn-secondary" id="btn-open-editor">
+					<svg class="btn-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+						<polyline points="15 3 21 3 21 9"/>
+						<line x1="10" y1="14" x2="21" y2="3"/>
+					</svg>
+					<span>Open Web Editor</span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<script src="popup.js"></script>
+</body>
+</html>

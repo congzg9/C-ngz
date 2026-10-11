@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Email Thanh Toán PayPal - Record Auto-Zoom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-5xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800 gap-4">
+      <div>
+        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          HỆ THỐNG GỬI EMAIL TỰ ĐỘNG
+        </span>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-white mt-2">Xem Trước (Preview) Mẫu Email Gửi Khi Mua PayPal</h1>
+        <p class="text-slate-400 text-sm mt-1">Khi khách thanh toán thành công, hệ thống sẽ tự động tạo và gửi 2 luồng email dưới đây:</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="switchTab('customer')" id="btn-customer" class="px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all">
+          1. Email Gửi Cho Khách Hàng
+        </button>
+        <button onclick="switchTab('admin')" id="btn-admin" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+          2. Email Thông Báo Cho Bạn (Admin)
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: EMAIL GỬI CHO KHÁCH HÀNG -->
+    <div id="tab-customer" class="space-y-4">
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between text-xs text-slate-300">
+        <div>
+          <span class="text-slate-500">Người gửi:</span> <strong class="text-white">Record Auto-Zoom &lt;support@recordly.com&gt;</strong><br>
+          <span class="text-slate-500">Người nhận:</span> <strong class="text-purple-400">customer_paypal@gmail.com</strong> (Email PayPal của khách)<br>
+          <span class="text-slate-500">Tiêu đề:</span> <strong class="text-emerald-400">🎉 Bản quyền Record Auto-Zoom PRO của bạn đã sẵn sàng!</strong>
+        </div>
+        <span class="px-2 py-1 rounded bg-purple-500/20 text-purple-300 font-medium">Khách Hàng</span>
+      </div>
+
+      <!-- Khung Email Khách -->
+      <div class="bg-[#0f172a] rounded-2xl border border-slate-700 p-6 md:p-8 max-w-xl mx-auto shadow-2xl">
+        <div class="text-center pb-5 border-b border-slate-800">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold mb-3">
+            ✨ GIAO DỊCH THÀNH CÔNG
+          </div>
+          <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">
+            RECORD AUTO-ZOOM PRO
+          </h2>
+          <p class="text-slate-400 text-xs mt-1">Cảm ơn bạn đã mua bản quyền ứng dụng quay màn hình tự động phóng to số 1 hiện nay!</p>
+        </div>
+
+        <div class="py-5 space-y-4 text-sm text-slate-300">
+          <p>Xin chào <strong class="text-white">John Doe</strong>,</p>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Giao dịch thanh toán qua PayPal của bạn đã hoàn tất thành công. Dưới đây là Mã kích hoạt bản quyền PRO dành riêng cho thiết bị của bạn:
+          </p>
+
+          <!-- Key Box -->
+          <div class="bg-slate-950 border border-purple-500/50 rounded-xl p-4 text-center shadow-[0_0_25px_rgba(168,85,247,0.15)]">
+            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">MÃ KÍCH HOẠT (LICENSE KEY)</div>
+            <div class="mono text-base md:text-lg font-bold text-sky-400 select-all tracking-wide break-all">
+              REC-8F92-4A1C-9B3D-1793849200000-A8B9C0D1
+            </div>
+            <div class="text-[11px] text-purple-400 font-medium mt-1">Gói: Dùng 1 Tháng (Hạn đến 30 ngày tới)</div>
+          </div>
+
+          <!-- 3 Steps -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
+            <p class="font-bold text-white text-xs">🚀 Hướng dẫn kích hoạt trong 3 bước:</p>
+            <ol class="list-decimal pl-5 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Mở ứng dụng <strong>Record Auto-Zoom</strong> trên máy tính của bạn.</li>
+              <li>Bấm vào nút <span class="px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-500/40 text-purple-200 font-bold">KÍCH HOẠT BẢN QUYỀN PRO</span> ở góc trên.</li>
+              <li>Dán mã kích hoạt ở trên vào ô và bấm <strong>"Kích hoạt ngay"</strong> để mở khóa toàn bộ tính năng.</li>
+            </ol>
+          </div>
+
+          <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 text-[11px] text-slate-400 flex justify-between items-center">
+            <span>Thiết bị đã gắn mã:</span>
+            <span class="mono font-bold text-slate-200">REC-8F92-4A1C-9B3D</span>
+          </div>
+
+          <p class="text-[11px] text-slate-500 text-center pt-2">
+            Nếu cần hỗ trợ kỹ thuật hoặc có bất kỳ câu hỏi nào, vui lòng liên hệ: <br>
+            <a href="mailto:Giangcong1089@gmail.com" class="text-purple-400 hover:underline">Giangcong1089@gmail.com</a> • FB: <a href="https://www.facebook.com/congz9g/" target="_blank" class="text-purple-400 hover:underline">facebook.com/congz9g</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: EMAIL THÔNG BÁO CHO BẠN (ADMIN) -->
+    <div id="tab-admin" class="space-y-4 hidden">
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between text-xs text-slate-300">
+        <div>
+          <span class="text-slate-500">Người gửi:</span> <strong class="text-white">Record Auto-Zoom Notifier &lt;onboarding@resend.dev&gt;</strong><br>
+          <span class="text-slate-500">Người nhận:</span> <strong class="text-emerald-400">Giangcong1089@gmail.com</strong> (Email của bạn)<br>
+          <span class="text-slate-500">Tiêu đề:</span> <strong class="text-emerald-400">🔔 [ĐƠN HÀNG MỚI] Khách vừa mua Record Auto-Zoom PRO ($35 USD)</strong>
+        </div>
+        <span class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 font-medium">Email Quản Trị</span>
+      </div>
+
+      <!-- Khung Email Admin -->
+      <div class="bg-[#100c1c] rounded-2xl border border-purple-500/30 p-6 md:p-8 max-w-xl mx-auto shadow-2xl">
+        <div class="text-center pb-5 border-b border-slate-800">
+          <div class="text-3xl mb-2">🎉</div>
+          <h2 class="text-xl font-extrabold text-emerald-400">CÓ ĐƠN HÀNG MỚI TỪ PAYPAL!</h2>
+          <p class="text-slate-400 text-xs mt-1">Hệ thống đã tự động nhận tiền PayPal và cấp License Key cho khách.</p>
+        </div>
+
+        <div class="py-5 space-y-4 text-sm">
+          <table class="w-full text-xs border-collapse">
+            <tr class="border-b border-slate-800/80">
+              <td class="py-2.5 text-slate-400 font-medium">👤 Tên khách hàng:</td>
+              <td class="py-2.5 text-right font-bold text-white">John Doe (Mỹ)</td>
+            </tr>
+            <tr class="border-b border-slate-800/80">
+              <td class="py-2.5 text-slate-400 font-medium">📧 Email PayPal khách:</td>
+              <td class="py-2.5 text-right font-bold text-sky-400">john.doe@gmail.com</td>
+            </tr>
+            <tr class="border-b border-slate-800/80">
+              <td class="py-2.5 text-slate-400 font-medium">💵 Số tiền thu được:</td>
+              <td class="py-2.5 text-right font-extrabold text-emerald-400 text-sm">$35.00 USD (Net ~850.000đ)</td>
+            </tr>
+            <tr class="border-b border-slate-800/80">
+              <td class="py-2.5 text-slate-400 font-medium">📦 Gói đã chọn:</td>
+              <td class="py-2.5 text-right font-bold text-purple-300">Gói Tháng (30 ngày)</td>
+            </tr>
+            <tr class="border-b border-slate-800/80">
+              <td class="py-2.5 text-slate-400 font-medium">💻 Mã máy của khách:</td>
+              <td class="py-2.5 text-right mono font-bold text-slate-300">REC-8F92-4A1C-9B3D</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 text-slate-400 font-medium">🆔 Mã đơn PayPal:</td>
+              <td class="py-2.5 text-right mono text-slate-400">9L381940KA021941J</td>
+            </tr>
+          </table>
+
+          <div class="bg-slate-950 border border-purple-500/40 rounded-xl p-4 text-center">
+            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">MÃ LICENSE KEY ĐÃ CẤP CHO MÁY NÀY</div>
+            <div class="mono text-xs md:text-sm font-bold text-sky-400 break-all">
+              REC-8F92-4A1C-9B3D-1793849200000-A8B9C0D1
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 text-center">
+            Đơn hàng này đã được đồng bộ tự động vào hệ thống quản trị của bạn.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      if (tab === 'customer') {
+        document.getElementById('tab-customer').classList.remove('hidden');
+        document.getElementById('tab-admin').classList.add('hidden');
+        document.getElementById('btn-customer').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all';
+        document.getElementById('btn-admin').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all';
+      } else {
+        document.getElementById('tab-customer').classList.add('hidden');
+        document.getElementById('tab-admin').classList.remove('hidden');
+        document.getElementById('btn-customer').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all';
+        document.getElementById('btn-admin').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all';
+      }
+    }
+  </script>
+</body>
+</html>

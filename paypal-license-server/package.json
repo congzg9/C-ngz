@@ -1,0 +1,13 @@
+{
+  "name": "recordly-paypal-serverless",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Serverless PayPal Automation for Recordly License (0% Fee)",
+  "main": "api/capture-order.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}
