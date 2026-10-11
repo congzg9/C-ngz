@@ -358,7 +358,7 @@ export function getPanSpringConfig(
 ): SpringConfig {
 	const clamped = Math.max(0, Math.min(1, smoothnessFactor));
 
-	const effectiveMultiplier = Math.max(0.3, Math.min(3.5, speedMultiplier));
+	const effectiveMultiplier = Math.max(0.3, Math.min(8.0, speedMultiplier));
 	const baseOmega = 6.8 * 2 ** ((0.5 - clamped) * 1.5);
 	const targetOmega = baseOmega * effectiveMultiplier;
 	const stiffness = targetOmega * targetOmega;

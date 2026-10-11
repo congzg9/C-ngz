@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Record-AutoZoom • High-Energy 9:16 Promo (12s Fast Paced)</title>
+  <title>Record-AutoZoom • Pro 9:16 Video (Chuẩn Tiếng Việt • Không Quảng Cáo)</title>
+  <!-- Nhúng font Be Vietnam Pro & Inter với đầy đủ bộ ký tự Tiếng Việt (Vietnamese Subsets) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800;900&family=Inter:wght@700;800;900&display=swap&subset=vietnamese" rel="stylesheet">
   <style>
     :root {
-      --bg: #07070a;
+      --bg: #030308;
       --primary: #f97316;
       --accent: #38bdf8;
-      --purple: #c084fc;
+      --font-main: 'Be Vietnam Pro', 'Segoe UI', -apple-system, Roboto, sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
     body {
-      background: #040407;
+      background: #030308;
       color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -30,18 +31,20 @@
       overflow-x: hidden;
     }
 
-    /* TOP CONTROLLER BAR */
+    /* CONTROLS HEADER */
     .controls-bar {
       display: flex;
       align-items: center;
-      gap: 14px;
-      background: rgba(24, 24, 27, 0.9);
-      backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 12px 26px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(18, 18, 28, 0.85);
+      backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 24px;
       border-radius: 999px;
-      margin-bottom: 18px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      margin-bottom: 16px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 20px rgba(249, 115, 22, 0.2);
       z-index: 100;
     }
 
@@ -51,6 +54,7 @@
       gap: 8px;
       background: linear-gradient(135deg, #f97316, #ea580c);
       color: #fff;
+      font-family: var(--font-main);
       font-weight: 800;
       font-size: 14px;
       padding: 10px 22px;
@@ -58,29 +62,36 @@
       border: none;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.45);
+      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.5);
     }
-    .btn:hover { transform: scale(1.06); }
+    .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: none;
     }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.16); }
+
+    .btn-export {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      box-shadow: 0 4px 18px rgba(2, 132, 199, 0.5);
+    }
 
     .status-text {
       font-size: 13px;
-      color: #f97316;
-      font-family: 'JetBrains Mono', monospace;
+      color: #38bdf8;
+      font-family: var(--font-main);
       font-weight: 800;
+      min-width: 95px;
+      text-align: center;
     }
 
-    .speed-badge {
+    .badge-tag {
       font-size: 11px;
       background: rgba(249, 115, 22, 0.15);
       border: 1px solid #f97316;
       color: #fdba74;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 999px;
       font-weight: 800;
     }
@@ -90,16 +101,27 @@
       position: relative;
       width: 405px;
       height: 720px;
-      border-radius: 36px;
+      border-radius: 38px;
       overflow: hidden;
-      box-shadow: 0 30px 80px -15px rgba(249, 115, 22, 0.45), 0 0 0 8px rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 30px 90px -15px rgba(249, 115, 22, 0.4),
+        0 0 0 10px rgba(255, 255, 255, 0.08),
+        0 0 0 1px rgba(255, 255, 255, 0.15);
       background: #000;
+      cursor: pointer;
     }
 
     canvas {
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+    .audio-tip {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
     }
   </style>
 </head>
@@ -108,465 +130,453 @@
   <!-- CONTROLS -->
   <div class="controls-bar">
     <button class="btn" id="btnPlay" onclick="togglePlay()">
-      <span id="playIcon">▶</span> <span id="playText">Phát Video (12s Siêu Cuốn)</span>
+      <span id="playIcon">▶</span> <span id="playText">Phát Video (Có Voice AI + Beat)</span>
     </button>
-    <button class="btn" id="btnRecord" onclick="recordAndExport()" style="background:linear-gradient(135deg, #06b6d4, #0284c7);box-shadow:0 4px 18px rgba(2,132,199,0.5);">
-      <span>⚡</span> <span>Xuất File Video 60 FPS</span>
+    <button class="btn btn-export" id="btnRecord" onclick="recordAndExport()">
+      <span>⚡</span> <span>Xuất File 60 FPS (Đủ Hình & Tiếng)</span>
     </button>
     <button class="btn btn-secondary" onclick="restartVideo()">
       <span>🔄</span> <span>Xem lại</span>
     </button>
-    <div class="status-text" id="timeDisplay">00:00 / 00:12</div>
-    <div class="speed-badge">🔥 12 NGUYÊN LÝ DIỄN HOẠT • NHỊP NHANH TIKTOK</div>
+    <div class="status-text" id="timeDisplay">00:00 / 00:14</div>
+    <div class="badge-tag">✨ BE VIETNAM PRO • CHUẨN ĐỒ HỌA SANG TRỌNG</div>
   </div>
 
-  <!-- PHONE CANVAS (1080 x 1920 native) -->
-  <div class="phone-container">
+  <!-- 9:16 CANVAS (1080 x 1920) -->
+  <div class="phone-container" onclick="togglePlay()">
     <canvas id="videoCanvas" width="1080" height="1920"></canvas>
   </div>
+
+  <div class="audio-tip">💡 Nhấn vào màn hình hoặc nút "Phát Video" để nghe trọn vẹn giọng đọc AI & nhạc beat!</div>
 
   <script>
     const canvas = document.getElementById('videoCanvas');
     const ctx = canvas.getContext('2d');
     const W = 1080;
     const H = 1920;
-    const TOTAL_DURATION = 12.0; // Rút ngắn thành 12s chuẩn pacing TikTok
+    const TOTAL_DURATION = 13.8; // 13.8s: Vừa vặn trọn vẹn lời bình & outro tinh tế, không có quảng cáo
+    const FONT_FAMILY = '"Be Vietnam Pro", "Segoe UI", -apple-system, sans-serif';
+
     let currentTime = 0;
     let isPlaying = false;
     let lastTimestamp = 0;
-    let audioCtx = null;
 
-    // Load App Logo
+    // ─── LOAD TÀI NGUYÊN (RESOURCES) ──────────────────────────────────────
     const logoImg = new Image();
     logoImg.src = './app-icon.png';
 
-    // ─── THƯ VIỆN NGUYÊN LÝ DIỄN HOẠT (ANIMATION EASING & SPRINGS) ─────────
-    
-    // Overshoot (Văng quá đà rồi nảy lại)
-    function easeOutBack(x, s = 1.70158) {
-      const c1 = s;
-      const c3 = c1 + 1;
-      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
-    }
+    // Video quay màn hình thực tế (ok.mp4)
+    const demoVideo = document.createElement('video');
+    demoVideo.src = './demo-video.mp4';
+    demoVideo.crossOrigin = 'anonymous';
+    demoVideo.muted = true;
+    demoVideo.playsInline = true;
+    demoVideo.preload = 'auto';
+    demoVideo.load();
 
-    // Anticipation (Lấy đà lùi lại trước khi phóng tới)
-    function easeInOutBack(x, s = 1.70158) {
-      const c1 = s;
-      const c2 = c1 * 1.525;
-      return x < 0.5
-        ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
-        : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
-    }
+    // Tệp giọng đọc AI tiếng Việt (vi-VN-NamMinhNeural)
+    const voiceAudio = new Audio('./promo-voice.mp3');
+    voiceAudio.preload = 'auto';
 
-    // Elastic (Nảy tưng tưng lò xo)
-    function easeOutElastic(x) {
-      const c4 = (2 * Math.PI) / 3;
-      return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
-    }
+    // ─── KINETIC SUBTITLES (CHUẨN FONT TIẾNG VIỆT • KHÔNG QUẢNG CÁO) ──────
+    const subtitles = [
+      {
+        start: 0.1, end: 3.35,
+        words: [
+          { text: "Bạn", start: 0.1, end: 0.4 },
+          { text: "vẫn", start: 0.4, end: 0.7 },
+          { text: "quay", start: 0.7, end: 1.0 },
+          { text: "màn", start: 1.0, end: 1.2 },
+          { text: "hình,", start: 1.2, end: 1.5 },
+          { text: "mất", start: 1.5, end: 1.8 },
+          { text: "hàng", start: 1.8, end: 2.1 },
+          { text: "giờ", start: 2.1, end: 2.4 },
+          { text: "ZOOM", start: 2.4, end: 2.85, highlight: "#ef4444" },
+          { text: "THỦ CÔNG Ư?", start: 2.85, end: 3.35, highlight: "#ef4444" }
+        ]
+      },
+      {
+        start: 3.35, end: 7.68,
+        words: [
+          { text: "Record", start: 3.35, end: 3.8, highlight: "#38bdf8" },
+          { text: "Auto", start: 3.8, end: 4.2, highlight: "#38bdf8" },
+          { text: "Zoom", start: 4.2, end: 4.6, highlight: "#38bdf8" },
+          { text: "tự", start: 4.6, end: 4.9 },
+          { text: "động", start: 4.9, end: 5.2 },
+          { text: "BẮT NÉT", start: 5.2, end: 5.8, highlight: "#facc15" },
+          { text: "chuột,", start: 5.8, end: 6.2 },
+          { text: "ZOOM", start: 6.2, end: 6.7, highlight: "#4ade80" },
+          { text: "MƯỢT", start: 6.7, end: 7.1, highlight: "#4ade80" },
+          { text: "ĐIỆN ẢNH!", start: 7.1, end: 7.68, highlight: "#facc15" }
+        ]
+      },
+      {
+        start: 7.68, end: 12.9,
+        words: [
+          { text: "TỰ ĐỘNG", start: 7.68, end: 8.4, highlight: "#f97316" },
+          { text: "HOÀN TOÀN", start: 8.4, end: 9.1, highlight: "#f97316" },
+          { text: "100%,", start: 9.1, end: 9.7, highlight: "#f97316" },
+          { text: "khung", start: 9.7, end: 10.0 },
+          { text: "hình", start: 10.0, end: 10.3 },
+          { text: "60 FPS", start: 10.3, end: 11.1, highlight: "#38bdf8" },
+          { text: "siêu", start: 11.1, end: 11.4 },
+          { text: "mượt", start: 11.4, end: 11.8, highlight: "#4ade80" },
+          { text: "trên cả", start: 11.8, end: 12.2 },
+          { text: "MAC & WIN!", start: 12.2, end: 12.9, highlight: "#a855f7" }
+        ]
+      }
+    ];
 
-    // Smooth Expo Out (Phóng nhanh rồi phanh êm)
-    function easeOutExpo(x) {
-      return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
-    }
+    // ─── AUDIO ENGINE & SYNTHESIZER BEAT ──────────────────────────────────
+    let audioCtx = null;
+    let audioDest = null;
+    let voiceNode = null;
+    let playedSFX = {};
 
-    // Damped Spring Simulation
-    function spring(t, freq = 12, damp = 6) {
-      return 1 - Math.exp(-damp * t) * Math.cos(freq * t);
-    }
-
-    // Camera Shake
-    let cameraShake = { x: 0, y: 0, intensity: 0 };
-    function triggerShake(intensity) {
-      cameraShake.intensity = intensity;
-    }
-
-    // ÂM THANH SYNTHESIZER (Tạo tiếng va đập Impact, Whoosh gió, Click đanh)
-    function initAudio() {
+    function initAudioEngine() {
       if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        audioDest = audioCtx.createMediaStreamDestination();
+
+        voiceNode = audioCtx.createMediaElementSource(voiceAudio);
+        voiceNode.connect(audioCtx.destination);
+        voiceNode.connect(audioDest);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
     }
 
-    function playImpact() {
+    // Nhịp gõ beat ngầm 125 BPM
+    function playBeat(time) {
       if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.35);
-      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.35);
+      const bpm = 125;
+      const beatInterval = 60 / bpm;
+      const beatNum = Math.floor(time / beatInterval);
+      const beatKey = 'beat_' + beatNum;
+
+      if (!playedSFX[beatKey] && time < TOTAL_DURATION) {
+        playedSFX[beatKey] = true;
+        const now = audioCtx.currentTime;
+
+        if (beatNum % 2 === 0) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(115, now);
+          osc.frequency.exponentialRampToValueAtTime(32, now + 0.12);
+          gain.gain.setValueAtTime(0.32, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          gain.connect(audioDest);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(75, now + 0.08);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          gain.connect(audioDest);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+      }
     }
 
-    function playWhooshFast() {
+    function playSfxImpact() {
       if (!audioCtx) return;
+      const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(26, now + 0.35);
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.18);
+      gain.connect(audioDest);
+      osc.start(now);
+      osc.stop(now + 0.4);
     }
 
-    function playPopTight() {
+    function playSfxWhoosh() {
       if (!audioCtx) return;
+      const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(900, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.18);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.08);
+      gain.connect(audioDest);
+      osc.start(now);
+      osc.stop(now + 0.22);
     }
 
-    let playedSFX = {};
     function checkSFX(t) {
-      if (!audioCtx) return;
-      if (t >= 0.1 && !playedSFX['hit0']) { playImpact(); playedSFX['hit0'] = true; }
-      if (t >= 1.2 && !playedSFX['hit1']) { playImpact(); playedSFX['hit1'] = true; }
-      if (t >= 2.4 && !playedSFX['whoosh1']) { playWhooshFast(); playedSFX['whoosh1'] = true; }
-      if (t >= 4.2 && !playedSFX['click_zoom']) { playPopTight(); playedSFX['click_zoom'] = true; }
-      if (t >= 6.4 && !playedSFX['card1']) { playPopTight(); playedSFX['card1'] = true; }
-      if (t >= 7.0 && !playedSFX['card2']) { playPopTight(); playedSFX['card2'] = true; }
-      if (t >= 7.6 && !playedSFX['card3']) { playPopTight(); playedSFX['card3'] = true; }
-      if (t >= 8.2 && !playedSFX['card4']) { playPopTight(); playedSFX['card4'] = true; }
-      if (t >= 9.2 && !playedSFX['cta_hit']) { playImpact(); playedSFX['cta_hit'] = true; }
+      playBeat(t);
+      if (t >= 0.05 && !playedSFX['hit1']) { playedSFX['hit1'] = true; playSfxImpact(); }
+      if (t >= 3.35 && !playedSFX['whoosh1']) { playedSFX['whoosh1'] = true; playSfxWhoosh(); }
+      if (t >= 7.68 && !playedSFX['whoosh2']) { playedSFX['whoosh2'] = true; playSfxWhoosh(); }
+      if (t >= 12.5 && !playedSFX['outro_hit']) { playedSFX['outro_hit'] = true; playSfxWhoosh(); }
     }
 
-    // ─── RENDER ENGINE (60 FPS) ───────────────────────────────────────────
+    // ─── EASING MATH ──────────────────────────────────────────────────────
+    function easeOutBack(x, s = 1.70158) {
+      return 1 + (s + 1) * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2);
+    }
+    function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+
+    let shakeStrength = 0;
+    function triggerShake(val) { shakeStrength = Math.max(shakeStrength, val); }
+
+    // ─── RENDER ENGINE (CANVAS 1080 x 1920) ───────────────────────────────
     function render(t) {
+      ctx.save();
       ctx.clearRect(0, 0, W, H);
 
-      // Camera Shake decay
-      if (cameraShake.intensity > 0) {
-        cameraShake.x = (Math.random() - 0.5) * cameraShake.intensity;
-        cameraShake.y = (Math.random() - 0.5) * cameraShake.intensity;
-        cameraShake.intensity *= 0.88;
-      } else {
-        cameraShake.x = 0; cameraShake.y = 0;
+      // Camera Shake
+      if (shakeStrength > 0.1) {
+        const sx = (Math.random() - 0.5) * shakeStrength;
+        const sy = (Math.random() - 0.5) * shakeStrength;
+        ctx.translate(sx, sy);
+        shakeStrength *= 0.88;
       }
 
-      ctx.save();
-      ctx.translate(cameraShake.x, cameraShake.y);
-
-      // ─── NỀN CYBER GRADIENT SỐNG ĐỘNG (DOPAMINE BACKGROUND) ───
-      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-      bgGrad.addColorStop(0, '#0c0217');
-      bgGrad.addColorStop(0.35, '#1e0738');
-      bgGrad.addColorStop(0.75, '#3b0764');
-      bgGrad.addColorStop(1, '#05020c');
+      // ─── NỀN DARK CYBER STUDIO ───
+      const bgGrad = ctx.createRadialGradient(W * 0.5, H * 0.45, 50, W * 0.5, H * 0.5, 1100);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(0.5, '#070a14');
+      bgGrad.addColorStop(1, '#020205');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // Moving Ambient Neon Glow (Follow Through)
-      const glowX = W * 0.5 + Math.sin(t * 3.5) * 160;
-      const glowY = H * 0.45 + Math.cos(t * 2.8) * 140;
-      const radialGlow = ctx.createRadialGradient(glowX, glowY, 40, glowX, glowY, 650);
-      radialGlow.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
-      radialGlow.addColorStop(0.5, 'rgba(168, 85, 247, 0.2)');
-      radialGlow.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = radialGlow;
+      // Quả cầu ánh sáng Plasma tím - cam mờ ảo
+      const orbX = W * 0.5 + Math.sin(t * 1.5) * 120;
+      const orbY = 700 + Math.cos(t * 1.2) * 80;
+      const orbGrad = ctx.createRadialGradient(orbX, orbY, 10, orbX, orbY, 500);
+      orbGrad.addColorStop(0, 'rgba(249, 115, 22, 0.2)');
+      orbGrad.addColorStop(0.6, 'rgba(56, 189, 248, 0.06)');
+      orbGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = orbGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // Floating Neon Sparkles (Secondary Action)
-      for (let i = 0; i < 30; i++) {
-        const px = ((i * 137.5 + t * 90) % (W + 100)) - 50;
-        const py = ((i * 219.3 + Math.sin(t * 4 + i) * 60) % (H + 100)) - 50;
-        const size = (i % 3) + 2.5;
-        ctx.fillStyle = i % 2 === 0 ? 'rgba(249, 115, 22, 0.6)' : 'rgba(56, 189, 248, 0.6)';
-        ctx.beginPath();
-        ctx.arc(px, py, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      // ═════════════════════════════════════════════════════════════════════
+      // SCENE 1: HOOK NỖI ĐAU (0.0s - 3.35s)
+      // Voice: "Bạn vẫn quay màn hình rồi mất hàng giờ zoom thủ công ư?"
+      // ═════════════════════════════════════════════════════════════════════
+      if (t < 3.35) {
+        if (t < 0.1) triggerShake(18);
 
-      // ═══════════════════════════════════════════════════════════════════════
-      // SCENE 1: HOOK ĐẬP MẠNH VÀO TÂM TRÍ (0.0s - 2.5s)
-      // Nguyên lý: Squash & Stretch + Impact Shake + Overshoot
-      // ═══════════════════════════════════════════════════════════════════════
-      if (t < 2.5) {
-        if (t < 0.15) triggerShake(25); // Va đập đầu video
+        const hookProg = Math.min(1, t / 0.35);
+        const hookScale = easeOutBack(hookProg, 2.0);
 
-        ctx.save();
-        
-        // Tagline trên đầu
-        const tagProgress = Math.min(1, t / 0.3);
-        const tagScale = easeOutBack(tagProgress, 2.5);
-        ctx.save();
-        ctx.translate(W * 0.5, 340);
-        ctx.scale(tagScale, tagScale);
-        drawBadge("⚠️ MẤT 3 TIẾNG EDIT VIDEO?", 0, 0, '#ef4444');
-        ctx.restore();
-
-        // Chữ HOOK đập từ trên xuống với Squash & Stretch
-        const textIn = Math.min(1, Math.max(0, (t - 0.1) / 0.35));
-        const textScaleX = textIn < 0.8 ? 0.8 + textIn * 0.4 : 1.0;
-        const textScaleY = textIn < 0.8 ? 1.4 - textIn * 0.4 : 1.0;
-        const textY = 480 + (1 - easeOutBack(textIn, 3.0)) * -300;
-
-        ctx.save();
-        ctx.translate(W * 0.5, textY);
-        ctx.scale(textScaleX, textScaleY);
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '900 86px "Plus Jakarta Sans"';
-        ctx.fillText("BẠN VẪN ĐANG", 0, 0);
-
-        ctx.fillStyle = '#f87171';
-        ctx.fillText("ZOOM THỦ CÔNG?", 0, 100);
-        ctx.restore();
-
-        // ❌ DẤU GẠCH CHÉO ĐẬP MẠNH (Impact tại t = 1.2s)
-        if (t >= 0.7) {
-          const crossT = Math.min(1, (t - 0.7) / 0.3);
-          const crossScale = easeOutBack(crossT, 4.0);
-          if (t >= 1.2 && t < 1.3) triggerShake(30);
-
-          const boxX = 140, boxY = 720, boxW = 800, boxH = 680;
-          drawSquircle(ctx, boxX, boxY, boxW, boxH, 36, 'rgba(255,255,255,0.06)', 'rgba(239,68,68,0.5)');
-
-          // Mock timeline
-          ctx.fillStyle = 'rgba(255,255,255,0.1)';
-          ctx.fillRect(boxX + 50, boxY + 120, boxW - 100, 60);
-          ctx.fillRect(boxX + 50, boxY + 220, boxW - 100, 60);
-          // Keyframes dày đặc
-          for (let k = 0; k < 14; k++) {
-            ctx.fillStyle = '#f59e0b';
-            ctx.beginPath();
-            ctx.arc(boxX + 90 + k * 48, boxY + 250, 10, 0, Math.PI * 2);
-            ctx.fill();
-          }
-
-          // GIÁT DẤU X ĐỎ KHỔNG LỒ NẢY BUNG LÊN
-          ctx.save();
-          ctx.translate(W * 0.5, boxY + boxH * 0.5);
-          ctx.scale(crossScale, crossScale);
-          ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = 32;
-          ctx.lineCap = 'round';
-          ctx.shadowColor = '#ef4444';
-          ctx.shadowBlur = 40;
-          ctx.beginPath();
-          ctx.moveTo(-180, -180); ctx.lineTo(180, 180);
-          ctx.moveTo(180, -180); ctx.lineTo(-180, 180);
-          ctx.stroke();
-          ctx.restore();
-        }
-
-        // Dòng chữ chốt Scene 1
-        if (t >= 1.3) {
-          const punchT = Math.min(1, (t - 1.3) / 0.25);
-          ctx.save();
-          ctx.translate(W * 0.5, 1550);
-          ctx.scale(easeOutBack(punchT, 2.5), easeOutBack(punchT, 2.5));
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#fef08a';
-          ctx.font = '900 52px "Plus Jakarta Sans"';
-          ctx.fillText("QUÊN NGAY ĐI! 🛑", 0, 0);
-          ctx.restore();
-        }
-
-        ctx.restore();
-      }
-
-      // ═══════════════════════════════════════════════════════════════════════
-      // SCENE 2: GIẢI PHÁP & DEMO AUTO-ZOOM THẦN THÁNH (2.5s - 6.5s)
-      // Nguyên lý: Arcs (Đường cong chuột) + Anticipation + Spring Zoom Camera
-      // ═══════════════════════════════════════════════════════════════════════
-      else if (t >= 2.5 && t < 6.5) {
-        const localT = t - 2.5; // 0s -> 4s
-        
-        ctx.save();
-
-        // Header xuất hiện với Overshoot
-        const headProg = Math.min(1, localT / 0.4);
-        const headScale = easeOutBack(headProg, 2.0);
         ctx.save();
         ctx.translate(W * 0.5, 260);
-        ctx.scale(headScale, headScale);
-        drawBadge("✨ BÍ QUYẾT PRO CREATOR", 0, 0, '#10b981');
+        ctx.scale(hookScale, hookScale);
+        drawPillBadge("⚠️ NỖI ÁM ẢNH CỦA CREATOR", 0, 0, '#ef4444');
         ctx.restore();
 
-        // Logo bung tỏa với Elastic Spring
-        const logoProg = Math.min(1, Math.max(0, (localT - 0.15) / 0.6));
-        const logoScale = easeOutElastic(logoProg);
-        ctx.save();
-        ctx.translate(W * 0.5, 420);
-        ctx.scale(logoScale, logoScale);
-        if (logoImg.complete) {
-          ctx.shadowColor = '#f97316'; ctx.shadowBlur = 40;
-          ctx.drawImage(logoImg, -90, -90, 180, 180);
-        }
-        ctx.restore();
-
-        // Tên App Punchy
+        // Tiêu đề Tiếng Việt nét căng, không lỗi font
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 74px "Plus Jakarta Sans"';
-        ctx.fillText("RECORD-AUTOZOOM", W * 0.5, 580);
+        ctx.font = `900 82px ${FONT_FAMILY}`;
+        ctx.fillText("MỆT MỎI VÌ", W * 0.5, 410);
 
-        const gradSub = ctx.createLinearGradient(200, 0, 880, 0);
-        gradSub.addColorStop(0, '#f97316'); gradSub.addColorStop(1, '#facc15');
-        ctx.fillStyle = gradSub;
-        ctx.font = '800 48px "Plus Jakarta Sans"';
-        ctx.fillText("TỰ ĐỘNG BẮT NÉT THEO CHUỘT", W * 0.5, 655);
+        const gradRed = ctx.createLinearGradient(150, 0, 930, 0);
+        gradRed.addColorStop(0, '#ef4444');
+        gradRed.addColorStop(1, '#f97316');
+        ctx.fillStyle = gradRed;
+        ctx.font = `900 94px ${FONT_FAMILY}`;
+        ctx.fillText("ZOOM THỦ CÔNG?", W * 0.5, 520);
 
-        // ─── CỬA SỔ DEMO VỚI HIỆU ỨNG SPRING PHYSICS AUTO-ZOOM ───
-        const winX = 100, winY = 740, winW = 880, winH = 760;
-        
-        // Window xuất hiện nảy lên
-        const winProg = Math.min(1, Math.max(0, (localT - 0.3) / 0.5));
-        const winScale = easeOutBack(winProg, 1.8);
-        
-        ctx.save();
-        ctx.translate(W * 0.5, winY + winH * 0.5);
-        ctx.scale(winScale, winScale);
-        ctx.translate(-W * 0.5, -(winY + winH * 0.5));
+        // Minh họa màn hình lỗi thời & keyframe rối mắt
+        const boxX = 90, boxY = 600, boxW = 900, boxH = 580;
+        drawSquircle(ctx, boxX, boxY, boxW, boxH, 28, 'rgba(20, 20, 30, 0.95)', 'rgba(239, 68, 68, 0.35)');
 
-        drawSquircle(ctx, winX, winY, winW, winH, 36, 'rgba(255,255,255,0.08)', 'rgba(249,115,22,0.6)');
-
-        // Window Titlebar
-        ctx.fillStyle = 'rgba(255,255,255,0.08)';
-        ctx.fillRect(winX, winY, winW, 58);
-        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(winX + 35, winY + 29, 8, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(winX + 65, winY + 29, 8, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(winX + 95, winY + 29, 8, 0, Math.PI*2); ctx.fill();
-
-        // NỘI DUNG BÊN TRONG CỬA SỔ + CAMERA ZOOM THEO CHUỘT
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(winX, winY + 58, winW, winH - 58);
-        ctx.clip();
-
-        // CHUỘT DI CHUYỂN THEO ĐƯỜNG CONG (ARC PRINCIPLE)
-        // Giai đoạn 1 (0 -> 1.5s): Lướt vòng cung đến nút
-        // Giai đoạn 2 (1.5s -> 4s): Click & Zoom cực mạnh!
-        const movePhase = Math.min(1, (localT - 0.6) / 1.1);
-        const arcT = easeInOutBack(movePhase, 1.4);
-        
-        const curStartX = winX + 180, curStartY = winY + 620;
-        const curTargetX = winX + 440, curTargetY = winY + 380;
-        // Arc curvature:
-        const curX = curStartX + (curTargetX - curStartX) * arcT + Math.sin(arcT * Math.PI) * 90;
-        const curY = curStartY + (curTargetY - curStartY) * arcT - Math.sin(arcT * Math.PI) * 110;
-
-        // CLICK & SPRING ZOOM (Xảy ra tại localT >= 1.7s)
-        const isZoomTime = localT >= 1.7;
-        const zoomDelta = Math.max(0, localT - 1.7);
-        // Spring bounce zoom (Phóng to 2.2x có độ dập lò xo):
-        const zoomFactor = isZoomTime ? (1.0 + (1.2 * spring(zoomDelta, 14, 5))) : 1.0;
-
-        ctx.translate(curTargetX, curTargetY);
-        ctx.scale(zoomFactor, zoomFactor);
-        ctx.translate(-curTargetX, -curTargetY);
-
-        // Nút bấm demo trong app
-        const btnDemoX = winX + 240, btnDemoY = winY + 320, btnDemoW = 400, btnDemoH = 120;
-        drawSquircle(ctx, btnDemoX, btnDemoY, btnDemoW, btnDemoH, 24, '#1e1b4b', '#38bdf8');
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '800 36px "Plus Jakarta Sans"';
-        ctx.textAlign = 'center';
-        ctx.fillText("⚡ BẤM MUA NGAY", btnDemoX + btnDemoW * 0.5, btnDemoY + 74);
-
-        // VÒNG TRÒN SHOCKWAVE KHI CLICK CHUỘT
-        if (isZoomTime) {
-          const shockProgress = (zoomDelta * 2.5) % 1.5;
-          ctx.strokeStyle = `rgba(249, 115, 22, ${Math.max(0, 1 - shockProgress)})`;
-          ctx.lineWidth = 12;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.fillRect(boxX + 40, boxY + 440, boxW - 80, 80);
+        ctx.fillStyle = '#ef4444';
+        for (let i = 0; i < 18; i++) {
           ctx.beginPath();
-          ctx.arc(curTargetX, curTargetY, shockProgress * 180, 0, Math.PI * 2);
-          ctx.stroke();
+          ctx.arc(boxX + 70 + i * 44, boxY + 480, 9, 0, Math.PI * 2);
+          ctx.fill();
         }
 
-        // Vẽ con trỏ chuột với Squash & Stretch khi click
-        const clicking = isZoomTime && zoomDelta < 0.25;
-        drawCursor(ctx, curX, curY, clicking);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = `700 32px ${FONT_FAMILY}`;
+        ctx.fillText("Hàng trăm Keyframe thủ công mỗi ngày...", W * 0.5, boxY + 380);
 
-        ctx.restore(); // Clip window
-        ctx.restore(); // Window scale
+        // DẤU X ĐỎ KHỔNG LỒ GIÁNG XUỐNG
+        if (t >= 0.8) {
+          const xProg = Math.min(1, (t - 0.8) / 0.25);
+          if (xProg < 0.2) triggerShake(25);
+          const xScale = easeOutBack(xProg, 2.8);
 
-        // Banner nhịp tim dưới cửa sổ
-        drawBadge("🔥 Zoom Mượt Mà Như Phim • Không Cần Edit!", W * 0.5, 1620, '#f97316');
+          ctx.save();
+          ctx.translate(W * 0.5, boxY + 200);
+          ctx.scale(xScale, xScale);
+          ctx.font = `900 240px ${FONT_FAMILY}`;
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 60;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText("❌", 0, 0);
+          ctx.restore();
+        }
 
-        ctx.restore();
+        drawPillBadge("⏳ Mất 3 - 4 Tiếng Chỉ Để Edit Zoom", W * 0.5, 1270, '#f87171');
       }
 
-      // ═══════════════════════════════════════════════════════════════════════
-      // SCENE 3: TÍNH NĂNG VĂNG RA DỒN DẬP (6.5s - 9.2s)
-      // Nguyên lý: Staggered Overlapping Action + Rotation Inertia
-      // ═══════════════════════════════════════════════════════════════════════
-      else if (t >= 6.5 && t < 9.2) {
-        const localT = t - 6.5;
+      // ═════════════════════════════════════════════════════════════════════
+      // SCENE 2: SHOWCASE MACBOOK 3D & DEMO THẬT OK.MP4 (3.35s - 7.68s)
+      // Voice: "Record Auto Zoom tự động bắt nét con trỏ chuột và zoom mượt như điện ảnh!"
+      // ═════════════════════════════════════════════════════════════════════
+      else if (t >= 3.35 && t < 7.68) {
+        const localT = t - 3.35;
 
+        // Flash transition chớp trắng
+        if (localT < 0.2) {
+          ctx.fillStyle = `rgba(255,255,255, ${ (1 - localT / 0.2) * 0.35 })`;
+          ctx.fillRect(0, 0, W, H);
+        }
+
+        const hProg = Math.min(1, localT / 0.35);
         ctx.save();
-
-        drawBadge("⚡ TÍNH NĂNG ĐỘT PHÁ", W * 0.5, 240, '#a855f7');
+        ctx.translate(W * 0.5, 210);
+        ctx.scale(easeOutBack(hProg, 2.0), easeOutBack(hProg, 2.0));
+        drawPillBadge("🚀 GIẢI PHÁP ĐỘT PHÁ SỐ 1", 0, 0, '#38bdf8');
+        ctx.restore();
 
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 78px "Plus Jakarta Sans"';
-        ctx.fillText("SIÊU VŨ KHÍ", W * 0.5, 360);
-        
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillText("CHO CREATOR!", W * 0.5, 450);
+        ctx.font = `900 78px ${FONT_FAMILY}`;
+        ctx.fillText("RECORD-AUTOZOOM", W * 0.5, 330);
 
-        // 4 Thẻ tính năng văng ra với Overlapping Delay (0.2s mỗi thẻ)
-        const features = [
-          { icon: "🎯", title: "Auto-Focus & Smooth Zoom", desc: "Tự động bắt nét theo chuột mượt 60 FPS", delay: 0 },
-          { icon: "💎", title: "Glassmorphism & Bo Góc", desc: "Viền cong sang chảnh chuẩn phong cách Apple", delay: 0.2 },
-          { icon: "🚀", title: "GPU Hardware Export 4K", desc: "Xuất video nhanh gấp 5 lần không giật lag", delay: 0.4 },
-          { icon: "🍏", title: "Hỗ Trợ macOS & Windows", desc: "Bản cài riêng cho chip Apple M và PC Win 11", delay: 0.6 }
+        const gradTech = ctx.createLinearGradient(160, 0, 920, 0);
+        gradTech.addColorStop(0, '#f97316');
+        gradTech.addColorStop(1, '#facc15');
+        ctx.fillStyle = gradTech;
+        ctx.font = `800 38px ${FONT_FAMILY}`;
+        ctx.fillText("TỰ ĐỘNG BẮT NÉT & PHÓNG TO THEO CHUỘT", W * 0.5, 400);
+
+        // MacBook Pro 3D Space Black với video thật
+        const mbT = Math.min(1, localT / 0.45);
+        const mbScale = easeOutBack(mbT, 1.6);
+        const cameraDive = 1.0 + Math.min(0.18, localT * 0.04);
+
+        ctx.save();
+        ctx.translate(W * 0.5, 780);
+        ctx.scale(mbScale * cameraDive, mbScale * cameraDive);
+        ctx.translate(-W * 0.5, -780);
+
+        drawMacBookProMockup(ctx, 45, 460, 990, 640);
+        ctx.restore();
+
+        // Các Floating Badge nổi lên
+        if (localT >= 1.2) {
+          const b1 = Math.min(1, (localT - 1.2) / 0.3);
+          ctx.save();
+          ctx.translate(280, 1180);
+          ctx.scale(easeOutBack(b1, 2.2), easeOutBack(b1, 2.2));
+          drawFloatingChip("✨ 60 FPS ULTRA SMOOTH", 0, 0, '#10b981');
+          ctx.restore();
+        }
+
+        if (localT >= 2.0) {
+          const b2 = Math.min(1, (localT - 2.0) / 0.3);
+          ctx.save();
+          ctx.translate(800, 1180);
+          ctx.scale(easeOutBack(b2, 2.2), easeOutBack(b2, 2.2));
+          drawFloatingChip("🎯 ZERO KEYFRAME", 0, 0, '#f59e0b');
+          ctx.restore();
+        }
+
+        drawPillBadge("🔴 LIVE FOOTAGE • QUAY THỰC TẾ 100%", W * 0.5, 1270, '#facc15');
+      }
+
+      // ═════════════════════════════════════════════════════════════════════
+      // SCENE 3: TÍNH NĂNG ĐẲNG CẤP (7.68s - 12.0s)
+      // Voice: "Tự động hoàn toàn 100%, khung hình 60 FPS siêu mượt trên cả Mac và Windows!"
+      // ═════════════════════════════════════════════════════════════════════
+      else if (t >= 7.68 && t < 12.0) {
+        const localT = t - 7.68;
+
+        ctx.save();
+        drawPillBadge("💎 ĐẲNG CẤP DÀNH CHO CREATOR", W * 0.5, 220, '#a855f7');
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `900 80px ${FONT_FAMILY}`;
+        ctx.fillText("TỰ ĐỘNG 100%", W * 0.5, 340);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = `800 40px ${FONT_FAMILY}`;
+        ctx.fillText("TIẾT KIỆM 90% THỜI GIAN EDIT VIDEO", W * 0.5, 415);
+
+        // 4 Thẻ kim loại cao cấp
+        const featureCards = [
+          { icon: "⚡", title: "Auto-Focus Con Trỏ Chuột", desc: "Tự nhận diện vùng click & phóng to mượt mà", delay: 0 },
+          { icon: "💎", title: "Bo Góc Glassmorphism", desc: "Đổ bóng đa tầng phong cách Apple sang trọng", delay: 0.18 },
+          { icon: "🚀", title: "Xuất Video 4K 60 FPS", desc: "Tận dụng GPU máy tính xuất nhanh gấp 5 lần", delay: 0.36 },
+          { icon: "🍏", title: "Sẵn Sàng Cho macOS & Win", desc: "Bản cài riêng cho Apple Silicon M & Windows 11", delay: 0.54 }
         ];
 
-        features.forEach((feat, index) => {
-          const cardT = Math.max(0, localT - feat.delay);
-          const enterProg = Math.min(1, cardT / 0.35);
-          
-          if (enterProg > 0) {
-            // Easing với Overshoot + Quán tính góc xoay (Rotation inertia)
-            const scale = easeOutBack(enterProg, 2.2);
-            const rot = (1 - enterProg) * (index % 2 === 0 ? 0.15 : -0.15); // Nghiêng rồi trả về thẳng
-            const cardY = 560 + index * 230;
+        featureCards.forEach((c, idx) => {
+          const cardT = Math.max(0, localT - c.delay);
+          const prog = Math.min(1, cardT / 0.35);
+
+          if (prog > 0) {
+            const scale = easeOutBack(prog, 2.0);
+            const cardY = 500 + idx * 200;
             const cardX = W * 0.5;
 
             ctx.save();
-            ctx.translate(cardX, cardY + 95);
-            ctx.rotate(rot);
+            ctx.translate(cardX, cardY + 85);
             ctx.scale(scale, scale);
-            ctx.translate(-cardX, -(cardY + 95));
+            ctx.translate(-cardX, -(cardY + 85));
 
-            drawSquircle(ctx, 90, cardY, 900, 190, 28, 'rgba(255,255,255,0.08)', 'rgba(56,189,248,0.4)');
+            drawSquircle(ctx, 80, cardY, 920, 170, 26, 'rgba(255, 255, 255, 0.06)', 'rgba(56, 189, 248, 0.35)');
+
+            // Shimmer light effect
+            const shimX = 80 + (localT * 400) % 1100;
+            const shimGrad = ctx.createLinearGradient(shimX - 100, 0, shimX + 100, 0);
+            shimGrad.addColorStop(0, 'transparent');
+            shimGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
+            shimGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = shimGrad;
+            ctx.fillRect(80, cardY, 920, 170);
 
             // Icon
             ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
             ctx.beginPath();
-            ctx.arc(180, cardY + 95, 55, 0, Math.PI * 2);
+            ctx.arc(175, cardY + 85, 52, 0, Math.PI * 2);
             ctx.fill();
-            ctx.font = '54px "Plus Jakarta Sans"';
+            ctx.font = `50px ${FONT_FAMILY}`;
             ctx.textAlign = 'center';
-            ctx.fillText(feat.icon, 180, cardY + 114);
+            ctx.fillText(c.icon, 175, cardY + 103);
 
-            // Text
+            // Title & Desc
             ctx.textAlign = 'left';
             ctx.fillStyle = '#ffffff';
-            ctx.font = '800 40px "Plus Jakarta Sans"';
-            ctx.fillText(feat.title, 270, cardY + 80);
+            ctx.font = `800 38px ${FONT_FAMILY}`;
+            ctx.fillText(c.title, 260, cardY + 74);
 
             ctx.fillStyle = '#94a3b8';
-            ctx.font = '600 28px "Plus Jakarta Sans"';
-            ctx.fillText(feat.desc, 270, cardY + 130);
+            ctx.font = `600 27px ${FONT_FAMILY}`;
+            ctx.fillText(c.desc, 260, cardY + 122);
 
             ctx.restore();
           }
@@ -575,135 +585,233 @@
         ctx.restore();
       }
 
-      // ═══════════════════════════════════════════════════════════════════════
-      // SCENE 4: CALL TO ACTION BÙNG NỔ (9.2s - 12.0s)
-      // Nguyên lý: Secondary Action (God Rays) + Heartbeat Pulse CTA
-      // ═══════════════════════════════════════════════════════════════════════
+      // ═════════════════════════════════════════════════════════════════════
+      // SCENE 4: OUTRO SANG TRỌNG • MINIMALIST APPLE (12.0s - 13.8s)
+      // TUYỆT ĐỐI KHÔNG CÓ QUẢNG CÁO, KHÔNG KÊU GỌI TẢI, KHÔNG LINK WEB!
+      // ═════════════════════════════════════════════════════════════════════
       else {
-        const localT = t - 9.2;
-        if (localT < 0.15) triggerShake(35); // Va đập mạnh lúc đổi cảnh CTA!
-
+        const localT = t - 12.0;
         ctx.save();
 
-        // Vòng tia sáng xoay tròn phía sau (God Rays rotating)
-        ctx.save();
-        ctx.translate(W * 0.5, 780);
-        ctx.rotate(localT * 1.5);
-        for (let r = 0; r < 12; r++) {
-          ctx.fillStyle = 'rgba(249, 115, 22, 0.06)';
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.arc(0, 0, 900, (r * Math.PI) / 6, ((r + 0.5) * Math.PI) / 6);
-          ctx.fill();
-        }
-        ctx.restore();
+        // Vòng sáng mờ ảo tinh tế
+        const outroGlow = ctx.createRadialGradient(W * 0.5, 780, 50, W * 0.5, 780, 600);
+        outroGlow.addColorStop(0, 'rgba(249, 115, 22, 0.2)');
+        outroGlow.addColorStop(0.6, 'rgba(56, 189, 248, 0.06)');
+        outroGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = outroGlow;
+        ctx.fillRect(0, 0, W, H);
 
-        drawBadge("🎁 HOÀN TOÀN MIỄN PHÍ", W * 0.5, 240, '#10b981');
-
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '900 86px "Plus Jakarta Sans"';
-        ctx.fillText("NÂNG TẦM VIDEO", W * 0.5, 380);
-
-        const ctaGrad = ctx.createLinearGradient(120, 0, 960, 0);
-        ctaGrad.addColorStop(0, '#f97316');
-        ctaGrad.addColorStop(0.5, '#fb923c');
-        ctaGrad.addColorStop(1, '#38bdf8');
-        ctx.fillStyle = ctaGrad;
-        ctx.fillText("NGAY HÔM NAY!", W * 0.5, 480);
-
-        // Hộp thiết bị trung tâm bung nở
-        const devT = Math.min(1, localT / 0.4);
-        const devScale = easeOutBack(devT, 2.5);
-        const devX = 130, devY = 560, devW = 820, devH = 680;
+        // Logo thương hiệu tinh xảo
+        const logoProg = Math.min(1, localT / 0.5);
+        const logoScale = easeOutBack(logoProg, 2.0);
 
         ctx.save();
-        ctx.translate(W * 0.5, devY + devH * 0.5);
-        ctx.scale(devScale, devScale);
-        ctx.translate(-W * 0.5, -(devY + devH * 0.5));
-
-        drawSquircle(ctx, devX, devY, devW, devH, 40, 'rgba(255,255,255,0.07)', 'rgba(168,85,247,0.5)');
+        ctx.translate(W * 0.5, 720);
+        ctx.scale(logoScale, logoScale);
 
         if (logoImg.complete) {
-          ctx.shadowColor = '#f97316'; ctx.shadowBlur = 50;
-          ctx.drawImage(logoImg, W * 0.5 - 130, devY + 80, 260, 260);
+          ctx.shadowColor = 'rgba(249, 115, 22, 0.6)';
+          ctx.shadowBlur = 60;
+          ctx.drawImage(logoImg, -140, -140, 280, 280);
         }
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '900 56px "Plus Jakarta Sans"';
-        ctx.fillText("Record-AutoZoom PRO", W * 0.5, devY + 415);
-
-        ctx.fillStyle = '#10b981';
-        ctx.font = '800 38px "Plus Jakarta Sans"';
-        ctx.fillText("🍏 macOS (M-Series)  •  🪟 Windows 11", W * 0.5, devY + 490);
-
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 30px "Plus Jakarta Sans"';
-        ctx.fillText("Tải trực tiếp • Cài đặt chỉ trong 10 giây", W * 0.5, devY + 560);
         ctx.restore();
 
-        // ─── NÚT BẤM CTA ĐẬP THEO NHỊP TIM (HEARTBEAT PULSE) ───
-        const pulseCycle = (localT * 4) % 1;
-        const pulseScale = 1.0 + (pulseCycle < 0.25 ? Math.sin(pulseCycle * Math.PI * 4) * 0.08 : 0);
-        
-        const btnW = 840 * pulseScale;
-        const btnH = 145 * pulseScale;
-        const btnX = (W - btnW) / 2;
-        const btnY = 1340;
-
-        ctx.save();
-        ctx.shadowColor = '#f97316';
-        ctx.shadowBlur = 55;
-        drawSquircle(ctx, btnX, btnY, btnW, btnH, 36, 'linear-gradient', '#ffffff');
-        
-        const bGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
-        bGrad.addColorStop(0, '#f97316');
-        bGrad.addColorStop(1, '#ea580c');
-        ctx.fillStyle = bGrad;
-        ctx.fill();
-        ctx.restore();
-
+        // Tên sản phẩm chính
+        ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 50px "Plus Jakarta Sans"';
-        ctx.fillText("⬇️ TẢI MIỄN PHÍ NGAY", W * 0.5, btnY + 92);
+        ctx.font = `900 84px ${FONT_FAMILY}`;
+        ctx.fillText("Record-AutoZoom", W * 0.5, 1020);
 
-        // Khung URL Website
-        drawSquircle(ctx, 150, 1540, 780, 115, 26, 'rgba(0,0,0,0.65)', 'rgba(56,189,248,0.6)');
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '900 46px "JetBrains Mono"';
-        ctx.fillText("record-autozoom.pages.dev", W * 0.5, 1615);
+        // Slogan tinh tế
+        const gradSlogan = ctx.createLinearGradient(200, 0, 880, 0);
+        gradSlogan.addColorStop(0, '#f97316');
+        gradSlogan.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = gradSlogan;
+        ctx.font = `800 44px ${FONT_FAMILY}`;
+        ctx.fillText("Tự Động Bắt Nét Chuột • 60 FPS", W * 0.5, 1100);
+
+        // Tag nền tảng cao cấp
+        drawPillBadge("🍏 macOS & 🪟 Windows", W * 0.5, 1220, '#10b981');
 
         ctx.restore();
       }
 
-      ctx.restore(); // Camera shake
+      // ═════════════════════════════════════════════════════════════════════
+      // KINETIC SUBTITLES (CHUẨN FONT BE VIETNAM PRO)
+      // ═════════════════════════════════════════════════════════════════════
+      drawKineticSubtitles(ctx, t);
 
-      // THANH TIẾN TRÌNH TRÔI DƯỚI ĐÁY
+      // THANH TIẾN TRÌNH REELS / TIKTOK DƯỚI ĐÁY
       const pWidth = (t / TOTAL_DURATION) * W;
       ctx.fillStyle = '#f97316';
-      ctx.fillRect(0, H - 18, pWidth, 18);
+      ctx.fillRect(0, H - 16, pWidth, 16);
+
+      ctx.restore();
     }
 
-    // ─── UTILS VẼ ĐỒ HỌA ──────────────────────────────────────────────────
-    function drawBadge(text, x, y, color) {
+    // ─── VẼ MOCKUP MACBOOK PRO 3D SPACE BLACK ─────────────────────────────
+    function drawMacBookProMockup(ctx, x, y, w, h) {
       ctx.save();
-      ctx.font = '800 30px "Plus Jakarta Sans"';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = 50;
+      ctx.shadowOffsetY = 25;
+
+      const r = 26;
+      drawSquircle(ctx, x, y, w, h - 35, r, '#1e2029', 'rgba(255,255,255,0.18)');
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 2;
+      drawSquircle(ctx, x + 1, y + 1, w - 2, h - 37, r);
+      ctx.stroke();
+
+      const screenMargin = 16;
+      const scrX = x + screenMargin;
+      const scrY = y + screenMargin + 8;
+      const scrW = w - screenMargin * 2;
+      const scrH = h - 35 - screenMargin * 2 - 8;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(scrX, scrY, scrW, scrH);
+      ctx.clip();
+
+      if (demoVideo.readyState >= 2) {
+        ctx.drawImage(demoVideo, scrX, scrY, scrW, scrH);
+      } else {
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(scrX, scrY, scrW, scrH);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = `800 32px ${FONT_FAMILY}`;
+        ctx.textAlign = 'center';
+        ctx.fillText("Đang đồng bộ video thực tế...", scrX + scrW * 0.5, scrY + scrH * 0.5);
+      }
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.fillRect(scrX, scrY, scrW, 26);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = `600 13px ${FONT_FAMILY}`;
+      ctx.textAlign = 'left';
+      ctx.fillText("🍎 File  Edit  View  Window  Help", scrX + 16, scrY + 18);
+      ctx.restore();
+
+      ctx.fillStyle = '#1e2029';
+      ctx.beginPath();
+      ctx.arc(x + w * 0.5, y + 14, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Đế bàn phím nhôm
+      const baseH = 32;
+      const baseY = y + h - 35;
+      const baseW = w + 40;
+      const baseX = x - 20;
+
+      ctx.save();
+      ctx.fillStyle = '#2d313d';
+      ctx.beginPath();
+      ctx.moveTo(baseX + 24, baseY);
+      ctx.lineTo(baseX + baseW - 24, baseY);
+      ctx.quadraticCurveTo(baseX + baseW, baseY + baseH, baseX + baseW - 35, baseY + baseH);
+      ctx.lineTo(baseX + 35, baseY + baseH);
+      ctx.quadraticCurveTo(baseX, baseY + baseH, baseX + 24, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#181a20';
+      ctx.beginPath();
+      ctx.roundRect(x + w * 0.5 - 60, baseY, 120, 9, [0, 0, 6, 6]);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ─── VẼ PHỤ ĐỀ KINETIC SUBTITLES (CHUẨN FONT TIẾNG VIỆT) ──────────────
+    function drawKineticSubtitles(ctx, t) {
+      const activeCue = subtitles.find(s => t >= s.start && t < s.end);
+      if (!activeCue) return;
+
+      ctx.save();
+      const subBgW = 960;
+      const subBgH = 125;
+      const subBgX = (W - subBgW) / 2;
+      const subBgY = 1660;
+
+      drawSquircle(ctx, subBgX, subBgY, subBgW, subBgH, 24, 'rgba(0, 0, 0, 0.72)', 'rgba(255, 255, 255, 0.12)');
+
+      ctx.font = `900 40px ${FONT_FAMILY}`;
+      ctx.textAlign = 'left';
+
+      let fullWords = activeCue.words;
+      const lineWords = fullWords.map(w => w.text).join(' ');
+      const currentWordIdx = fullWords.findIndex(w => t >= w.start && t < w.end);
+
+      const fullWidth = ctx.measureText(lineWords).width;
+      let startX = Math.max(subBgX + 30, (W - fullWidth) / 2);
+
+      fullWords.forEach((wordObj, i) => {
+        const isCurrent = (i === currentWordIdx);
+        const hasPassed = (t >= wordObj.end);
+
+        ctx.save();
+        if (isCurrent) {
+          const scale = 1.15;
+          ctx.translate(startX + 25, subBgY + 75);
+          ctx.scale(scale, scale);
+          ctx.translate(-(startX + 25), -(subBgY + 75));
+
+          ctx.fillStyle = wordObj.highlight || '#facc15';
+          ctx.shadowColor = wordObj.highlight || '#facc15';
+          ctx.shadowBlur = 24;
+        } else if (hasPassed) {
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.font = `900 40px ${FONT_FAMILY}`;
+        ctx.fillText(wordObj.text, startX, subBgY + 76);
+        ctx.restore();
+
+        startX += ctx.measureText(wordObj.text + " ").width;
+      });
+
+      ctx.restore();
+    }
+
+    // ─── UTILS VẼ ─────────────────────────────────────────────────────────
+    function drawPillBadge(text, x, y, color) {
+      ctx.save();
+      ctx.font = `800 28px ${FONT_FAMILY}`;
       ctx.textAlign = 'center';
       const textW = ctx.measureText(text).width;
-      const bW = textW + 64;
-      const bH = 68;
+      const bW = textW + 60;
+      const bH = 64;
       const bX = x - bW / 2;
       const bY = y - bH / 2;
 
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillStyle = 'rgba(10, 10, 18, 0.75)';
       ctx.strokeStyle = color;
-      ctx.lineWidth = 3.5;
-      drawSquircle(ctx, bX, bY, bW, bH, 22);
+      ctx.lineWidth = 3;
+      drawSquircle(ctx, bX, bY, bW, bH, 20);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = color;
-      ctx.fillText(text, x, y + 11);
+      ctx.fillText(text, x, y + 10);
+      ctx.restore();
+    }
+
+    function drawFloatingChip(text, x, y, color) {
+      ctx.save();
+      ctx.font = `800 26px ${FONT_FAMILY}`;
+      ctx.textAlign = 'center';
+      const textW = ctx.measureText(text).width;
+      const bW = textW + 48;
+      const bH = 58;
+      drawSquircle(ctx, x - bW/2, y - bH/2, bW, bH, 18, 'rgba(0,0,0,0.85)', color);
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y + 9);
       ctx.restore();
     }
 
@@ -720,45 +828,49 @@
       ctx.quadraticCurveTo(x, y, x + r, y);
       ctx.closePath();
 
-      if (fill && fill !== 'linear-gradient') {
+      if (fill) {
         ctx.fillStyle = fill;
         ctx.fill();
       }
       if (stroke) {
         ctx.strokeStyle = stroke;
-        ctx.lineWidth = 3.5;
+        ctx.lineWidth = 3;
         ctx.stroke();
       }
     }
 
-    function drawCursor(ctx, x, y, clicking) {
-      ctx.save();
-      // Squash & Stretch: Click chuột thì co dẹt lại
-      const scaleX = clicking ? 0.8 : 1.0;
-      const scaleY = clicking ? 1.25 : 1.0;
-      
-      ctx.translate(x, y);
-      ctx.scale(scaleX, scaleY);
-      ctx.translate(-x, -y);
+    // ─── ĐỒNG BỘ MEDIA ────────────────────────────────────────────────────
+    function syncMedia(t, playing) {
+      if (playing) {
+        if (voiceAudio.paused && t < TOTAL_DURATION) {
+          voiceAudio.currentTime = t;
+          voiceAudio.play().catch(() => {});
+        } else if (Math.abs(voiceAudio.currentTime - t) > 0.25) {
+          voiceAudio.currentTime = t;
+        }
+      } else {
+        if (!voiceAudio.paused) voiceAudio.pause();
+      }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + 42);
-      ctx.lineTo(x + 11, y + 31);
-      ctx.lineTo(x + 26, y + 48);
-      ctx.lineTo(x + 35, y + 40);
-      ctx.lineTo(x + 21, y + 23);
-      ctx.lineTo(x + 32, y + 23);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.fill();
-      ctx.restore();
+      if (t >= 3.35 && t < 7.68) {
+        const targetVideoTime = t - 3.35;
+        if (playing) {
+          if (demoVideo.paused) {
+            demoVideo.play().catch(() => {});
+          }
+          if (Math.abs(demoVideo.currentTime - targetVideoTime) > 0.25) {
+            demoVideo.currentTime = targetVideoTime;
+          }
+        } else {
+          if (!demoVideo.paused) demoVideo.pause();
+        }
+      } else {
+        if (!demoVideo.paused) demoVideo.pause();
+        if (t < 3.35 && demoVideo.currentTime !== 0) demoVideo.currentTime = 0;
+      }
     }
 
-    // ─── VÒNG LẶP ANIMATION (ANIMATION LOOP) ───────────────────────────────
+    // ─── ANIMATION LOOP ───────────────────────────────────────────────────
     function loop(timestamp) {
       if (!lastTimestamp) lastTimestamp = timestamp;
       const delta = (timestamp - lastTimestamp) / 1000;
@@ -770,10 +882,13 @@
         if (currentTime >= TOTAL_DURATION) {
           currentTime = TOTAL_DURATION;
           isPlaying = false;
+          if (!demoVideo.paused) demoVideo.pause();
+          if (!voiceAudio.paused) voiceAudio.pause();
           updatePlayUI();
         }
       }
 
+      syncMedia(currentTime, isPlaying);
       render(currentTime);
       updateTimeDisplay();
 
@@ -783,10 +898,12 @@
     }
 
     function togglePlay() {
-      initAudio();
+      initAudioEngine();
       isPlaying = !isPlaying;
       if (isPlaying && currentTime >= TOTAL_DURATION) {
         currentTime = 0;
+        demoVideo.currentTime = 0;
+        voiceAudio.currentTime = 0;
         playedSFX = {};
       }
       lastTimestamp = performance.now();
@@ -795,8 +912,10 @@
     }
 
     function restartVideo() {
-      initAudio();
+      initAudioEngine();
       currentTime = 0;
+      demoVideo.currentTime = 0;
+      voiceAudio.currentTime = 0;
       playedSFX = {};
       isPlaying = true;
       lastTimestamp = performance.now();
@@ -806,7 +925,7 @@
 
     function updatePlayUI() {
       document.getElementById('playIcon').textContent = isPlaying ? '⏸' : '▶';
-      document.getElementById('playText').textContent = isPlaying ? 'Tạm dừng' : 'Phát Video (12s Siêu Cuốn)';
+      document.getElementById('playText').textContent = isPlaying ? 'Tạm dừng' : 'Phát Video (Có Voice AI + Beat)';
     }
 
     function updateTimeDisplay() {
@@ -815,18 +934,26 @@
       document.getElementById('timeDisplay').textContent = `00:${curSec} / 00:${totSec}`;
     }
 
-    // XUẤT VIDEO 60 FPS
+    // ─── XUẤT VIDEO 60 FPS HOÀN CHỈNH ─────────────────────────────────────
     function recordAndExport() {
-      initAudio();
-      const stream = canvas.captureStream(60);
-      let mimeType = 'video/webm;codecs=vp9';
+      initAudioEngine();
+
+      const canvasStream = canvas.captureStream(60);
+      const audioTracks = audioDest ? audioDest.stream.getAudioTracks() : [];
+      const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...audioTracks
+      ]);
+
+      let mimeType = 'video/webm;codecs=vp9,opus';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
         mimeType = 'video/webm';
       }
 
-      const recorder = new MediaRecorder(stream, {
+      const recorder = new MediaRecorder(combinedStream, {
         mimeType: mimeType,
-        videoBitsPerSecond: 16000000 // 16 Mbps siêu nét
+        videoBitsPerSecond: 16000000,
+        audioBitsPerSecond: 256000
       });
 
       const chunks = [];
@@ -836,33 +963,40 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Record-AutoZoom-Promo-9x16-Fast.webm';
+        a.download = 'Record-AutoZoom-Showcase-60FPS.webm';
         a.click();
         URL.revokeObjectURL(url);
-        alert('🎉 ĐÃ XUẤT VIDEO THÀNH CÔNG!\nTệp "Record-AutoZoom-Promo-9x16-Fast.webm" (1080x1920 60 FPS) đã tải về máy của bạn!');
-        document.getElementById('btnRecord').innerHTML = '<span>⚡</span> <span>Xuất File Video 60 FPS</span>';
+        alert('🎉 ĐÃ XUẤT VIDEO THÀNH CÔNG!\nTệp "Record-AutoZoom-Showcase-60FPS.webm" (1080x1920 60 FPS + Voice AI) đã tải về máy!');
+        document.getElementById('btnRecord').innerHTML = '<span>⚡</span> <span>Xuất File 60 FPS (Đủ Hình & Tiếng)</span>';
       };
 
       currentTime = 0;
+      demoVideo.currentTime = 0;
+      voiceAudio.currentTime = 0;
       playedSFX = {};
       isPlaying = true;
       lastTimestamp = performance.now();
       recorder.start();
-      document.getElementById('btnRecord').innerHTML = '<span>🔴</span> <span>Đang render 60 FPS...</span>';
+      document.getElementById('btnRecord').innerHTML = '<span>🔴</span> <span>Đang xuất cả hình & tiếng...</span>';
 
       const recordInterval = setInterval(() => {
         if (!isPlaying || currentTime >= TOTAL_DURATION) {
           clearInterval(recordInterval);
           recorder.stop();
           isPlaying = false;
+          if (!demoVideo.paused) demoVideo.pause();
+          if (!voiceAudio.paused) voiceAudio.pause();
           updatePlayUI();
         }
-      }, 300);
+      }, 200);
 
       requestAnimationFrame(loop);
     }
 
-    // Render frame đầu
+    // Đảm bảo font chữ Be Vietnam Pro load xong 100% trước khi render frame đầu
+    document.fonts.ready.then(() => {
+      render(0);
+    });
     logoImg.onload = () => render(0);
     render(0);
   </script>

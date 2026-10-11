@@ -1,6 +1,8 @@
 import {
 	createSpringState,
 	resetSpringState,
+	stepSpringValue,
+	getPanSpringConfig,
 	type SpringConfig,
 	type SpringState,
 } from "./motionSmoothing";
@@ -127,50 +129,88 @@ export function stepZoomCamera(
 	const targetProgress = Math.min(1, Math.max(0, target.progress));
 	const targetScale = 1 + (Math.max(1, target.scale) - 1) * targetProgress;
 
-	// Hold the last focus while zooming out so the camera does not drift back
-	// towards the centre as it releases.
-	if (targetProgress > 0) {
+	// When completely idle (progress = 0), reset focus to target and mark uninitialized
+	// so the next zoom starts cleanly from its target focus.
+	if (targetProgress <= 0) {
 		state.heldFocusX = target.focusX;
 		state.heldFocusY = target.focusY;
+		state.focusX.value = target.focusX;
+		state.focusY.value = target.focusY;
+		state.focusX.velocity = 0;
+		state.focusY.velocity = 0;
+		state.focusX.initialized = false;
+		state.focusY.initialized = false;
+		state.scale.value = 1;
+		state.scale.velocity = 0;
+		state.progress.value = 0;
+		state.progress.velocity = 0;
+
+		return composeZoomCameraTransform(
+			options.geometry,
+			1,
+			0,
+			target.focusX,
+			target.focusY,
+		);
 	}
+
+	// Hold the last focus while zooming so the camera does not drift back
+	// towards the centre as it releases.
+	state.heldFocusX = target.focusX;
+	state.heldFocusY = target.focusY;
 	const focusTargetX = state.heldFocusX;
 	const focusTargetY = state.heldFocusY;
 
 	let currentFocusX = focusTargetX;
 	let currentFocusY = focusTargetY;
 
-	// Pan tracking:
-	// Pure smooth exponential interpolation without spring damping oscillations or lag.
-	// When zooming in or out (targetProgress < 0.99), focus stays locked to target
-	// so the initial zoom lands squarely on the region's focus point without sideways swoop.
-	const isZoomedIn = targetProgress >= 0.99 && state.progress.value >= 0.99;
-	const isPanActive =
-		isZoomedIn &&
-		(Math.abs(state.focusX.value - focusTargetX) > 0.00005 ||
-			Math.abs(state.focusY.value - focusTargetY) > 0.00005);
-
-	if (options.animate && options.deltaMs > 0 && isPanActive && state.focusX.initialized) {
-		const dt = Math.min(0.1, options.deltaMs / 1000);
-		const panRate = 8.5 * (options.panSpeedMultiplier ?? 1.0);
-		const alpha = 1 - Math.exp(-panRate * dt);
-		state.focusX.value += (focusTargetX - state.focusX.value) * alpha;
-		state.focusY.value += (focusTargetY - state.focusY.value) * alpha;
+	if (!options.animate) {
+		// Paused or seeking: snap directly to target
+		state.focusX.value = focusTargetX;
+		state.focusY.value = focusTargetY;
 		state.focusX.velocity = 0;
 		state.focusY.velocity = 0;
-		currentFocusX = state.focusX.value;
-		currentFocusY = state.focusY.value;
-	} else if (!isZoomedIn) {
-		state.focusX.value = focusTargetX;
-		state.focusX.velocity = 0;
 		state.focusX.initialized = true;
-		state.focusY.value = focusTargetY;
-		state.focusY.velocity = 0;
 		state.focusY.initialized = true;
-	} else {
+		currentFocusX = focusTargetX;
+		currentFocusY = focusTargetY;
+	} else if (!state.focusX.initialized) {
+		// First frame of a zoom-in: initialize squarely on target focus
 		state.focusX.value = focusTargetX;
-		state.focusX.velocity = 0;
 		state.focusY.value = focusTargetY;
+		state.focusX.velocity = 0;
 		state.focusY.velocity = 0;
+		state.focusX.initialized = true;
+		state.focusY.initialized = true;
+		currentFocusX = focusTargetX;
+		currentFocusY = focusTargetY;
+	} else {
+		// Continuous silky smooth pan tracking with zoom-adaptive second-order spring physics
+		// Clamping deltaMs to [1ms, 50ms] eliminates lag spikes and micro-stutter
+		const safeDeltaMs = Math.min(50, Math.max(1, options.deltaMs));
+
+		// 1. ZOOM-ADAPTIVE SPEED BOOST:
+		// Khi zoom càng to (targetScale > 1), màn hình thu hẹp lại nên camera cần tăng tốc độ
+		// đuổi theo tương ứng để luôn giữ con trỏ chuột ở chính giữa khung hình.
+		const zoomScaleBoost = Math.max(1, Math.pow(targetScale, 0.75));
+
+		// 2. CATCH-UP DYNAMIC ACCELERATION:
+		// Nếu chuột di chuyển nhanh ra xa khỏi tâm camera, tự động tăng tốc độ đuổi bắt
+		// để camera không bao giờ bị hụt hơi hay để chuột rơi ra mép màn hình.
+		const dist = Math.hypot(focusTargetX - state.focusX.value, focusTargetY - state.focusY.value);
+		const catchUpMultiplier = 1 + Math.min(2.0, dist * 6.0);
+
+		const effectiveSpeedMultiplier =
+			(options.panSpeedMultiplier ?? 1.0) * zoomScaleBoost * catchUpMultiplier;
+
+		const panConfig = getPanSpringConfig(
+			0.5,
+			undefined,
+			effectiveSpeedMultiplier,
+		);
+
+		currentFocusX = stepSpringValue(state.focusX, focusTargetX, safeDeltaMs, panConfig);
+		currentFocusY = stepSpringValue(state.focusY, focusTargetY, safeDeltaMs, panConfig);
 	}
 
 	state.scale.value = targetScale;

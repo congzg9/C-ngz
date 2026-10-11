@@ -3454,6 +3454,7 @@ export class FrameRenderer {
 						snapToEdgesRatio: SNAP_TO_EDGES_RATIO_AUTO,
 						followSpeed: 3.5 * panSpeedMultiplier,
 					},
+					region.id,
 				);
 			}
 

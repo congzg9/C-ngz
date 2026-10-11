@@ -17,11 +17,10 @@ export const SNAP_TO_EDGES_RATIO_MANUAL = 0.25;
 const SEEK_JUMP_MS = 1000;
 /**
  * Snap ratio for system/auto zoom regions.
- * 0.2 inset per side → the cursor can roam the middle 60% of the zoomed view
- * before the camera starts to follow. (Was 0.35 → only 30%, which made the
- * camera chase every small cursor movement and feel glued to the pointer.)
+ * 0 inset = continuous follow: keeps the cursor pinned at the center of the frame
+ * with silky smooth Steadicam spring interpolation.
  */
-export const SNAP_TO_EDGES_RATIO_AUTO = 0.2;
+export const SNAP_TO_EDGES_RATIO_AUTO = 0;
 
 export interface CursorFollowCameraState {
 	/** Whether the state has been initialized with a starting position */
@@ -41,6 +40,8 @@ export interface CursorFollowCameraState {
 	frozenFocusY: number;
 	/** Zoom strength on the previous call — detects a new zoom-in starting mid zoom-out. */
 	lastStrength: number;
+	/** Identifier of the currently active zoom region to avoid state leakage between regions. */
+	activeRegionId?: string | null;
 }
 
 export interface CursorFollowConfig {
@@ -67,6 +68,7 @@ export function createCursorFollowCameraState(): CursorFollowCameraState {
 		frozenFocusX: 0.5,
 		frozenFocusY: 0.5,
 		lastStrength: 0,
+		activeRegionId: null,
 	};
 }
 
@@ -81,6 +83,7 @@ export function markCursorFollowIdle(state: CursorFollowCameraState): void {
 	state.initialized = false;
 	state.reachedFullZoom = false;
 	state.lastStrength = 0;
+	state.activeRegionId = null;
 }
 
 export function resetCursorFollowCamera(state: CursorFollowCameraState): void {
@@ -93,6 +96,7 @@ export function resetCursorFollowCamera(state: CursorFollowCameraState): void {
 	state.frozenFocusX = 0.5;
 	state.frozenFocusY = 0.5;
 	state.lastStrength = 0;
+	state.activeRegionId = null;
 }
 
 function clampSafeZoneRatio(ratio: number) {
@@ -163,7 +167,23 @@ export function computeCursorFollowFocus(
 	zoomStrength: number,
 	regionFocus: ZoomFocus,
 	config: CursorFollowConfig = DEFAULT_CURSOR_FOLLOW_CONFIG,
+	regionId?: string,
 ): ZoomFocus {
+	if (
+		regionId !== undefined &&
+		state.activeRegionId !== undefined &&
+		state.activeRegionId !== null &&
+		state.activeRegionId !== regionId
+	) {
+		state.reachedFullZoom = false;
+		state.initialized = false;
+		state.wasZoomed = false;
+		state.lastStrength = 0;
+	}
+	if (regionId !== undefined) {
+		state.activeRegionId = regionId;
+	}
+
 	const clampedRegionFocus = clampFocusToScale(regionFocus, zoomScale);
 
 	// If not zoomed (strength <= 0), reset state and return region focus
@@ -248,20 +268,10 @@ export function computeCursorFollowFocus(
 		return clampedRegionFocus;
 	}
 
-	let targetFocus: ZoomFocus;
-	if (safeZoneRatio > 0) {
-		targetFocus = rawTarget;
-	} else if (!state.initialized || !state.wasZoomed || timeWentBackwards) {
-		targetFocus = rawTarget;
-	} else {
-		// Low-pass exponential smoothing for continuous follow mode (zero micro-jitter / vertical shake)
-		const dt = Math.min(0.05, Math.max(0.001, (timeMs - state.lastTimeMs) / 1000));
-		const followSpeed = config.followSpeed ?? 3.5;
-		const alpha = 1 - Math.exp(-followSpeed * dt);
-		const smoothX = state.focusX + (rawTarget.cx - state.focusX) * alpha;
-		const smoothY = state.focusY + (rawTarget.cy - state.focusY) * alpha;
-		targetFocus = clampFocusToScale({ cx: smoothX, cy: smoothY }, zoomScale);
-	}
+	// When safeZoneRatio <= 0 (continuous follow), target the cursor directly to pin
+	// the mouse at the center of the frame. The downstream zoomCamera stepSpringValue layer
+	// provides buttery smooth Steadicam interpolation without double-filtering lag.
+	const targetFocus = rawTarget;
 
 	state.lastTimeMs = timeMs;
 	state.initialized = true;
