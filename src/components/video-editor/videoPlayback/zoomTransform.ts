@@ -62,7 +62,7 @@ interface TransformQuad {
 }
 
 interface CameraStepAnalysis {
-	mode: "move" | "zoom" | null;
+	mode: "move" | "zoom" | "both" | null;
 	moveVelocity: Point2D;
 	moveBlurVelocity: Point2D;
 	moveBlurOffset: number;
@@ -349,22 +349,18 @@ function analyzeCameraStep({
 	};
 	const moveBlurMagnitude = Math.hypot(moveBlurVelocity.x, moveBlurVelocity.y);
 
+	const isMoveActive = mode === "move" && moveBlurMagnitude >= MIN_DIRECTIONAL_BLUR_MAGNITUDE;
+	const isZoomActive = mode === "zoom";
+
 	return {
 		mode,
 		moveVelocity: moveDelta,
-		moveBlurVelocity:
-			mode === "move" && moveBlurMagnitude >= MIN_DIRECTIONAL_BLUR_MAGNITUDE
-				? moveBlurVelocity
-				: createZeroPoint(),
-		moveBlurOffset:
-			mode === "move" && moveBlurMagnitude >= MIN_DIRECTIONAL_BLUR_MAGNITUDE
-				? -moveBlurMagnitude / DIRECTIONAL_BLUR_OFFSET_DIVISOR
-				: 0,
+		moveBlurVelocity: isMoveActive ? moveBlurVelocity : createZeroPoint(),
+		moveBlurOffset: isMoveActive ? -moveBlurMagnitude / DIRECTIONAL_BLUR_OFFSET_DIVISOR : 0,
 		zoomCenter: inferZoomCenterFromQuads(previousQuad, currentQuad, stageSize),
-		zoomStrength:
-			mode === "zoom"
-				? computeZoomStrength(previousQuad, currentQuad) * blurChannels.zoom
-				: 0,
+		zoomStrength: isZoomActive
+			? computeZoomStrength(previousQuad, currentQuad) * blurChannels.zoom
+			: 0,
 	};
 }
 

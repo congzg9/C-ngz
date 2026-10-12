@@ -274,3 +274,54 @@ describe("zoom speed (1x–4x)", () => {
 		});
 	}
 });
+
+describe("deadband anti-micro-jitter", () => {
+	it("locks camera focus firmly against sensor micro-jitter when stationary", () => {
+		const state = createZoomCameraState();
+		const baseFocus = { x: 0.5, y: 0.5 };
+
+		// First frame initializes squarely on base focus
+		stepZoomCamera(
+			state,
+			{ scale: 2, progress: 1, focusX: baseFocus.x, focusY: baseFocus.y },
+			{ geometry, deltaMs: FRAME_MS, springConfig, animate: true },
+		);
+
+		// Simulate 30 frames of mouse optical sensor noise (±0.001 noise <= 0.0025 radius)
+		for (let i = 0; i < 30; i += 1) {
+			const jitterX = baseFocus.x + (i % 2 === 0 ? 0.001 : -0.001);
+			const jitterY = baseFocus.y + (i % 3 === 0 ? 0.001 : -0.0008);
+			stepZoomCamera(
+				state,
+				{ scale: 2, progress: 1, focusX: jitterX, focusY: jitterY },
+				{ geometry, deltaMs: FRAME_MS, springConfig, animate: true },
+			);
+		}
+
+		// Deadband anchor remains unchanged, locking camera without drift
+		expect(state.deadbandFocusX).toBe(baseFocus.x);
+		expect(state.deadbandFocusY).toBe(baseFocus.y);
+		expect(state.focusX.value).toBeCloseTo(baseFocus.x, 3);
+		expect(state.focusY.value).toBeCloseTo(baseFocus.y, 3);
+	});
+
+	it("smoothly pulls the leash when cursor intentionally moves outside deadband radius", () => {
+		const state = createZoomCameraState();
+		stepZoomCamera(
+			state,
+			{ scale: 2, progress: 1, focusX: 0.5, focusY: 0.5 },
+			{ geometry, deltaMs: FRAME_MS, springConfig, animate: true },
+		);
+
+		// Intentional move to 0.55 (> 0.0025 threshold)
+		stepZoomCamera(
+			state,
+			{ scale: 2, progress: 1, focusX: 0.55, focusY: 0.5 },
+			{ geometry, deltaMs: FRAME_MS, springConfig, animate: true },
+		);
+
+		// Deadband anchor smoothly dragged: 0.55 - 0.0025 = 0.5475
+		expect(state.deadbandFocusX).toBeCloseTo(0.5475, 4);
+		expect(state.deadbandFocusY).toBe(0.5);
+	});
+});

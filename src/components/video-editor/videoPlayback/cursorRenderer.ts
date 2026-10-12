@@ -660,8 +660,23 @@ export async function buildNativeCursorAtlas(
 }
 
 /**
- * Interpolates cursor position from telemetry samples at a given time.
- * Uses linear interpolation between the two nearest samples.
+ * 1D Catmull-Rom Spline evaluation for smooth C1-continuous motion curves.
+ */
+function catmullRom1D(p0: number, p1: number, p2: number, p3: number, t: number): number {
+	const t2 = t * t;
+	const t3 = t2 * t;
+	return (
+		0.5 *
+		(2 * p1 +
+			(-p0 + p2) * t +
+			(2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+			(-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+	);
+}
+
+/**
+ * Interpolates cursor position from telemetry samples at the specified timestamp.
+ * Uses Catmull-Rom Spline interpolation for silky, C1-continuous curves without corner sharp edges.
  */
 export function interpolateCursorPosition(
 	samples: CursorTelemetryPoint[],
@@ -697,9 +712,37 @@ export function interpolateCursorPosition(
 	if (span <= 0) return { cx: a.cx, cy: a.cy };
 
 	const t = (timeMs - a.timeMs) / span;
+
+	// For large pauses or time gaps (> 250ms), fallback to linear interpolation to avoid overshoot
+	if (span > 250) {
+		return {
+			cx: a.cx + (b.cx - a.cx) * t,
+			cy: a.cy + (b.cy - a.cy) * t,
+		};
+	}
+
+	// Adjacent control points for Catmull-Rom spline
+	const p1 = a;
+	const p2 = b;
+
+	let p0 = lo > 0 ? samples[lo - 1] : null;
+	if (!p0 || a.timeMs - p0.timeMs > 250) {
+		// Natural linear velocity tangent reflection at sequence start or gap
+		p0 = { cx: 2 * a.cx - b.cx, cy: 2 * a.cy - b.cy } as CursorTelemetryPoint;
+	}
+
+	let p3 = hi < samples.length - 1 ? samples[hi + 1] : null;
+	if (!p3 || p3.timeMs - b.timeMs > 250) {
+		// Natural linear velocity tangent reflection at sequence end or gap
+		p3 = { cx: 2 * b.cx - a.cx, cy: 2 * b.cy - a.cy } as CursorTelemetryPoint;
+	}
+
+	const rawCx = catmullRom1D(p0.cx, p1.cx, p2.cx, p3.cx, t);
+	const rawCy = catmullRom1D(p0.cy, p1.cy, p2.cy, p3.cy, t);
+
 	return {
-		cx: a.cx + (b.cx - a.cx) * t,
-		cy: a.cy + (b.cy - a.cy) * t,
+		cx: Math.max(0, Math.min(1, rawCx)),
+		cy: Math.max(0, Math.min(1, rawCy)),
 	};
 }
 
@@ -1277,7 +1320,11 @@ export class PixiCursorOverlay {
 							width: 1.2,
 						});
 					}
-					this.clickRingGraphics.circle(px, py, Math.max(2, baseR * 0.12 * clickProgress));
+					this.clickRingGraphics.circle(
+						px,
+						py,
+						Math.max(2, baseR * 0.12 * clickProgress),
+					);
 					this.clickRingGraphics.fill({ color: 0xffffff, alpha: clickProgress * 0.9 });
 				} else if (style === "magnetic") {
 					// Magnetic Wave (dual harmonic shockwave)
@@ -1307,7 +1354,10 @@ export class PixiCursorOverlay {
 						const ox = Math.cos(angle) * dist;
 						const oy = Math.sin(angle) * dist;
 						this.clickRingGraphics.circle(px + ox, py + oy, sparkR);
-						this.clickRingGraphics.fill({ color: i % 2 === 0 ? 0xffffff : 0x93c5fd, alpha });
+						this.clickRingGraphics.fill({
+							color: i % 2 === 0 ? 0xffffff : 0x93c5fd,
+							alpha,
+						});
 					}
 					this.clickRingGraphics.circle(px, py, baseR * 0.25 * (1 - eased));
 					this.clickRingGraphics.fill({ color: 0xffffff, alpha: alpha * 0.75 });
@@ -1316,7 +1366,12 @@ export class PixiCursorOverlay {
 					const alpha = clickProgress * 0.9;
 					const beamLen = baseR * (1.6 + 2.4 * eased);
 					const beamH = Math.max(1.5, baseR * 0.06 * clickProgress);
-					this.clickRingGraphics.rect(px - beamLen * 0.5, py - beamH * 0.5, beamLen, beamH);
+					this.clickRingGraphics.rect(
+						px - beamLen * 0.5,
+						py - beamH * 0.5,
+						beamLen,
+						beamH,
+					);
 					this.clickRingGraphics.fill({ color: 0x67e8f9, alpha: alpha * 0.85 });
 					const vLen = baseR * (0.6 + 0.8 * eased);
 					this.clickRingGraphics.rect(px - beamH * 0.5, py - vLen * 0.5, beamH, vLen);

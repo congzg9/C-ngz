@@ -1349,12 +1349,21 @@
           label: "paypal",
           height: 48,
         },
-        createOrder: async () => {
+        onClick: (data, actions) => {
           const mId = machineIdInput.value.trim();
           if (!mId) {
             alert(currentLang === 'vi' 
               ? "Vui lòng nhập Mã máy (Machine ID) của bạn trước khi thanh toán!" 
               : "Please enter your Machine ID before paying!");
+            machineIdInput.focus();
+            machineIdInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return actions.reject();
+          }
+          return actions.resolve();
+        },
+        createOrder: async () => {
+          const mId = machineIdInput.value.trim();
+          if (!mId) {
             throw new Error("Missing Machine ID");
           }
 
@@ -1393,9 +1402,14 @@
             alert("Error: " + (captureData.error || "Unknown error"));
           }
         },
+        onCancel: (data) => {
+          console.log("PayPal payment cancelled by user:", data);
+        },
         onError: (err) => {
           console.error("PayPal Error:", err);
-          alert(currentLang === 'vi' ? "Giao dịch PayPal gặp lỗi hoặc bị hủy." : "PayPal transaction was cancelled or encountered an error.");
+          alert(currentLang === 'vi' 
+            ? "Giao dịch PayPal gặp lỗi hoặc bị hủy. (Lưu ý: Không dùng tài khoản PayPal người nhận tiền để tự thanh toán)." 
+            : "PayPal transaction was cancelled or encountered an error. (Note: You cannot pay using the recipient/merchant PayPal account).");
         },
       }).render("#paypal-button-container");
     }

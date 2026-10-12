@@ -54,8 +54,8 @@ function easeConnectedPan(value: number) {
 export const ZOOM_ENVELOPE_BASE_DURATION_MS = 800;
 
 export function easeZoomCamera(value: number) {
-	// Fast surge in the middle with a long, elegant deceleration landing (smooth landing without abrupt stop)
-	return cubicBezier(0.36, 0.03, 0.05, 1, value);
+	// Ultra-smooth cinematic easing (slow in, smooth harmonic mid-phase, soft landing)
+	return cubicBezier(0.4, 0.0, 0.2, 1, value);
 }
 
 /**

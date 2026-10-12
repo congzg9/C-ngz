@@ -188,7 +188,7 @@ export function stepSpringValue(
 			(state.value >= target && current < target);
 		if (crossed) {
 			state.value = target;
-			state.velocity = 0;
+			state.velocity *= 0.2;
 			return state.value;
 		}
 	}
@@ -358,21 +358,20 @@ export function getPanSpringConfig(
 ): SpringConfig {
 	const clamped = Math.max(0, Math.min(1, smoothnessFactor));
 
-	const effectiveMultiplier = Math.max(0.3, Math.min(8.0, speedMultiplier));
-	const baseOmega = 6.8 * 2 ** ((0.5 - clamped) * 1.5);
+	const effectiveMultiplier = Math.max(0.4, Math.min(2.5, speedMultiplier));
+	const baseOmega = 4.8 * 2 ** ((0.5 - clamped) * 1.3);
 	const targetOmega = baseOmega * effectiveMultiplier;
 	const stiffness = targetOmega * targetOmega;
-	const damping = 2.4 * targetOmega; // ζ = 1.2 (overdamped for buttery, zero-bounce deceleration)
+	const damping = 2.05 * targetOmega; // ζ = 1.025 (critically damped: maximum fluid softness, zero bounce)
 
 	return applyCursorSpringTuning(
 		{
 			stiffness,
 			damping,
 			mass: 1,
-			restDelta: 0.00005,
-			restSpeed: 0.0005,
+			restDelta: 0.0001,
+			restSpeed: 0.001,
 		},
 		tuning,
 	);
 }
-

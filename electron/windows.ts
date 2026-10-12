@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
@@ -151,22 +150,8 @@ export function reassertHudOverlayCaptureProtection(): void {
 	}
 }
 
-function getWindowsBuildNumber(): number | null {
-	if (process.platform !== "win32") {
-		return null;
-	}
-
-	const build = Number.parseInt(os.release().split(".")[2] ?? "", 10);
-	return Number.isFinite(build) ? build : null;
-}
-
 export function isHudOverlayMousePassthroughSupported(): boolean {
 	if (process.platform === "linux") {
-		return false;
-	}
-
-	const build = getWindowsBuildNumber();
-	if (build !== null && build < 22000) {
 		return false;
 	}
 
@@ -288,11 +273,6 @@ function positionUpdateToastWindow() {
 
 ipcMain.on("hud-overlay-set-ignore-mouse", (_event, ignore: boolean) => {
 	if (hudOverlayWindow && !hudOverlayWindow.isDestroyed()) {
-		if (!isHudOverlayMousePassthroughSupported()) {
-			hudOverlayWindow.setIgnoreMouseEvents(false);
-			return;
-		}
-
 		if (ignore) {
 			hudOverlayWindow.setIgnoreMouseEvents(true, { forward: true });
 			return;
@@ -453,12 +433,16 @@ export function createHudOverlayWindow(): BrowserWindow {
 			return;
 		}
 		hasShownHudWindow = true;
-		win.show();
+		if (process.platform === "win32" || process.platform === "darwin") {
+			win.showInactive();
+		} else {
+			win.show();
+		}
 		win.moveTop();
 		if (isHudOverlayCaptureProtectionSupported()) {
 			win.setContentProtection(hudOverlayHiddenFromCapture);
 		}
-		if (process.platform === "win32" && isHudOverlayMousePassthroughSupported()) {
+		if (isHudOverlayMousePassthroughSupported()) {
 			win.setIgnoreMouseEvents(false);
 			setTimeout(() => {
 				if (!win.isDestroyed()) {
@@ -476,13 +460,10 @@ export function createHudOverlayWindow(): BrowserWindow {
 		win.setIgnoreMouseEvents(true, { forward: true });
 	}
 
-	// On Windows 11+, focus changes (e.g. showing a native notification) can break
-	// setIgnoreMouseEvents forwarding on a transparent always-on-top window, making
-	// it permanently click-through without hover detection.  Re-initialise the
-	// pass-through-with-forwarding state whenever the window gains focus by toggling
-	// the flag off then back on so the native WS_EX_TRANSPARENT flag is fully reset.
-	// On Windows 10 (build < 22000) passthrough is disabled entirely, so skip this.
-	if (process.platform === "win32" && isHudOverlayMousePassthroughSupported()) {
+	// Focus changes (e.g. showing a native notification or app switching) can break
+	// setIgnoreMouseEvents forwarding on a transparent always-on-top window.
+	// Re-initialise the pass-through-with-forwarding state whenever the window gains focus.
+	if (isHudOverlayMousePassthroughSupported()) {
 		win.on("focus", () => {
 			if (!win.isDestroyed()) {
 				win.setIgnoreMouseEvents(false);
@@ -590,8 +571,8 @@ export function showHudOverlayWindow(): BrowserWindow {
 		if (isHudOverlayCaptureProtectionSupported()) {
 			hudOverlayWindow.setContentProtection(hudOverlayHiddenFromCapture);
 		}
-		if (process.platform === "win32" && isHudOverlayMousePassthroughSupported()) {
-			hudOverlayWindow.show();
+		if (isHudOverlayMousePassthroughSupported()) {
+			hudOverlayWindow.showInactive();
 			hudOverlayWindow.moveTop();
 			reassertHudOverlayMousePassthrough();
 			return hudOverlayWindow;
@@ -608,15 +589,13 @@ export function showHudOverlayWindow(): BrowserWindow {
 /**
  * Re-initialise the HUD overlay's mouse passthrough state.
  *
- * On Windows 11+, any new BrowserWindow appearing (even focusable:false ones
- * like the source highlight overlay) can silently corrupt the
- * WS_EX_TRANSPARENT flag that backs setIgnoreMouseEvents forwarding.  Call
- * this after any operation that creates or destroys a sibling window so that
- * hover detection on the HUD is immediately restored without requiring the
- * user to move their mouse over the bar.
+ * Any new window appearing or focus changes can silently corrupt
+ * setIgnoreMouseEvents forwarding on macOS and Windows. Call this after
+ * any operation that changes windows or recording state so click-through
+ * and hover detection on the HUD are immediately active.
  */
 export function reassertHudOverlayMousePassthrough(): void {
-	if (process.platform !== "win32" || !isHudOverlayMousePassthroughSupported()) {
+	if (!isHudOverlayMousePassthroughSupported()) {
 		return;
 	}
 
@@ -625,8 +604,7 @@ export function reassertHudOverlayMousePassthrough(): void {
 		return;
 	}
 
-	// Toggle off then back on so the native WS_EX_TRANSPARENT flag is fully
-	// re-initialised rather than merely re-asserted in a potentially broken state.
+	// Toggle off then back on so the native passthrough flag is fully re-initialised.
 	hud.setIgnoreMouseEvents(false);
 	setTimeout(() => {
 		if (!hud.isDestroyed()) {
@@ -977,7 +955,7 @@ export function createCountdownWindow(): BrowserWindow {
 		alwaysOnTop: true,
 		skipTaskbar: true,
 		hasShadow: false,
-		focusable: true,
+		focusable: false,
 		show: false,
 		webPreferences: {
 			preload: path.join(electronWindowsDir, "preload.mjs"),
@@ -997,12 +975,8 @@ export function createCountdownWindow(): BrowserWindow {
 
 	win.webContents.on("did-finish-load", () => {
 		if (!win.isDestroyed()) {
-			if (process.platform === "win32") {
-				win.showInactive();
-				win.moveTop();
-			} else {
-				win.show();
-			}
+			win.showInactive();
+			win.moveTop();
 		}
 	});
 

@@ -29,7 +29,11 @@ import {
 	preloadCursorAssets,
 } from "@/components/video-editor/videoPlayback/cursorRenderer";
 import { computePaddedLayout } from "@/components/video-editor/videoPlayback/layoutUtils";
-import { getPanSpeedMultiplier, getPanSpringConfig, getZoomSpringConfig } from "@/components/video-editor/videoPlayback/motionSmoothing";
+import {
+	getPanSpeedMultiplier,
+	getPanSpringConfig,
+	getZoomSpringConfig,
+} from "@/components/video-editor/videoPlayback/motionSmoothing";
 import { getWebcamMediaTargetTimeSeconds } from "@/components/video-editor/videoPlayback/webcamSync";
 import {
 	createZoomCameraState,
@@ -522,6 +526,7 @@ export class FrameRenderer {
 
 		this.backgroundContainer = new Container();
 		this.cameraContainer = new Container();
+		(this.cameraContainer as unknown as { roundPixels?: boolean }).roundPixels = false;
 		this.videoEffectsContainer = new Container();
 		this.videoContainer = new Container();
 		this.frameContainer = new Container();

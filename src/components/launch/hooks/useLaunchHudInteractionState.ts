@@ -2,17 +2,29 @@ import { type MouseEvent, type RefObject, useCallback, useEffect, useRef } from 
 
 export function useLaunchHudInteractionState({
 	openId,
+	recording = false,
+	countdownActive = false,
 	isHudDraggingRef,
 	isWebcamPreviewDraggingRef,
 	webcamPreviewDragStartRef,
 }: {
 	openId: string | null;
+	recording?: boolean;
+	countdownActive?: boolean;
 	isHudDraggingRef: RefObject<boolean>;
 	isWebcamPreviewDraggingRef: RefObject<boolean>;
 	webcamPreviewDragStartRef: RefObject<unknown>;
 }) {
 	const isMouseOverHudRef = useRef(false);
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		if (recording || countdownActive) {
+			isMouseOverHudRef.current = false;
+			if (timeoutRef.current) clearTimeout(timeoutRef.current);
+			window.electronAPI?.hudOverlaySetIgnoreMouse?.(true);
+		}
+	}, [recording, countdownActive]);
 
 	useEffect(() => {
 		if (openId !== null) {

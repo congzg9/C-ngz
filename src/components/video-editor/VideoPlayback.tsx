@@ -44,7 +44,12 @@ import {
 	preloadCursorAssets,
 } from "./videoPlayback/cursorRenderer";
 import { clamp01 } from "./videoPlayback/mathUtils";
-import { getPanSpeedMultiplier, getPanSpringConfig, getZoomSpringConfig, resetSpringState } from "./videoPlayback/motionSmoothing";
+import {
+	getPanSpeedMultiplier,
+	getPanSpringConfig,
+	getZoomSpringConfig,
+	resetSpringState,
+} from "./videoPlayback/motionSmoothing";
 
 function getContributedCursorStylesSignature() {
 	return extensionHost
@@ -554,7 +559,8 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			const updateSize = () => {
 				if (el.clientWidth > 0 && el.clientHeight > 0) {
 					setOverlayDimensions((prev) => {
-						if (prev.width === el.clientWidth && prev.height === el.clientHeight) return prev;
+						if (prev.width === el.clientWidth && prev.height === el.clientHeight)
+							return prev;
 						return { width: el.clientWidth, height: el.clientHeight };
 					});
 				}
@@ -641,6 +647,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 
 		// Spring animation state for smooth zoom transitions
 		const lastTickTimeRef = useRef<number | null>(null);
+		const smoothedDeltaMsRef = useRef<number | null>(null);
 		const zoomSmoothnessRef = useRef(zoomSmoothness);
 		const zoomSpeedRef = useRef(zoomSpeed);
 		const zoomClassicModeRef = useRef(zoomClassicMode);
@@ -650,6 +657,9 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		// Shared zoom camera (same module as the exporters): springs scale,
 		// progress and focus so the pan stays locked to the zoom.
 		const zoomCameraRef = useRef<ZoomCameraState>(createZoomCameraState());
+		// Sub-frame continuous timeline interpolation for buttery-smooth 60/120Hz display refresh
+		const lastFrameSyncTimeMsRef = useRef<number>(0);
+		const lastFrameWallClockTimeMsRef = useRef<number>(performance.now());
 
 		const initializePixiRenderer = useCallback(
 			async (
@@ -1892,6 +1902,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 
 				// Camera container - this will be scaled/positioned for zoom
 				const cameraContainer = new Container();
+				(cameraContainer as unknown as { roundPixels?: boolean }).roundPixels = false;
 				cameraContainerRef.current = cameraContainer;
 				app.stage.addChild(cameraContainer);
 
@@ -2135,9 +2146,34 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 					return;
 				}
 
+				// Continuous sub-frame timeline interpolation for silky-smooth 60/120Hz display refresh
+				let renderTimeMs = currentTimeRef.current;
+				const activeVideo = videoRef.current;
+				if (
+					activeVideo &&
+					isPlayingRef.current &&
+					!isSeekingRef.current &&
+					!activeVideo.paused
+				) {
+					const now = performance.now();
+					const currentVideoMs = activeVideo.currentTime * 1000;
+					if (Math.abs(currentVideoMs - lastFrameSyncTimeMsRef.current) > 0.5) {
+						lastFrameSyncTimeMsRef.current = currentVideoMs;
+						lastFrameWallClockTimeMsRef.current = now;
+					}
+					const elapsedMs = Math.max(0, now - lastFrameWallClockTimeMsRef.current);
+					const rate = activeVideo.playbackRate || 1;
+					// Interpolate forward up to 60ms between video decoder ticks
+					const extraMs = Math.min(60, elapsedMs * rate);
+					renderTimeMs = Math.min(
+						(activeVideo.duration || 0) * 1000,
+						lastFrameSyncTimeMsRef.current + extraMs,
+					);
+				}
+
 				const { region, strength, blendedScale, transition } = findDominantRegion(
 					zoomRegionsRef.current,
-					currentTimeRef.current,
+					renderTimeMs,
 					{
 						connectZooms: connectZoomsRef.current,
 						zoomInDurationMs: getZoomEnvelopeDurationMs(
@@ -2170,7 +2206,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 					const zoomScale = blendedScale ?? getZoomRegionScale(region);
 
 					// Cursor follow: use cursor-follow camera when pan is active
-					const currentMs = currentTimeRef.current;
+					const currentMs = renderTimeMs;
 					const isPanActive =
 						panRegionsRef.current !== undefined
 							? panRegionsRef.current.some(
@@ -2185,17 +2221,14 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 					let regionFocus = region.focus;
 					if (isPanActive && cursorTelemetryRef.current.length > 0) {
 						const activePan = panRegionsRef.current?.find(
-							(p) =>
-								!p.disabled &&
-								currentMs >= p.startMs &&
-								currentMs <= p.endMs,
+							(p) => !p.disabled && currentMs >= p.startMs && currentMs <= p.endMs,
 						);
 						const panSpeedMultiplier = getPanSpeedMultiplier(activePan?.speed);
 
 						regionFocus = computeCursorFollowFocus(
 							cursorFollowCameraRef.current,
 							cursorTelemetryRef.current,
-							currentTimeRef.current,
+							renderTimeMs,
 							zoomScale,
 							strength,
 							region.focus,
@@ -2268,11 +2301,19 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 					progress: targetProgress,
 				});
 
-				// Spring-driven zoom animation
+				// Spring-driven zoom animation with EWMA display delta smoothing
 				const now = performance.now();
-				const deltaMs =
+				const rawDeltaMs =
 					lastTickTimeRef.current !== null ? now - lastTickTimeRef.current : 1000 / 60;
 				lastTickTimeRef.current = now;
+
+				// EWMA filter (0.75 previous + 0.25 raw) eliminates VSync jitter on 60/120/144Hz monitors
+				const clampedRawDelta = Math.min(60, Math.max(1, rawDeltaMs));
+				const deltaMs =
+					smoothedDeltaMsRef.current !== null
+						? smoothedDeltaMsRef.current * 0.75 + clampedRawDelta * 0.25
+						: clampedRawDelta;
+				smoothedDeltaMsRef.current = deltaMs;
 
 				const zoomSpringConfig = getZoomSpringConfig(zoomSmoothnessRef.current, {
 					stiffnessMultiplier: cameraSpringStiffnessMultiplierRef.current,
@@ -2282,8 +2323,8 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 				const activePan = panRegionsRef.current?.find(
 					(p) =>
 						!p.disabled &&
-						currentTimeRef.current >= p.startMs &&
-						currentTimeRef.current <= p.endMs,
+						renderTimeMs >= p.startMs &&
+						renderTimeMs <= p.endMs,
 				);
 				const panSpeedMultiplier = getPanSpeedMultiplier(activePan?.speed);
 
@@ -2327,7 +2368,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 
 				applyWebcamBubbleLayout(animationStateRef.current.appliedScale || 1);
 
-				const timeMs = currentTimeRef.current;
+				const timeMs = renderTimeMs;
 				const effectsCanvas = cursorEffectsCanvasRef.current;
 				const extensionCanvasWidth = effectsCanvas?.width || stageSizeRef.current.width;
 				const extensionCanvasHeight = effectsCanvas?.height || stageSizeRef.current.height;
@@ -2515,6 +2556,8 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 				if (app && app.ticker) {
 					app.ticker.remove(ticker);
 				}
+				lastTickTimeRef.current = null;
+				smoothedDeltaMsRef.current = null;
 			};
 		}, [
 			pixiReady,
@@ -2957,10 +3000,14 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 									annotation={annotation}
 									isSelected={annotation.id === selectedAnnotationId}
 									containerWidth={
-										overlayDimensions.width || overlayRef.current?.clientWidth || 800
+										overlayDimensions.width ||
+										overlayRef.current?.clientWidth ||
+										800
 									}
 									containerHeight={
-										overlayDimensions.height || overlayRef.current?.clientHeight || 600
+										overlayDimensions.height ||
+										overlayRef.current?.clientHeight ||
+										600
 									}
 									onPositionChange={(id, position) =>
 										onAnnotationPositionChange?.(id, position)

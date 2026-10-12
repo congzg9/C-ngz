@@ -1,10 +1,10 @@
 import {
 	createSpringState,
-	resetSpringState,
-	stepSpringValue,
 	getPanSpringConfig,
+	resetSpringState,
 	type SpringConfig,
 	type SpringState,
+	stepSpringValue,
 } from "./motionSmoothing";
 import type { AppliedTransform, ZoomTransformGeometry } from "./zoomTransform";
 
@@ -43,6 +43,9 @@ export interface ZoomCameraState {
 	/** Last focus target received while zoomed; held while zooming out. */
 	heldFocusX: number;
 	heldFocusY: number;
+	/** Continuous leash anchor to eliminate micro-jitter when cursor is stationary */
+	deadbandFocusX: number;
+	deadbandFocusY: number;
 }
 
 export function createZoomCameraState(): ZoomCameraState {
@@ -53,6 +56,8 @@ export function createZoomCameraState(): ZoomCameraState {
 		focusY: createSpringState(0.5),
 		heldFocusX: 0.5,
 		heldFocusY: 0.5,
+		deadbandFocusX: 0.5,
+		deadbandFocusY: 0.5,
 	};
 }
 
@@ -63,6 +68,8 @@ export function resetZoomCameraState(state: ZoomCameraState): void {
 	resetSpringState(state.focusY, 0.5);
 	state.heldFocusX = 0.5;
 	state.heldFocusY = 0.5;
+	state.deadbandFocusX = 0.5;
+	state.deadbandFocusY = 0.5;
 }
 
 /**
@@ -134,6 +141,8 @@ export function stepZoomCamera(
 	if (targetProgress <= 0) {
 		state.heldFocusX = target.focusX;
 		state.heldFocusY = target.focusY;
+		state.deadbandFocusX = target.focusX;
+		state.deadbandFocusY = target.focusY;
 		state.focusX.value = target.focusX;
 		state.focusY.value = target.focusY;
 		state.focusX.velocity = 0;
@@ -145,13 +154,7 @@ export function stepZoomCamera(
 		state.progress.value = 0;
 		state.progress.velocity = 0;
 
-		return composeZoomCameraTransform(
-			options.geometry,
-			1,
-			0,
-			target.focusX,
-			target.focusY,
-		);
+		return composeZoomCameraTransform(options.geometry, 1, 0, target.focusX, target.focusY);
 	}
 
 	// Hold the last focus while zooming so the camera does not drift back
@@ -172,6 +175,8 @@ export function stepZoomCamera(
 		state.focusY.velocity = 0;
 		state.focusX.initialized = true;
 		state.focusY.initialized = true;
+		state.deadbandFocusX = focusTargetX;
+		state.deadbandFocusY = focusTargetY;
 		currentFocusX = focusTargetX;
 		currentFocusY = focusTargetY;
 	} else if (!state.focusX.initialized) {
@@ -182,6 +187,8 @@ export function stepZoomCamera(
 		state.focusY.velocity = 0;
 		state.focusX.initialized = true;
 		state.focusY.initialized = true;
+		state.deadbandFocusX = focusTargetX;
+		state.deadbandFocusY = focusTargetY;
 		currentFocusX = focusTargetX;
 		currentFocusY = focusTargetY;
 	} else {
@@ -189,28 +196,45 @@ export function stepZoomCamera(
 		// Clamping deltaMs to [1ms, 50ms] eliminates lag spikes and micro-stutter
 		const safeDeltaMs = Math.min(50, Math.max(1, options.deltaMs));
 
+		// 0. CONTINUOUS LEASH DEADBAND (ANTI-MICRO-JITTER):
+		// Khi chuột đứng yên hoặc chỉ rung vi mô do nhiễu cảm biến (1-2px), deadband giữ neo focus
+		// ổn định tuyệt đối, triệt tiêu hoàn toàn hiện tượng micro-drift / camera thở phập phồng.
+		// Khi chuột di chuyển thực sự vượt bán kính leash, neo trượt theo mượt mà (C0-continuous leash).
+		const PAN_DEADBAND_RADIUS = 0.0025; // ~4.8px trên 1920x1080
+		const deltaTargetX = focusTargetX - state.deadbandFocusX;
+		const deltaTargetY = focusTargetY - state.deadbandFocusY;
+		const targetDisplacement = Math.hypot(deltaTargetX, deltaTargetY);
+
+		if (targetDisplacement > PAN_DEADBAND_RADIUS) {
+			const dragFactor = (targetDisplacement - PAN_DEADBAND_RADIUS) / targetDisplacement;
+			state.deadbandFocusX += deltaTargetX * dragFactor;
+			state.deadbandFocusY += deltaTargetY * dragFactor;
+		}
+
+		const effectiveTargetX = state.deadbandFocusX;
+		const effectiveTargetY = state.deadbandFocusY;
+
 		// 1. ZOOM-ADAPTIVE SPEED BOOST:
-		// Khi zoom càng to (targetScale > 1), màn hình thu hẹp lại nên camera cần tăng tốc độ
-		// đuổi theo tương ứng để luôn giữ con trỏ chuột ở chính giữa khung hình.
-		const zoomScaleBoost = Math.max(1, Math.pow(targetScale, 0.75));
+		// Tăng tốc siêu êm khi phóng to, tránh làm tăng vọt độ cứng lò xo (do stiffness = omega^2)
+		const zoomScaleBoost = 1 + (Math.max(1, targetScale) - 1) * 0.12;
 
-		// 2. CATCH-UP DYNAMIC ACCELERATION:
-		// Nếu chuột di chuyển nhanh ra xa khỏi tâm camera, tự động tăng tốc độ đuổi bắt
-		// để camera không bao giờ bị hụt hơi hay để chuột rơi ra mép màn hình.
-		const dist = Math.hypot(focusTargetX - state.focusX.value, focusTargetY - state.focusY.value);
-		const catchUpMultiplier = 1 + Math.min(2.0, dist * 6.0);
+		// 2. SOFT TETHERING CATCH-UP (QUÁN TÍNH ĐÀN HỒI MỀM MẠI):
+		// Giữ nguyên cảm giác lướt bay êm dịu trên đệm không khí, tăng tốc vừa phải khi chuột ra xa
+		const dist = Math.hypot(
+			effectiveTargetX - state.focusX.value,
+			effectiveTargetY - state.focusY.value,
+		);
+		const catchUpMultiplier = 1 + Math.min(0.5, Math.max(0, dist - 0.08) * 1.5);
 
-		const effectiveSpeedMultiplier =
-			(options.panSpeedMultiplier ?? 1.0) * zoomScaleBoost * catchUpMultiplier;
-
-		const panConfig = getPanSpringConfig(
-			0.5,
-			undefined,
-			effectiveSpeedMultiplier,
+		const effectiveSpeedMultiplier = Math.min(
+			1.5,
+			(options.panSpeedMultiplier ?? 1.0) * zoomScaleBoost * catchUpMultiplier,
 		);
 
-		currentFocusX = stepSpringValue(state.focusX, focusTargetX, safeDeltaMs, panConfig);
-		currentFocusY = stepSpringValue(state.focusY, focusTargetY, safeDeltaMs, panConfig);
+		const panConfig = getPanSpringConfig(0.5, undefined, effectiveSpeedMultiplier);
+
+		currentFocusX = stepSpringValue(state.focusX, effectiveTargetX, safeDeltaMs, panConfig);
+		currentFocusY = stepSpringValue(state.focusY, effectiveTargetY, safeDeltaMs, panConfig);
 	}
 
 	state.scale.value = targetScale;

@@ -229,7 +229,7 @@ function showHudOverlayFromTray() {
 		hud.restore();
 	}
 
-	if (process.platform === "win32" && isHudOverlayMousePassthroughSupported()) {
+	if (isHudOverlayMousePassthroughSupported()) {
 		hud.showInactive();
 		hud.moveTop();
 		reassertHudOverlayMouseState();
@@ -318,14 +318,10 @@ function focusOrCreateMainWindow() {
 			return;
 		}
 
-		// On Win32 with mouse passthrough enabled (Win11+), calling
-		// show/moveTop/focus on the transparent HUD overlay permanently corrupts
-		// setIgnoreMouseEvents forwarding, making it click-through.  Only focus
-		// the editor window; the HUD is alwaysOnTop so it doesn't need explicit
-		// focus.  On Win10 (passthrough disabled), the HUD is always interactive
-		// and can be safely shown/restored.
+		// With mouse passthrough enabled, calling show/moveTop/focus on the transparent
+		// HUD overlay can permanently corrupt event forwarding, making it click-through.
+		// Only focus the editor window; the HUD is alwaysOnTop so it doesn't need explicit focus.
 		if (
-			process.platform === "win32" &&
 			!isEditorWindow(mainWindow) &&
 			isHudOverlayMousePassthroughSupported()
 		) {
@@ -341,13 +337,12 @@ function focusOrCreateMainWindow() {
 }
 
 /**
- * On Windows 10, focus changes and native notifications can break
- * {@link BrowserWindow.setIgnoreMouseEvents} forwarding on the transparent HUD
- * overlay, causing it to become permanently click-through.  Call this after any
- * operation that may alter focus or z-order so that hover detection keeps working.
+ * Focus changes and native notifications can break setIgnoreMouseEvents forwarding
+ * on the transparent HUD overlay. Call this after any operation that alters focus,
+ * z-order, or recording state so that mouse events and hover detection keep working.
  */
 function reassertHudOverlayMouseState() {
-	if (process.platform !== "win32" || !isHudOverlayMousePassthroughSupported()) {
+	if (!isHudOverlayMousePassthroughSupported()) {
 		return;
 	}
 
@@ -356,8 +351,7 @@ function reassertHudOverlayMouseState() {
 		return;
 	}
 
-	// Toggle off then back on so the native WS_EX_TRANSPARENT flag is fully
-	// re-initialised rather than merely re-asserted in a potentially broken state.
+	// Toggle off then back on so the native passthrough state is fully re-initialised.
 	hud.setIgnoreMouseEvents(false);
 	reassertHudOverlayCaptureProtection();
 	setTimeout(() => {

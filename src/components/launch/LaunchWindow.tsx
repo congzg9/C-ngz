@@ -194,6 +194,8 @@ function LaunchWindowContent() {
 	const { handleHudMouseEnter, handleHudMouseLeave, beginInteractiveHudAction } =
 		useLaunchHudInteractionState({
 			openId,
+			recording,
+			countdownActive,
 			isHudDraggingRef,
 			isWebcamPreviewDraggingRef,
 			webcamPreviewDragStartRef,
