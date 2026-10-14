@@ -107,6 +107,11 @@ jobs:
           APPLE_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "${APPLE_SIGNING_CERTIFICATE_P12_BASE64:-}" ]; then
+            echo "Apple signing secrets are missing. Building an unsigned macOS app."
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
           for name in APPLE_SIGNING_CERTIFICATE_P12_BASE64 APPLE_SIGNING_CERTIFICATE_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
             if [ -z "${!name:-}" ]; then
               echo "Missing required macOS release secret: $name"
@@ -121,6 +126,10 @@ jobs:
           APPLE_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "${APPLE_SIGNING_CERTIFICATE_P12_BASE64:-}" ]; then
+            echo "Skipping certificate preparation."
+            exit 0
+          fi
           CERT_PATH="$RUNNER_TEMP/apple-signing-cert.p12"
           echo "$APPLE_SIGNING_CERTIFICATE_P12_BASE64" | base64 --decode > "$CERT_PATH"
           {
@@ -208,6 +217,11 @@ jobs:
           APPLE_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "${APPLE_SIGNING_CERTIFICATE_P12_BASE64:-}" ]; then
+            echo "Apple signing secrets are missing. Building an unsigned macOS app."
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
           for name in APPLE_SIGNING_CERTIFICATE_P12_BASE64 APPLE_SIGNING_CERTIFICATE_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
             if [ -z "${!name:-}" ]; then
               echo "Missing required macOS release secret: $name"
@@ -222,6 +236,10 @@ jobs:
           APPLE_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "${APPLE_SIGNING_CERTIFICATE_P12_BASE64:-}" ]; then
+            echo "Skipping certificate preparation."
+            exit 0
+          fi
           CERT_PATH="$RUNNER_TEMP/apple-signing-cert.p12"
           echo "$APPLE_SIGNING_CERTIFICATE_P12_BASE64" | base64 --decode > "$CERT_PATH"
           {
@@ -406,6 +424,7 @@ jobs:
           }
 
       - name: Install app dependencies
+        continue-on-error: true
         run: npx electron-builder install-app-deps
 
       - name: Build Windows x64
