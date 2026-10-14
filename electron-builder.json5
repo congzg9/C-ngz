@@ -11,8 +11,8 @@
     "electron/native/**"
   ],
   "productName": "Record-AutoZoom",
-  "npmRebuild": true,
-  "buildDependenciesFromSource": true,
+  "npmRebuild": false,
+  "buildDependenciesFromSource": false,
   "compression": "maximum",
   "directories": {
     "output": "release"
