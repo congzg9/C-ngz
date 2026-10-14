@@ -46,8 +46,8 @@
   "publish": [
     {
       "provider": "github",
-      "owner": "webadderall",
-      "repo": "Recordly",
+      "owner": "congzg9",
+      "repo": "C-ngz",
       "tagNamePrefix": "v",
       "publishAutoUpdate": true
     }

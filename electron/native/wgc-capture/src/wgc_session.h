@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <d3d11.h>
+#include <d3d11_4.h>
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 
@@ -55,7 +56,10 @@ private:
     int64_t frameIntervalHns_ = 0;
     int64_t lastFrameTimeHns_ = 0;
 
-    bool createD3DDevice();
+    ComPtr<ID3D11Texture2D> captureCopyTexture_;
+
+    bool createD3DDevice(HMONITOR targetMonitor = nullptr);
+    bool ensureCaptureCopyTexture(int width, int height);
     winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice createWinRTDevice();
     winrt::Windows::Graphics::Capture::GraphicsCaptureItem createCaptureItemForMonitor(HMONITOR monitor);
     winrt::Windows::Graphics::Capture::GraphicsCaptureItem createCaptureItemForWindow(HWND hwnd);

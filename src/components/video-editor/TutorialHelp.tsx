@@ -24,10 +24,10 @@ import { useShortcuts } from "@/contexts/ShortcutsContext";
 import { formatBinding, SHORTCUT_ACTIONS, SHORTCUT_LABELS } from "@/lib/shortcuts";
 import { formatShortcut } from "@/utils/platformUtils";
 
-export const RECORDLY_ISSUES_URL = "https://github.com/webadderallorg/Recordly/issues";
+export const RECORDLY_ISSUES_URL = "https://github.com/congzg9/C-ngz/issues";
 const RECORDLY_DISCORD_URL = "https://discord.gg/sdv2FBVNgE";
-const RECORDLY_X_URL = "https://x.com/webadderall";
-const CONTACT_EMAIL = "youngchen3442@gmail.com";
+const RECORDLY_X_URL = "https://facebook.com/congz9g";
+const CONTACT_EMAIL = "Giangcong1089@gmail.com";
 export const APP_HEADER_ACTION_BUTTON_CLASS =
 	"h-7 px-2 text-xs text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-all gap-1.5";
 export const APP_HEADER_ICON_BUTTON_CLASS =
@@ -137,10 +137,10 @@ export function FeedbackDialog() {
 						<div className="flex items-center justify-between gap-3 rounded-lg border border-foreground/5 bg-foreground/5 px-3 py-3">
 							<div>
 								<p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70">
-									{t("feedback.xLabel", "X")}
+									Facebook
 								</p>
 								<p className="mt-1 text-sm font-medium text-foreground">
-									@webadderall
+									facebook.com/congz9g
 								</p>
 							</div>
 							<Button

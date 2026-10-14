@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { USER_DATA_PATH } from "./appPaths";
+import { selectedSource } from "./ipc/state";
 import { getPackagedRendererBaseUrl } from "./rendererServer";
 
 function applySecurityHandlers(win: BrowserWindow): void {
@@ -146,6 +147,27 @@ export function reassertHudOverlayCaptureProtection(): void {
 		hudOverlayWindow &&
 		!hudOverlayWindow.isDestroyed()
 	) {
+		// On Windows multi-monitor setups, setting WDA_EXCLUDEFROMCAPTURE (setContentProtection)
+		// on a window located on an UNCAPTURED monitor causes Desktop Window Manager (DWM)
+		// to stall/freeze rendering on that uncaptured monitor.
+		// If the user is capturing a display other than the one where the HUD is located,
+		// disable content protection because that uncaptured monitor is never recorded anyway.
+		if (process.platform === "win32") {
+			try {
+				const displays = getScreen().getAllDisplays();
+				if (displays.length > 1 && selectedSource?.id?.startsWith("screen:")) {
+					const hudDisplay = getHudOverlayDisplay();
+					const capturedDisplayId = selectedSource.display_id;
+					if (capturedDisplayId && String(hudDisplay.id) !== String(capturedDisplayId)) {
+						hudOverlayWindow.setContentProtection(false);
+						return;
+					}
+				}
+			} catch {
+				// fall through to default setting
+			}
+		}
+
 		hudOverlayWindow.setContentProtection(hudOverlayHiddenFromCapture);
 	}
 }

@@ -164,6 +164,12 @@ export function getCursorCaptureElapsedMs(nowMs = Date.now()) {
 	);
 }
 
+let cachedTargetDisplay: {
+	id: number;
+	bounds: { x: number; y: number; width: number; height: number };
+	updatedAt: number;
+} | null = null;
+
 export function getNormalizedCursorPoint() {
 	const fallbackCursor = getScreen().getCursorScreenPoint();
 	const linuxCursorCache = process.platform === "linux" ? linuxCursorScreenPoint : null;
@@ -195,13 +201,31 @@ export function getNormalizedCursorPoint() {
 	}
 
 	const sourceDisplayId = Number(selectedSource?.display_id);
-	const sourceDisplay = Number.isFinite(sourceDisplayId)
-		? (getScreen()
-				.getAllDisplays()
-				.find((display) => display.id === sourceDisplayId) ?? null)
-		: null;
-	const display = sourceDisplay ?? getScreen().getDisplayNearestPoint(cursor);
-	const bounds = display.bounds;
+	let bounds: { x: number; y: number; width: number; height: number };
+
+	if (
+		Number.isFinite(sourceDisplayId) &&
+		cachedTargetDisplay &&
+		cachedTargetDisplay.id === sourceDisplayId &&
+		Date.now() - cachedTargetDisplay.updatedAt < 1000
+	) {
+		bounds = cachedTargetDisplay.bounds;
+	} else {
+		const screen = getScreen();
+		const sourceDisplay = Number.isFinite(sourceDisplayId)
+			? (screen.getAllDisplays().find((display) => display.id === sourceDisplayId) ?? null)
+			: null;
+		const display = sourceDisplay ?? screen.getDisplayNearestPoint(cursor);
+		bounds = display.bounds;
+		if (Number.isFinite(sourceDisplayId)) {
+			cachedTargetDisplay = {
+				id: sourceDisplayId,
+				bounds,
+				updatedAt: Date.now(),
+			};
+		}
+	}
+
 	const width = Math.max(1, bounds.width);
 	const height = Math.max(1, bounds.height);
 

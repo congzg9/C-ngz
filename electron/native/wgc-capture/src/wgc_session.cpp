@@ -36,15 +36,71 @@ WgcSession::~WgcSession() {
     stopCapture();
 }
 
-bool WgcSession::createD3DDevice() {
+bool WgcSession::ensureCaptureCopyTexture(int width, int height) {
+    if (captureCopyTexture_) {
+        D3D11_TEXTURE2D_DESC desc = {};
+        captureCopyTexture_->GetDesc(&desc);
+        if (static_cast<int>(desc.Width) == width && static_cast<int>(desc.Height) == height) {
+            return true;
+        }
+        captureCopyTexture_.Reset();
+    }
+
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    HRESULT hr = d3dDevice_->CreateTexture2D(&desc, nullptr, &captureCopyTexture_);
+    if (FAILED(hr)) {
+        std::cerr << "ERROR: Failed to create capture copy texture: 0x" << std::hex << hr << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool WgcSession::createD3DDevice(HMONITOR targetMonitor) {
     D3D_FEATURE_LEVEL featureLevels[] = {
         D3D_FEATURE_LEVEL_11_1,
         D3D_FEATURE_LEVEL_11_0,
     };
 
+    ComPtr<IDXGIAdapter> targetAdapter;
+    if (targetMonitor) {
+        MONITORINFOEXW mi = {};
+        mi.cbSize = sizeof(mi);
+        if (GetMonitorInfoW(targetMonitor, &mi)) {
+            ComPtr<IDXGIFactory1> dxgiFactory;
+            if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory)))) {
+                ComPtr<IDXGIAdapter1> adapter;
+                for (UINT i = 0; dxgiFactory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i) {
+                    ComPtr<IDXGIOutput> output;
+                    for (UINT j = 0; adapter->EnumOutputs(j, &output) != DXGI_ERROR_NOT_FOUND; ++j) {
+                        DXGI_OUTPUT_DESC desc = {};
+                        if (SUCCEEDED(output->GetDesc(&desc))) {
+                            if (desc.Monitor == targetMonitor || wcscmp(desc.DeviceName, mi.szDevice) == 0) {
+                                targetAdapter = adapter;
+                                std::cerr << "INFO: Matched target monitor to DXGI adapter " << i << std::endl;
+                                break;
+                            }
+                        }
+                    }
+                    if (targetAdapter) break;
+                }
+            }
+        }
+    }
+
+    const D3D_DRIVER_TYPE driverType = targetAdapter ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE;
+
     HRESULT hr = D3D11CreateDevice(
-        nullptr,
-        D3D_DRIVER_TYPE_HARDWARE,
+        targetAdapter.Get(),
+        driverType,
         nullptr,
         D3D11_CREATE_DEVICE_BGRA_SUPPORT,
         featureLevels,
@@ -57,6 +113,12 @@ bool WgcSession::createD3DDevice() {
     if (FAILED(hr)) {
         std::cerr << "ERROR: D3D11CreateDevice failed: 0x" << std::hex << hr << std::endl;
         return false;
+    }
+
+    // Enable multithread protection on the D3D11 device
+    ComPtr<ID3D11Multithread> multithread;
+    if (SUCCEEDED(d3dDevice_.As(&multithread))) {
+        multithread->SetMultithreadProtected(TRUE);
     }
 
     return true;
@@ -126,7 +188,7 @@ bool WgcSession::initializeWithItem(int fps) {
     framePool_ = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
         winrtDevice_,
         winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-        2,
+        4,
         size);
 
     session_ = framePool_.CreateCaptureSession(captureItem_);
@@ -161,7 +223,7 @@ bool WgcSession::recreateFramePoolIfNeeded(
         framePool_.Recreate(
             winrtDevice_,
             winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-            2,
+            4,
             normalizedSize);
         framePoolWidth_ = normalizedWidth;
         framePoolHeight_ = normalizedHeight;
@@ -181,7 +243,7 @@ bool WgcSession::initialize(HMONITOR monitor, int fps) {
     fps_ = fps;
     frameIntervalHns_ = 10000000LL / fps_;
 
-    if (!createD3DDevice()) return false;
+    if (!createD3DDevice(monitor)) return false;
 
     winrtDevice_ = createWinRTDevice();
     if (!winrtDevice_) {
@@ -197,7 +259,8 @@ bool WgcSession::initialize(HWND hwnd, int fps) {
     fps_ = fps;
     frameIntervalHns_ = 10000000LL / fps_;
 
-    if (!createD3DDevice()) return false;
+    HMONITOR targetMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+    if (!createD3DDevice(targetMonitor)) return false;
 
     winrtDevice_ = createWinRTDevice();
     if (!winrtDevice_) {
@@ -243,6 +306,7 @@ void WgcSession::stopCapture() {
         framePool_.Close();
         framePool_ = nullptr;
     }
+    captureCopyTexture_.Reset();
 }
 
 void WgcSession::onFrameArrived(
@@ -282,8 +346,21 @@ void WgcSession::onFrameArrived(
     ComPtr<ID3D11Texture2D> texture;
     HRESULT hr = access->GetInterface(IID_PPV_ARGS(&texture));
 
-    if (SUCCEEDED(hr) && texture && frameCallback_) {
-        frameCallback_(texture.Get(), frameTimeHns);
+    if (SUCCEEDED(hr) && texture) {
+        D3D11_TEXTURE2D_DESC texDesc = {};
+        texture->GetDesc(&texDesc);
+        if (ensureCaptureCopyTexture(static_cast<int>(texDesc.Width), static_cast<int>(texDesc.Height))) {
+            d3dContext_->CopyResource(captureCopyTexture_.Get(), texture.Get());
+
+            // Release the frame back to Direct3D11CaptureFramePool immediately
+            // so DWM's composition pool is never starved across monitors!
+            frame.Close();
+
+            if (frameCallback_) {
+                frameCallback_(captureCopyTexture_.Get(), frameTimeHns);
+            }
+            return;
+        }
     }
 
     frame.Close();

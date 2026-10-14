@@ -2,17 +2,17 @@
 	"name": "record-autozoom",
 	"productName": "Record-AutoZoom",
 	"description": "A free, creator-focused screen recorder with auto-zoom, cursor effects, backgrounds, annotations, and more - built for polished videos out of the box.",
-	"author": "webadderall",
-	"homepage": "https://github.com/webadderallorg/Recordly",
+	"author": "Record-AutoZoom",
+	"homepage": "https://record-autozoom.pages.dev",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/webadderallorg/Recordly.git"
+		"url": "https://github.com/congzg9/C-ngz.git"
 	},
 	"bugs": {
-		"url": "https://github.com/webadderallorg/Recordly/issues"
+		"url": "https://github.com/congzg9/C-ngz/issues"
 	},
 	"private": true,
-	"version": "1.3.0-beta.3",
+	"version": "1.3.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite --config vite.config.ts",
