@@ -1,5 +1,3 @@
-Language: EN | [简中](README.zh-CN.md)
-
 <p align="center">
   <img width="220" alt="Recordly Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />
 </p>
@@ -355,7 +353,20 @@ Areas where help is especially useful:
 
 Please keep pull requests focused, test recording/edit/export flows, and avoid unrelated refactors.
 
-See `CONTRIBUTING.md` for guidelines.
+See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for guidelines.
+
+---
+
+# 📚 Documentation & Marketing Assets
+
+- **Commercial Licensing & Keygen**: [`docs/HD_BAN_QUYEN_THUONG_MAI.md`](docs/HD_BAN_QUYEN_THUONG_MAI.md)
+- **Deployment (Cloudflare Pages & Extension)**: [`docs/DEPLOY_CLOUDFLARE_AND_EXTENSION.md`](docs/DEPLOY_CLOUDFLARE_AND_EXTENSION.md)
+- **Extensions Architecture**: [`docs/EXTENSIONS.md`](docs/EXTENSIONS.md)
+- **Translation & i18n**: [`docs/TRANSLATION_GUIDE.md`](docs/TRANSLATION_GUIDE.md)
+- **Release Guide**: [`docs/RELEASING.md`](docs/RELEASING.md)
+- **Contribution Guidelines**: [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
+- **TikTok / Shorts Video Script**: [`marketing/KICH_BAN_VIDEO_TIKTOK.md`](marketing/KICH_BAN_VIDEO_TIKTOK.md)
+- **Promo Video Studio**: [`marketing/promo-video/`](marketing/promo-video/)
 
 ---
 

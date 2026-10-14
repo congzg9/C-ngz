@@ -208,6 +208,59 @@ export default {
 			}
 		}
 
+		// POST /api/claim-free (Kích hoạt bản quyền qua coupon giảm 100%)
+		if (url.pathname === "/api/claim-free" && request.method === "POST") {
+			try {
+				const body = await request.json().catch(() => ({}));
+				const { machineId, couponCode, durationDays = 0 } = body;
+
+				if (!machineId) {
+					return jsonResponse({ error: "Thiếu thông tin Mã máy (Machine ID)" }, 400);
+				}
+
+				const valid100Codes = ["FREE100", "PRO100", "GIAM100"];
+				const codeUpper = (couponCode || "").trim().toUpperCase();
+				if (!valid100Codes.includes(codeUpper)) {
+					return jsonResponse({ error: "Mã giảm giá không hợp lệ hoặc không áp dụng ưu đãi 100%" }, 400);
+				}
+
+				const { licenseKey, machineId: normId, expiresAt } = generateLicenseKey(machineId, Number(durationDays), secret);
+
+				const record = {
+					machineId: normId,
+					licenseKey,
+					orderId: `FREE-${Date.now()}`,
+					customerName: `Khách ưu đãi 100% [${codeUpper}]`,
+					email: "free-coupon@record-autozoom.app",
+					price: 0,
+					currency: "USD",
+					couponCode: codeUpper,
+					type: "free_coupon",
+					durationDays: Number(durationDays),
+					expiresAt,
+					paidAt: Date.now(),
+					status: "active",
+				};
+
+				if (env.ORDERS_KV) {
+					const clean = normId.replace(/[^A-Z0-9]/g, "");
+					await env.ORDERS_KV.delete(`revoked:${clean}`);
+					await env.ORDERS_KV.put(`lic:${clean}`, JSON.stringify(record));
+					await env.ORDERS_KV.put(clean, JSON.stringify(record));
+				}
+
+				return jsonResponse({
+					success: true,
+					status: "COMPLETED",
+					licenseKey,
+					machineId: normId,
+					message: "Kích hoạt bản quyền miễn phí 100% thành công!",
+				});
+			} catch (err) {
+				return jsonResponse({ error: err.message }, 500);
+			}
+		}
+
 		// ─── 2. SEPAY WEBHOOK (TECHCOMBANK TỰ ĐỘNG) ─────────────────
 		if (url.pathname === "/api/sepay-webhook" && request.method === "POST") {
 			try {

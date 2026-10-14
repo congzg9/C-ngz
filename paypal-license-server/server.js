@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import createOrderHandler from "./api/create-order.js";
 import captureOrderHandler from "./api/capture-order.js";
+import claimFreeHandler from "./api/claim-free.js";
 import sepayWebhookHandler from "./api/sepay-webhook.js";
 import checkPaymentHandler from "./api/check-payment.js";
 
@@ -75,6 +76,11 @@ const server = http.createServer(async (req, res) => {
 		if (url.pathname === "/api/capture-order" && req.method === "POST") {
 			req.body = await parseJsonBody(req);
 			return await captureOrderHandler(req, customRes);
+		}
+
+		if (url.pathname === "/api/claim-free" && req.method === "POST") {
+			req.body = await parseJsonBody(req);
+			return await claimFreeHandler(req, customRes);
 		}
 
 		if (url.pathname === "/api/sepay-webhook" && req.method === "POST") {

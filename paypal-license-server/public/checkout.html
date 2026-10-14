@@ -526,21 +526,169 @@
       color: #c2410c;
     }
 
+    /* ─── HƯỚNG DẪN LẤY MÃ MÁY & MUA HÀNG ─── */
+    .guide-box {
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.45) 0%, rgba(243, 232, 255, 0.4) 100%);
+      border: 1.5px solid #fde68a;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.08);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .guide-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .guide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+    }
+    .guide-heading {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #78350f;
+    }
+    .guide-toggle-btn {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .guide-toggle-btn:hover {
+      background: #fff;
+      border-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+    .guide-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(217, 119, 6, 0.25);
+    }
+    @media (max-width: 860px) {
+      .guide-steps-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+    .step-card {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(254, 215, 170, 0.75);
+      border-radius: 14px;
+      padding: 13px 14px 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+    .step-card:hover {
+      background: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.12);
+      border-color: #f59e0b;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ea580c;
+    }
+    .step-badge-num {
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #f97316, #d97706);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 2px 5px rgba(249, 115, 22, 0.3);
+    }
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .step-highlight {
+      font-weight: 700;
+      color: #c2410c;
+      background: #fff7ed;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #ffedd5;
+    }
+    .step-tip {
+      font-size: 11px;
+      color: #059669;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-top: 4px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
     /* Machine ID & Coupon Rows */
     .input-row-grid {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 16px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
       margin-bottom: 22px;
+      align-items: start;
     }
-    @media (max-width: 680px) {
-      .input-row-grid { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+      .input-row-grid { grid-template-columns: 1fr; gap: 16px; }
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 8px;
     }
     .form-label {
       font-size: 12px;
@@ -551,14 +699,32 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
+      height: 22px;
+      box-sizing: border-box;
+    }
+    .form-label-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .form-label-sub {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: normal;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .form-input-box {
       display: flex;
       gap: 8px;
+      height: 48px;
     }
     .custom-input {
       flex: 1;
-      padding: 11px 14px;
+      height: 48px;
+      padding: 0 14px;
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
       border-radius: 12px;
@@ -568,6 +734,7 @@
       color: #0f172a;
       outline: none;
       transition: all 0.2s;
+      box-sizing: border-box;
     }
     .custom-input:focus {
       border-color: #f97316;
@@ -575,17 +742,23 @@
       box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
     }
     .btn-small-action {
-      padding: 11px 16px;
+      height: 48px;
+      padding: 0 16px;
       border-radius: 12px;
       border: 1.5px solid #e2e8f0;
       background: #f8fafc;
       color: #334155;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
       font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-sizing: border-box;
     }
     .btn-small-action:hover {
       background: #f1f5f9;
@@ -605,18 +778,23 @@
     .coupon-msg {
       font-size: 12px;
       font-weight: 600;
+      margin-top: 6px;
       display: none;
-      margin-top: 4px;
     }
-    .coupon-msg.success {
+    .coupon-msg.is-visible {
       display: flex;
+    }
+    .coupon-msg-success {
+      color: #16a34a;
       align-items: center;
       justify-content: space-between;
-      color: #16a34a;
     }
-    .coupon-msg.error {
-      display: block;
+    .coupon-msg-error {
       color: #dc2626;
+      display: none;
+    }
+    .coupon-msg-error.is-visible {
+      display: block;
     }
 
     /* PayPal Area */
@@ -629,6 +807,36 @@
       min-height: 110px;
       max-width: 520px;
       margin: 0 auto;
+    }
+    #free-claim-container {
+      display: none;
+      max-width: 520px;
+      margin: 0 auto 10px;
+    }
+    .btn-claim-free {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-claim-free:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(16, 185, 129, 0.45);
+    }
+    .btn-claim-free:active {
+      transform: translateY(0);
     }
 
     /* SUCCESS CARD (KHI THANH TOÁN XONG) */
@@ -931,14 +1139,68 @@
         </div>
       </div>
 
+      <!-- HỘP HƯỚNG DẪN 3 BƯỚC: XEM MÃ MÁY & ĐIỀN MUA -->
+      <div class="guide-box" id="guideBox">
+        <div class="guide-header" onclick="toggleGuide()">
+          <div class="guide-title-wrap">
+            <span class="guide-badge">💡 <span id="t-guide-badge">HƯỚNG DẪN</span></span>
+            <span class="guide-heading" id="t-guide-heading">Cách lấy Mã máy (Machine ID) & kích hoạt PRO trong 3 bước</span>
+          </div>
+          <button type="button" class="guide-toggle-btn" id="btnToggleGuide">
+            <span id="t-guide-toggle-text">Thu gọn</span> <span id="guideToggleArrow">▲</span>
+          </button>
+        </div>
+
+        <div class="guide-steps-grid" id="guideStepsGrid">
+          <!-- Bước 1 -->
+          <div class="step-card">
+            <div class="step-badge">
+              <span class="step-badge-num">1</span>
+              <span id="t-step1-badge">LẤY MÃ MÁY TRÊN APP</span>
+            </div>
+            <div class="step-title" id="t-step1-title">Mở ứng dụng Record-AutoZoom</div>
+            <div class="step-desc" id="t-step1-desc">
+              Nhấp vào biểu tượng <span class="step-highlight">Vương Miện (👑)</span> trên thanh công cụ ➔ Bấm nút <span class="step-highlight">📋 Sao chép</span> tại ô <em>Mã máy của bạn (Machine ID)</em>.
+            </div>
+            <div class="step-tip" id="t-step1-tip">
+              ✨ <strong>Mẹo:</strong> Bấm "Nâng cấp qua PayPal" trong app sẽ tự động mở web và điền sẵn mã máy!
+            </div>
+          </div>
+
+          <!-- Bước 2 -->
+          <div class="step-card">
+            <div class="step-badge">
+              <span class="step-badge-num">2</span>
+              <span id="t-step2-badge">ĐIỀN THÔNG TIN & ƯU ĐÃI</span>
+            </div>
+            <div class="step-title" id="t-step2-title">Dán Mã máy & Chọn gói</div>
+            <div class="step-desc" id="t-step2-desc">
+              Dán mã máy vào ô bên dưới, chọn gói <strong>Vĩnh Viễn</strong> hoặc <strong>1 Tháng</strong>. Nhập mã giảm giá (nếu có) rồi bấm <strong>Áp dụng</strong>.
+            </div>
+          </div>
+
+          <!-- Bước 3 -->
+          <div class="step-card">
+            <div class="step-badge">
+              <span class="step-badge-num">3</span>
+              <span id="t-step3-badge">NHẬN KEY & KÍCH HOẠT</span>
+            </div>
+            <div class="step-title" id="t-step3-title">Nhận License Key tức thì</div>
+            <div class="step-desc" id="t-step3-desc">
+              Hệ thống cấp ngay <span class="step-highlight">License Key</span> trên màn hình. Bấm <strong>Sao Chép</strong>, dán vào ô <em>Kích hoạt bản quyền</em> trong app là sở hữu trọn đời!
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- INPUT GRID: MACHINE ID & COUPON CODE -->
       <div class="input-row-grid">
         
         <!-- Ô Mã Máy (Machine ID) -->
         <div class="form-group">
           <label class="form-label" for="machineIdInput">
-            <span id="t-label-mid">💻 Mã máy của bạn (Machine ID)</span>
-            <span style="font-size:11px;color:#94a3b8;font-weight:500;" id="t-sub-mid">Tự động nhận diện từ app</span>
+            <span class="form-label-title" id="t-label-mid">💻 Mã máy của bạn (Machine ID)</span>
+            <span class="form-label-sub" style="color:#f97316;cursor:pointer;text-decoration:underline;" onclick="focusGuide()" id="t-sub-mid">❓ Cách lấy mã máy</span>
           </label>
           <div class="form-input-box">
             <input type="text" id="machineIdInput" class="custom-input" placeholder="REC-XXXX-XXXX-XXXX" />
@@ -951,8 +1213,8 @@
         <!-- Ô Mã Giảm Giá (Coupon) -->
         <div class="form-group">
           <label class="form-label" for="couponInput">
-            <span id="t-label-coupon">🎟️ Mã giảm giá (Coupon)</span>
-            <span style="font-size:11px;color:#f97316;font-weight:700;" id="t-sub-coupon">Nhập mã ưu đãi</span>
+            <span class="form-label-title" id="t-label-coupon">🎟️ Mã giảm giá (Coupon)</span>
+            <span class="form-label-sub" style="color:#f97316;" id="t-sub-coupon">Nhập mã ưu đãi</span>
           </label>
           <div class="form-input-box">
             <input type="text" id="couponInput" class="custom-input" placeholder="Nhập mã giảm giá..." />
@@ -961,11 +1223,11 @@
             </button>
           </div>
           <!-- Alert coupon -->
-          <div id="couponStatusSuccess" class="coupon-msg success">
+          <div id="couponStatusSuccess" class="coupon-msg coupon-msg-success">
             <span id="couponSuccessText">🎉 Đã áp dụng mã: Giảm 20%</span>
-            <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:#ef4444;text-decoration:underline;cursor:pointer;font-size:11px;">[Hủy mã]</button>
+            <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:#ef4444;text-decoration:underline;cursor:pointer;font-size:11px;font-weight:700;">[Hủy mã]</button>
           </div>
-          <div id="couponStatusError" class="coupon-msg error">
+          <div id="couponStatusError" class="coupon-msg coupon-msg-error">
             ⚠️ Mã giảm giá không đúng hoặc đã hết hạn!
           </div>
         </div>
@@ -978,6 +1240,11 @@
           Hệ thống bảo mật SSL quốc tế. License Key sẽ <strong>hiển thị ngay tức thì</strong> trên màn hình và gửi vào email của bạn sau khi thanh toán:
         </p>
         <div id="paypal-button-container"></div>
+        <div id="free-claim-container">
+          <button type="button" id="btnClaimFree" class="btn-claim-free" onclick="claimFreeLicense()">
+            🎁 <span id="t-claim-free-btn">Kích Hoạt Bản Quyền Miễn Phí (100% OFF)</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -994,12 +1261,6 @@
         <span id="t-sup-title">Cần trợ giúp kích hoạt hoặc hỗ trợ kỹ thuật?</span>
       </div>
       <div class="support-contacts">
-        <a href="https://github.com/congzg9/C-ngz/releases/download/v1.3.0/Record-AutoZoom-windows-x64.exe" class="support-item-link" download title="Tải file cài đặt Record-AutoZoom cho Windows">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-          </svg>
-          <span id="t-sup-dl">Tải Bản Cài Windows (.exe)</span>
-        </a>
         <a href="mailto:Giangcong1089@gmail.com" class="support-item-link link-email" title="Gửi email cho tác giả">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="20" height="16" x="2" y="4" rx="3"></rect>
@@ -1011,7 +1272,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>
-          <span>Facebook: facebook.com/congz9g</span>
+          <span>Facebook</span>
         </a>
       </div>
     </div>
@@ -1063,6 +1324,23 @@
         bottomMonth: "Miễn phí nâng cấp các bản cập nhật mới",
         bottomLifetime: "Sở hữu vĩnh viễn Record-AutoZoom trọn đời",
         couponPlaceholder: "Nhập mã giảm giá...",
+        claimFreeBtn: "Kích Hoạt Bản Quyền Miễn Phí (100% OFF)",
+        freeNotice: "🎉 Bạn đang áp dụng mã ưu đãi 100%! Bấm nút bên dưới để nhận License Key PRO miễn phí ngay lập tức:",
+        guideBadge: "HƯỚNG DẪN",
+        guideHeading: "Cách lấy Mã máy (Machine ID) & kích hoạt PRO trong 3 bước",
+        step1Badge: "LẤY MÃ MÁY TRÊN APP",
+        step1Title: "Mở ứng dụng Record-AutoZoom",
+        step1Desc: "Nhấp vào biểu tượng <span class=\"step-highlight\">Vương Miện (👑)</span> trên thanh công cụ ➔ Bấm nút <span class=\"step-highlight\">📋 Sao chép</span> tại ô <em>Mã máy của bạn (Machine ID)</em>.",
+        step1Tip: "✨ <strong>Mẹo:</strong> Bấm \"Nâng cấp qua PayPal\" trong app sẽ tự động mở web và điền sẵn mã máy!",
+        step2Badge: "ĐIỀN THÔNG TIN & ƯU ĐÃI",
+        step2Title: "Dán Mã máy & Chọn gói",
+        step2Desc: "Dán mã máy vào ô bên dưới, chọn gói <strong>Vĩnh Viễn</strong> hoặc <strong>1 Tháng</strong>. Nhập mã giảm giá (nếu có) rồi bấm <strong>Áp dụng</strong>.",
+        step3Badge: "NHẬN KEY & KÍCH HOẠT",
+        step3Title: "Nhận License Key tức thì",
+        step3Desc: "Hệ thống cấp ngay <span class=\"step-highlight\">License Key</span> trên màn hình. Bấm <strong>Sao Chép</strong>, dán vào ô <em>Kích hoạt bản quyền</em> trong app là sở hữu trọn đời!",
+        subMidHasId: "✅ Đã nhận diện",
+        subMidNoId: "❓ Cách lấy mã máy",
+        subCoupon: "Nhập mã ưu đãi",
         navHome: "Trang Tải App",
         supDl: "Tải Bản Cài Windows (.exe)"
       },
@@ -1096,7 +1374,7 @@
         subMid: "Auto-detected from desktop app",
         btnCopyMid: "Copy ID",
         labelCoupon: "🎟️ Coupon / Promo Code",
-        subCoupon: "Apply discount code",
+        subCoupon: "Promo code",
         btnApplyCoupon: "Apply",
         paypalNotice: "Secure 256-bit SSL encryption. Your License Key will be displayed on-screen instantly and sent to your email after checkout:",
         supTitle: "Need help with activation or technical support?",
@@ -1108,6 +1386,22 @@
         bottomMonth: "Free upgrade to future updates",
         bottomLifetime: "Lifetime Access to Record-AutoZoom",
         couponPlaceholder: "Enter coupon code...",
+        claimFreeBtn: "Claim Free PRO License (100% OFF)",
+        freeNotice: "🎉 You are using a 100% discount coupon! Click the button below to get your PRO License Key immediately:",
+        guideBadge: "INSTRUCTIONS",
+        guideHeading: "How to find Machine ID & Activate PRO in 3 easy steps",
+        step1Badge: "FIND MACHINE ID IN APP",
+        step1Title: "Open Record-AutoZoom App",
+        step1Desc: "Click the <span class=\"step-highlight\">Crown (👑)</span> icon on top toolbar ➔ Click <span class=\"step-highlight\">📋 Copy</span> at the <em>Your Machine ID</em> field.",
+        step1Tip: "✨ <strong>Quick tip:</strong> Click \"Upgrade via PayPal\" inside app to automatically open web and auto-fill your ID!",
+        step2Badge: "FILL DETAILS & COUPON",
+        step2Title: "Paste Machine ID & Select Plan",
+        step2Desc: "Paste your Machine ID below. Select plan (<strong>Lifetime</strong> or <strong>1 Month</strong>). Enter coupon code (if any) and click <strong>Apply</strong>.",
+        step3Badge: "GET KEY & ACTIVATE",
+        step3Title: "Instant License Key Delivery",
+        step3Desc: "System generates your <span class=\"step-highlight\">License Key</span> on-screen instantly. Click <strong>Copy</strong>, paste into <em>Activate License</em> box in your desktop app!",
+        subMidHasId: "✅ Auto-detected",
+        subMidNoId: "❓ How to get ID",
         navHome: "Download App",
         supDl: "Download for Windows (.exe)"
       }
@@ -1160,12 +1454,60 @@
       if (cpInput) cpInput.placeholder = t.couponPlaceholder;
       document.getElementById("t-sec-title").textContent = t.secTitle;
       document.getElementById("t-label-mid").textContent = t.labelMid;
-      document.getElementById("t-sub-mid").textContent = t.subMid;
+      
+      const subMidEl = document.getElementById("t-sub-mid");
+      if (subMidEl) {
+        const hasId = Boolean((document.getElementById("machineIdInput")?.value || "").trim());
+        subMidEl.textContent = hasId ? t.subMidHasId : t.subMidNoId;
+        subMidEl.style.color = hasId ? "#16a34a" : "#ea580c";
+      }
+
+      const subCpEl = document.getElementById("t-sub-coupon");
+      if (subCpEl) {
+        subCpEl.textContent = t.subCoupon || "";
+      }
+
+      // Hướng dẫn 3 bước
+      const gBadge = document.getElementById("t-guide-badge");
+      if (gBadge && t.guideBadge) gBadge.textContent = t.guideBadge;
+      const gHead = document.getElementById("t-guide-heading");
+      if (gHead && t.guideHeading) gHead.textContent = t.guideHeading;
+      const gToggle = document.getElementById("t-guide-toggle-text");
+      if (gToggle) gToggle.textContent = guideOpen ? (lang === 'vi' ? 'Thu gọn' : 'Collapse') : (lang === 'vi' ? 'Xem chi tiết' : 'View steps');
+      
+      const s1b = document.getElementById("t-step1-badge");
+      if (s1b) s1b.textContent = t.step1Badge;
+      const s1t = document.getElementById("t-step1-title");
+      if (s1t) s1t.textContent = t.step1Title;
+      const s1d = document.getElementById("t-step1-desc");
+      if (s1d) s1d.innerHTML = t.step1Desc;
+      const s1tip = document.getElementById("t-step1-tip");
+      if (s1tip) s1tip.innerHTML = t.step1Tip;
+
+      const s2b = document.getElementById("t-step2-badge");
+      if (s2b) s2b.textContent = t.step2Badge;
+      const s2t = document.getElementById("t-step2-title");
+      if (s2t) s2t.textContent = t.step2Title;
+      const s2d = document.getElementById("t-step2-desc");
+      if (s2d) s2d.innerHTML = t.step2Desc;
+
+      const s3b = document.getElementById("t-step3-badge");
+      if (s3b) s3b.textContent = t.step3Badge;
+      const s3t = document.getElementById("t-step3-title");
+      if (s3t) s3t.textContent = t.step3Title;
+      const s3d = document.getElementById("t-step3-desc");
+      if (s3d) s3d.innerHTML = t.step3Desc;
+
       document.getElementById("t-btn-copy-mid").textContent = t.btnCopyMid;
       document.getElementById("t-label-coupon").textContent = t.labelCoupon;
       document.getElementById("t-sub-coupon").textContent = t.subCoupon;
       document.getElementById("t-btn-apply-coupon").textContent = t.btnApplyCoupon;
-      document.getElementById("t-paypal-notice").textContent = t.paypalNotice;
+      const noticeEl = document.getElementById("t-paypal-notice");
+      if (noticeEl) {
+        noticeEl.textContent = (currentUsd <= 0 && activeCoupon) ? t.freeNotice : t.paypalNotice;
+      }
+      const freeBtnText = document.getElementById("t-claim-free-btn");
+      if (freeBtnText && t.claimFreeBtn) freeBtnText.textContent = t.claimFreeBtn;
       document.getElementById("t-sup-title").textContent = t.supTitle;
       document.getElementById("t-success-title").textContent = t.successTitle;
       document.getElementById("t-success-desc").textContent = t.successDesc;
@@ -1185,6 +1527,10 @@
     };
 
     const COUPONS = {
+      "TEST01": { type: "fixed", value: 0.1, label: "$0.10 (Test PayPal)" },
+      "FREE100": { type: "percent", value: 100, label: "100% OFF (Miễn Phí)" },
+      "PRO100": { type: "percent", value: 100, label: "100% OFF (Miễn Phí)" },
+      "GIAM100": { type: "percent", value: 100, label: "100% OFF (Miễn Phí)" },
       "RECORDLY10": { type: "percent", value: 10, label: "10% OFF" },
       "RECORDLY20": { type: "percent", value: 20, label: "20% OFF" },
       "GIAM30": { type: "percent", value: 30, label: "30% OFF" },
@@ -1202,10 +1548,12 @@
     function getFinalPrice(basePrice) {
       if (!activeCoupon) return basePrice;
       let finalPrice = basePrice;
-      if (activeCoupon.type === "percent") {
+      if (activeCoupon.type === "fixed") {
+        finalPrice = activeCoupon.value;
+      } else if (activeCoupon.type === "percent") {
         finalPrice = basePrice * (1 - activeCoupon.value / 100);
       } else if (activeCoupon.type === "amount") {
-        finalPrice = Math.max(1, basePrice - activeCoupon.value);
+        finalPrice = Math.max(0.1, basePrice - activeCoupon.value);
       }
       return Math.round(finalPrice * 100) / 100;
     }
@@ -1263,17 +1611,25 @@
       if (!code) {
         if (errorEl) {
           errorEl.textContent = currentLang === 'vi' ? "⚠️ Vui lòng nhập mã giảm giá!" : "⚠️ Please enter a coupon code!";
+          errorEl.classList.add("is-visible");
           errorEl.style.display = "block";
         }
-        if (successEl) successEl.style.display = "none";
+        if (successEl) {
+          successEl.classList.remove("is-visible");
+          successEl.style.display = "none";
+        }
         return;
       }
 
       if (COUPONS[code]) {
         activeCoupon = { ...COUPONS[code], code };
-        if (errorEl) errorEl.style.display = "none";
+        if (errorEl) {
+          errorEl.classList.remove("is-visible");
+          errorEl.style.display = "none";
+        }
         if (successEl && successText) {
           successText.textContent = `🎉 ${currentLang === 'vi' ? 'Đã áp dụng mã' : 'Coupon applied'} [${code}]: -${activeCoupon.label}`;
+          successEl.classList.add("is-visible");
           successEl.style.display = "flex";
         }
         updatePricingUI();
@@ -1282,9 +1638,13 @@
         activeCoupon = null;
         if (errorEl) {
           errorEl.textContent = currentLang === 'vi' ? "⚠️ Mã giảm giá không đúng hoặc đã hết hạn!" : "⚠️ Invalid or expired coupon code!";
+          errorEl.classList.add("is-visible");
           errorEl.style.display = "block";
         }
-        if (successEl) successEl.style.display = "none";
+        if (successEl) {
+          successEl.classList.remove("is-visible");
+          successEl.style.display = "none";
+        }
         updatePricingUI();
         initPayPal();
       }
@@ -1296,8 +1656,14 @@
       if (input) input.value = "";
       const successEl = document.getElementById("couponStatusSuccess");
       const errorEl = document.getElementById("couponStatusError");
-      if (successEl) successEl.style.display = "none";
-      if (errorEl) errorEl.style.display = "none";
+      if (successEl) {
+        successEl.classList.remove("is-visible");
+        successEl.style.display = "none";
+      }
+      if (errorEl) {
+        errorEl.classList.remove("is-visible");
+        errorEl.style.display = "none";
+      }
       updatePricingUI();
       initPayPal();
     }
@@ -1311,7 +1677,38 @@
       machineIdInput.value = paramMachineId;
     }
 
+    let guideOpen = true;
+    function toggleGuide() {
+      guideOpen = !guideOpen;
+      const grid = document.getElementById("guideStepsGrid");
+      const arrow = document.getElementById("guideToggleArrow");
+      const text = document.getElementById("t-guide-toggle-text");
+      if (grid) grid.style.display = guideOpen ? "grid" : "none";
+      if (arrow) arrow.textContent = guideOpen ? "▲" : "▼";
+      if (text) text.textContent = guideOpen ? (currentLang === 'vi' ? "Thu gọn" : "Collapse") : (currentLang === 'vi' ? "Xem chi tiết" : "View steps");
+    }
+
+    function focusGuide() {
+      const box = document.getElementById("guideBox");
+      if (!box) return;
+      if (!guideOpen) toggleGuide();
+      box.scrollIntoView({ behavior: "smooth", block: "center" });
+      box.style.borderColor = "#f97316";
+      box.style.boxShadow = "0 0 0 4px rgba(249, 115, 22, 0.35)";
+      setTimeout(() => {
+        box.style.borderColor = "#fde68a";
+        box.style.boxShadow = "0 4px 18px rgba(245, 158, 11, 0.08)";
+      }, 1600);
+    }
+
     machineIdInput.addEventListener("input", () => {
+      const subMidEl = document.getElementById("t-sub-mid");
+      const t = I18N[currentLang];
+      if (subMidEl && t) {
+        const hasId = Boolean((machineIdInput.value || "").trim());
+        subMidEl.textContent = hasId ? t.subMidHasId : t.subMidNoId;
+        subMidEl.style.color = hasId ? "#16a34a" : "#ea580c";
+      }
       initPayPal();
     });
 
@@ -1335,10 +1732,29 @@
       alert(currentLang === 'vi' ? "Đã sao chép Mã máy: " + val : "Copied Machine ID: " + val);
     }
 
-    // ─── 4. PAYPAL BUTTON INTEGRATION ─────────────────────────────────────
+    // ─── 4. PAYPAL BUTTON INTEGRATION & FREE CLAIM ────────────────────────
     function initPayPal() {
       const container = document.getElementById("paypal-button-container");
-      if (!container || typeof paypal === "undefined") return;
+      const freeContainer = document.getElementById("free-claim-container");
+      const noticeEl = document.getElementById("t-paypal-notice");
+      const t = I18N[currentLang];
+
+      if (currentUsd <= 0) {
+        if (container) {
+          container.style.display = "none";
+          container.innerHTML = "";
+        }
+        if (freeContainer) freeContainer.style.display = "block";
+        if (noticeEl) noticeEl.textContent = t.freeNotice;
+        return;
+      }
+
+      if (freeContainer) freeContainer.style.display = "none";
+      if (noticeEl) noticeEl.textContent = t.paypalNotice;
+      if (!container) return;
+      container.style.display = "block";
+
+      if (typeof paypal === "undefined") return;
       container.innerHTML = "";
 
       paypal.Buttons({
@@ -1412,6 +1828,55 @@
             : "PayPal transaction was cancelled or encountered an error. (Note: You cannot pay using the recipient/merchant PayPal account).");
         },
       }).render("#paypal-button-container");
+    }
+
+    async function claimFreeLicense() {
+      const mId = machineIdInput.value.trim();
+      if (!mId) {
+        alert(currentLang === 'vi' 
+          ? "Vui lòng nhập Mã máy (Machine ID) của bạn trước khi kích hoạt!" 
+          : "Please enter your Machine ID before activating!");
+        machineIdInput.focus();
+        machineIdInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const days = currentPlanType === "lifetime" ? 0 : 30;
+      const btn = document.getElementById("btnClaimFree");
+      const originalHtml = btn ? btn.innerHTML : "";
+
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+        btn.innerHTML = currentLang === 'vi' ? "⏳ Đang kích hoạt bản quyền..." : "⏳ Generating license key...";
+      }
+
+      try {
+        const res = await fetch("/api/claim-free", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            machineId: mId,
+            couponCode: activeCoupon ? activeCoupon.code : "FREE100",
+            durationDays: days,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success && data.licenseKey) {
+          showSuccess(data.licenseKey);
+        } else {
+          alert("Error: " + (data.error || "Không thể tạo bản quyền"));
+        }
+      } catch (err) {
+        alert("Lỗi kết nối: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = "1";
+          btn.innerHTML = originalHtml;
+        }
+      }
     }
 
     function showSuccess(key) {

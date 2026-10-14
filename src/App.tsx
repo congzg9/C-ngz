@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { CountdownOverlay } from "./components/countdown/CountdownOverlay";
-import LandingPage from "./components/landing/LandingPage";
 import { LaunchWindow } from "./components/launch/LaunchWindow";
 import { SourceSelector } from "./components/launch/SourceSelector";
 import { UpdateToastWindow } from "./components/launch/UpdateToastWindow";
@@ -18,9 +17,9 @@ export default function App() {
 			const type = params.get("windowType");
 			if (type) return type;
 			const isElectron = Boolean((window as any).electronAPI?.isElectron);
-			return isElectron ? "" : "landing";
+			return isElectron ? "" : "editor";
 		} catch {
-			return "landing";
+			return "editor";
 		}
 	});
 	const { t } = useI18n();
@@ -30,7 +29,7 @@ export default function App() {
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const isElectron = Boolean((window as any).electronAPI?.isElectron);
-		const type = params.get("windowType") || (isElectron ? "" : "landing");
+		const type = params.get("windowType") || (isElectron ? "" : "editor");
 		if (type !== windowType) {
 			setWindowType(type);
 		}
@@ -67,14 +66,10 @@ export default function App() {
 		document.title =
 			windowType === "editor"
 				? t("app.editorTitle", "Trình chỉnh sửa Record-AutoZoom")
-				: windowType === "landing"
-					? "Record Auto-Zoom — Quay Màn Hình & Tự Động Phóng To Chuyên Nghiệp"
-					: t("app.name", "Record-AutoZoom");
+				: t("app.name", "Record-AutoZoom");
 	}, [windowType, t]);
 
 	switch (windowType) {
-		case "landing":
-			return <LandingPage onOpenWebEditor={() => setWindowType("editor")} />;
 		case "hud-overlay":
 			return (
 				<>

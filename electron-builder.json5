@@ -13,15 +13,23 @@
   "productName": "Record-AutoZoom",
   "npmRebuild": true,
   "buildDependenciesFromSource": true,
-  "compression": "normal",
+  "compression": "maximum",
   "directories": {
     "output": "release"
   },
   "files": [
     "dist",
+    "!dist/wallpapers/**",
     "dist-electron",
     "electron/native",
     "!electron/native/**/build/**",
+    "!electron/native/**/*.cpp",
+    "!electron/native/**/*.h",
+    "!electron/native/**/*.vcxproj*",
+    "!electron/native/**/CMakeLists.txt",
+    "!electron/native/**/*.obj",
+    "!electron/native/**/*.tlog",
+    "!electron/native/**/*.pdb",
     "!*.png",
     "!preview*.png",
     "!*.md",
@@ -62,9 +70,24 @@
     "icon": "icons/icons/mac/icon.icns",
     "artifactName": "${productName}-${arch}.${ext}",
     "files": [
+      "dist",
+      "!dist/wallpapers/**",
+      "dist-electron",
+      "electron/native",
+      "!electron/native/**/build/**",
+      "!electron/native/**/*.cpp",
+      "!electron/native/**/*.h",
+      "!electron/native/**/*.vcxproj*",
+      "!electron/native/**/CMakeLists.txt",
+      "!electron/native/**/*.obj",
+      "!electron/native/**/*.tlog",
+      "!electron/native/**/*.pdb",
       "!node_modules/ffprobe-static/bin/win32/**",
       "!node_modules/ffprobe-static/bin/linux/**",
-      "!electron/native/bin/win32-**/**"
+      "!electron/native/bin/win32-x64/**",
+      "!electron/native/bin/win32-arm64/**",
+      "!electron/native/bin/linux-x64/**",
+      "!electron/native/bin/linux-arm64/**"
     ],
     "extendInfo": {
       "NSAudioCaptureUsageDescription": "Record-AutoZoom needs audio capture permission to record system audio.",
@@ -80,7 +103,28 @@
     ],
     "icon": "icons/icons/png",
     "artifactName": "${productName}-linux-x64.${ext}",
-    "category": "AudioVideo"
+    "category": "AudioVideo",
+    "files": [
+      "dist",
+      "!dist/wallpapers/**",
+      "dist-electron",
+      "electron/native",
+      "!electron/native/**/build/**",
+      "!electron/native/**/*.cpp",
+      "!electron/native/**/*.h",
+      "!electron/native/**/*.vcxproj*",
+      "!electron/native/**/CMakeLists.txt",
+      "!electron/native/**/*.obj",
+      "!electron/native/**/*.tlog",
+      "!electron/native/**/*.pdb",
+      "!electron/native/**/*.swift",
+      "!node_modules/ffprobe-static/bin/darwin/**",
+      "!node_modules/ffprobe-static/bin/win32/**",
+      "!electron/native/bin/darwin-arm64/**",
+      "!electron/native/bin/darwin-x64/**",
+      "!electron/native/bin/win32-x64/**",
+      "!electron/native/bin/win32-arm64/**"
+    ]
   },
   "win": {
     "target": [
@@ -90,11 +134,33 @@
     "executableName": "RecordAutoZoom",
     "artifactName": "${productName}-windows-${arch}.${ext}",
     "files": [
+      "dist",
+      "!dist/wallpapers/**",
+      "dist-electron",
+      "electron/native",
+      "!electron/native/**/build/**",
+      "!electron/native/**/*.cpp",
+      "!electron/native/**/*.h",
+      "!electron/native/**/*.vcxproj*",
+      "!electron/native/**/CMakeLists.txt",
+      "!electron/native/**/*.obj",
+      "!electron/native/**/*.tlog",
+      "!electron/native/**/*.pdb",
+      "!electron/native/**/*.swift",
       "!node_modules/ffprobe-static/bin/darwin/**",
       "!node_modules/ffprobe-static/bin/linux/**",
       "!node_modules/ffprobe-static/bin/win32/ia32/**",
-      "!electron/native/bin/darwin-**/**"
+      "!electron/native/bin/darwin-arm64/**",
+      "!electron/native/bin/darwin-x64/**",
+      "!electron/native/bin/linux-x64/**",
+      "!electron/native/bin/linux-arm64/**"
     ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false,
+    "differentialPackage": true
   }
 }
 
