@@ -97,6 +97,9 @@
       "com.apple.security.device.audio-input": true
     }
   },
+  "dmg": {
+    "format": "UDZO"
+  },
   "linux": {
     "target": [
       "AppImage"
