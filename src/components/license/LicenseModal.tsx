@@ -58,9 +58,11 @@ export function LicenseModal({ open, onOpenChange, onLicenseChanged }: LicenseMo
 
 		void (async () => {
 			try {
+				let currentMid = machineId;
 				if (window.electronAPI?.getMachineId) {
 					const id = await window.electronAPI.getMachineId();
 					setMachineId(id);
+					currentMid = id;
 				}
 				if (window.electronAPI?.getLicenseStatus) {
 					const status = await window.electronAPI.getLicenseStatus(true);
@@ -71,12 +73,86 @@ export function LicenseModal({ open, onOpenChange, onLicenseChanged }: LicenseMo
 					if (status.email) {
 						setEmail(status.email);
 					}
+
+					// Nếu chưa là PRO, tự động kiểm tra xem máy này đã từng thanh toán trên web chưa
+					if (!status.isPro && currentMid && currentMid.startsWith("REC-")) {
+						try {
+							const res = await fetch(`https://record-autozoom.pages.dev/api/check-payment?machineId=${encodeURIComponent(currentMid)}`);
+							if (res.ok) {
+								const checkData = await res.json();
+								if (checkData.paid && checkData.licenseKey) {
+									const actRes = await window.electronAPI.activateLicense(checkData.licenseKey);
+									if (actRes.success && actRes.license) {
+										setLicenseStatus(actRes.license);
+										setLicenseKey(checkData.licenseKey);
+										toast.success(
+											isVi
+												? "🎉 Nhận diện thanh toán thành công! Bản quyền PRO đã được tự động kích hoạt!"
+												: "🎉 Verified payment! PRO License has been automatically activated!"
+										);
+										onLicenseChanged?.(true);
+									}
+								}
+							}
+						} catch (_) {}
+					}
 				}
 			} catch (err) {
 				console.warn("Could not load license status:", err);
 			}
 		})();
 	}, [open]);
+
+	const handleAutoSync = async (explicit = false) => {
+		try {
+			let currentMid = machineId;
+			if (!currentMid || currentMid === "Đang tải...") {
+				if (window.electronAPI?.getMachineId) {
+					currentMid = await window.electronAPI.getMachineId();
+					setMachineId(currentMid);
+				}
+			}
+			if (!currentMid || !currentMid.startsWith("REC-")) {
+				if (explicit) toast.error(isVi ? "Chưa xác định được Mã máy." : "Machine ID not ready.");
+				return;
+			}
+
+			if (explicit) setLoading(true);
+
+			const res = await fetch(`https://record-autozoom.pages.dev/api/check-payment?machineId=${encodeURIComponent(currentMid)}`);
+			if (res.ok) {
+				const checkData = await res.json();
+				if (checkData.paid && checkData.licenseKey) {
+					const actRes = await window.electronAPI.activateLicense(checkData.licenseKey);
+					if (actRes.success && actRes.license) {
+						setLicenseStatus(actRes.license);
+						setLicenseKey(checkData.licenseKey);
+						toast.success(
+							isVi
+								? "🎉 Nhận diện đơn hàng thành công! Bản quyền PRO đã được tự động kích hoạt!"
+								: "🎉 Verified purchase! PRO License has been automatically activated!"
+						);
+						onLicenseChanged?.(true);
+						return;
+					}
+				}
+			}
+
+			if (explicit) {
+				toast.info(
+					isVi
+						? "Chưa tìm thấy giao dịch đã hoàn tất cho mã máy này. Nếu vừa thanh toán xong, vui lòng đợi 15-30 giây để hệ thống xử lý rồi thử lại."
+						: "No completed purchase found yet for this machine. Please wait 15-30 seconds and try again."
+				);
+			}
+		} catch (err) {
+			if (explicit) {
+				toast.error(isVi ? "Lỗi kết nối đến máy chủ xác thực." : "Failed to connect to verification server.");
+			}
+		} finally {
+			if (explicit) setLoading(false);
+		}
+	};
 
 	const handleCopyMachineId = () => {
 		if (window.electronAPI?.copyToClipboard) {
@@ -268,22 +344,35 @@ export function LicenseModal({ open, onOpenChange, onLicenseChanged }: LicenseMo
 								className="font-mono text-[12.5px] bg-black/50 border border-white/15 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 h-11 rounded-xl px-3.5 tracking-wider shadow-inner"
 							/>
 
-							{/* Nút kích hoạt bản quyền PRO */}
-							<Button
-								type="button"
-								onClick={handleActivate}
-								disabled={loading}
-								className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-[13px] h-11 rounded-xl shadow-[0_4px_20px_rgba(139,92,246,0.35)] hover:shadow-[0_6px_25px_rgba(139,92,246,0.5)] transition-all cursor-pointer active:scale-[0.99] tracking-wide"
-							>
-								{loading ? (
-									<>
-										<RefreshCw className="h-3.5 w-3.5 animate-spin mr-2" />
-										{isVi ? "Đang xác thực..." : "Verifying..."}
-									</>
-								) : (
-									isVi ? "Kích hoạt bản quyền ngay" : "Activate License Now"
-								)}
-							</Button>
+							{/* Nút kích hoạt: Thủ công & Tự động đồng bộ */}
+							<div className="flex gap-2">
+								<Button
+									type="button"
+									onClick={handleActivate}
+									disabled={loading}
+									className="flex-1 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-[13px] h-11 rounded-xl shadow-[0_4px_20px_rgba(139,92,246,0.35)] hover:shadow-[0_6px_25px_rgba(139,92,246,0.5)] transition-all cursor-pointer active:scale-[0.99] tracking-wide"
+								>
+									{loading ? (
+										<>
+											<RefreshCw className="h-3.5 w-3.5 animate-spin mr-2" />
+											{isVi ? "Đang xác thực..." : "Verifying..."}
+										</>
+									) : (
+										isVi ? "Kích hoạt bằng mã" : "Activate with Key"
+									)}
+								</Button>
+								<Button
+									type="button"
+									onClick={() => handleAutoSync(true)}
+									disabled={loading}
+									variant="outline"
+									title={isVi ? "Tự động nhận diện bản quyền nếu bạn đã thanh toán trên trang web" : "Auto-detect paid license from website"}
+									className="bg-white/5 hover:bg-white/10 border-white/20 text-amber-300 hover:text-amber-200 text-[12px] h-11 rounded-xl px-3 flex items-center gap-1.5 transition-all cursor-pointer font-medium"
+								>
+									<RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+									<span>{isVi ? "Tự kích hoạt" : "Auto Sync"}</span>
+								</Button>
+							</div>
 						</div>
 
 						{/* KHỐI 2: CHƯA MUA - THANH TOÁN QUA CỔNG PAYPAL */}

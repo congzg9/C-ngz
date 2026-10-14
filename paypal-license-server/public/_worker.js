@@ -76,13 +76,10 @@ function jsonResponse(data, status = 200) {
 }
 
 async function sendLicenseEmail(env, { toEmail = "giangcong1089@gmail.com", customerName, customerEmail, licenseKey, machineId, price = 35, durationDays = 0, couponCode = null }) {
-	const resendKey = env.RESEND_API_KEY;
-	if (!resendKey) return;
-
 	const targetEmail = env.ADMIN_EMAIL || "giangcong1089@gmail.com";
 	const planText = durationDays === 0 ? "Vĩnh viễn (Trọn đời)" : `${durationDays} ngày`;
-	const subject = `🔔 [ĐƠN HÀNG MỚI] Khách vừa mua Record-AutoZoom PRO ($${price} USD)${couponCode ? ` [Mã: ${couponCode}]` : ""}`;
-	const html = `
+	const adminSubject = `🔔 [ĐƠN HÀNG MỚI] Khách vừa mua Record-AutoZoom PRO ($${price} USD)${couponCode ? ` [Mã: ${couponCode}]` : ""}`;
+	const adminHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -150,30 +147,8 @@ async function sendLicenseEmail(env, { toEmail = "giangcong1089@gmail.com", cust
 </html>
 	`;
 
-	// 1. Gửi email thông báo cho bạn (Admin)
-	try {
-		await fetch("https://api.resend.com/emails", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${resendKey}`,
-			},
-			body: JSON.stringify({
-				from: env.EMAIL_FROM || "Record-AutoZoom <onboarding@resend.dev>",
-				to: [targetEmail],
-				subject,
-				html,
-			}),
-		});
-	} catch (err) {
-		console.warn("Lỗi gửi email Resend cho admin:", err);
-	}
-
-	// 2. Tự động gửi email chứa License Key trực tiếp cho khách hàng
-	if (customerEmail && customerEmail.includes("@")) {
-		try {
-			const customerSubject = "🎉 Bản quyền Record-AutoZoom PRO của bạn đã sẵn sàng!";
-			const customerHtml = `
+	const customerSubject = "🎉 Bản quyền Record-AutoZoom PRO của bạn đã sẵn sàng!";
+	const customerHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -219,8 +194,54 @@ async function sendLicenseEmail(env, { toEmail = "giangcong1089@gmail.com", cust
   </div>
 </body>
 </html>
-			`;
+	`;
 
+	// 1. KÊNH 1: Google Apps Script Webhook (Gửi từ chính Gmail của bạn vào Inbox khách 100% không bị chặn)
+	if (env.GOOGLE_MAIL_WEBHOOK) {
+		try {
+			await fetch(env.GOOGLE_MAIL_WEBHOOK, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					to: customerEmail && customerEmail.includes("@") ? customerEmail : null,
+					subject: customerSubject,
+					html: customerHtml,
+					notifyAdmin: true,
+					adminEmail: targetEmail,
+					adminSubject: adminSubject,
+					adminHtml: adminHtml,
+				}),
+			});
+		} catch (errGoogle) {
+			console.warn("Lỗi gửi qua Google Mail Webhook:", errGoogle);
+		}
+	}
+
+	// 2. KÊNH 2: Brevo API (Nếu cấu hình)
+	if (env.BREVO_API_KEY && customerEmail && customerEmail.includes("@")) {
+		try {
+			await fetch("https://api.brevo.com/v3/smtp/email", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"api-key": env.BREVO_API_KEY,
+				},
+				body: JSON.stringify({
+					sender: { name: "Record-AutoZoom PRO", email: targetEmail },
+					to: [{ email: customerEmail, name: customerName || "Khách hàng" }],
+					subject: customerSubject,
+					htmlContent: customerHtml,
+				}),
+			});
+		} catch (errBrevo) {
+			console.warn("Lỗi gửi qua Brevo:", errBrevo);
+		}
+	}
+
+	// 3. KÊNH 3: Resend API (Gửi thông báo đơn hàng cho Quản trị viên)
+	const resendKey = env.RESEND_API_KEY;
+	if (resendKey) {
+		try {
 			await fetch("https://api.resend.com/emails", {
 				method: "POST",
 				headers: {
@@ -229,13 +250,13 @@ async function sendLicenseEmail(env, { toEmail = "giangcong1089@gmail.com", cust
 				},
 				body: JSON.stringify({
 					from: env.EMAIL_FROM || "Record-AutoZoom <onboarding@resend.dev>",
-					to: [customerEmail],
-					subject: customerSubject,
-					html: customerHtml,
+					to: [targetEmail],
+					subject: adminSubject,
+					html: adminHtml,
 				}),
 			});
-		} catch (e) {
-			console.warn("Lỗi gửi email cho khách:", e);
+		} catch (errResend) {
+			console.warn("Lỗi gửi email Resend cho admin:", errResend);
 		}
 	}
 }
@@ -580,6 +601,78 @@ export default {
 			} catch (err) {
 				return jsonResponse({ error: err.message }, 500);
 			}
+		}
+
+		// GET /api/lookup-license?q=... (Tra cứu mã bản quyền theo Machine ID hoặc Email)
+		if (url.pathname === "/api/lookup-license" && request.method === "GET") {
+			const q = (url.searchParams.get("q") || url.searchParams.get("query") || url.searchParams.get("machineId") || "").trim();
+			if (!q) return jsonResponse({ found: false, error: "Vui lòng nhập Mã máy hoặc Email để tra cứu" }, 400);
+
+			if (!env.ORDERS_KV) return jsonResponse({ found: false, error: "Hệ thống chưa kết nối database" }, 500);
+
+			const normId = normalizeMachineId(q);
+			const clean = normId.replace(/[^A-Z0-9]/g, "");
+
+			let dataStr = null;
+			// 1. Tìm theo machineId trước
+			if (clean && clean.length >= 8) {
+				dataStr = await env.ORDERS_KV.get(`lic:${clean}`);
+				if (!dataStr) dataStr = await env.ORDERS_KV.get(clean);
+			}
+
+			// 2. Nếu chưa thấy, tìm quét theo email hoặc orderId trong các keys
+			if (!dataStr) {
+				const qLower = q.toLowerCase();
+				const list = await env.ORDERS_KV.list({ prefix: "lic:", limit: 200 });
+				for (const item of list.keys) {
+					const val = await env.ORDERS_KV.get(item.name);
+					if (val) {
+						try {
+							const rec = JSON.parse(val);
+							if (
+								(rec.email && rec.email.toLowerCase() === qLower) ||
+								(rec.orderId && rec.orderId.toLowerCase() === qLower) ||
+								(rec.machineId && rec.machineId.toUpperCase().includes(clean))
+							) {
+								dataStr = val;
+								break;
+							}
+						} catch (_) {}
+					}
+				}
+			}
+
+			if (!dataStr) {
+				return jsonResponse({
+					found: false,
+					message: "Không tìm thấy thông tin bản quyền phù hợp với dữ liệu bạn cung cấp.",
+				});
+			}
+
+			const record = JSON.parse(dataStr);
+			if (record.status === "revoked" || record.status === "disabled") {
+				return jsonResponse({
+					found: false,
+					revoked: true,
+					message: "Khóa bản quyền này đã bị thu hồi hoặc vô hiệu hóa.",
+				});
+			}
+
+			const maskEmail = (em) => {
+				if (!em || !em.includes("@")) return "—";
+				const [user, domain] = em.split("@");
+				return `${user.slice(0, 2)}***@${domain}`;
+			};
+
+			return jsonResponse({
+				found: true,
+				licenseKey: record.licenseKey,
+				machineId: record.machineId,
+				customerName: record.customerName || "Khách hàng",
+				maskedEmail: maskEmail(record.email),
+				plan: record.durationDays === 0 ? "Vĩnh viễn (Trọn đời)" : `${record.durationDays} ngày`,
+				paidAt: record.paidAt,
+			});
 		}
 
 		// GET /api/check-payment (Polling kiểm tra chuyển khoản)

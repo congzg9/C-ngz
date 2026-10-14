@@ -770,6 +770,9 @@
 
     <!-- Nút Bản Quyền PRO & Đổi ngôn ngữ Anh - Việt -->
     <div class="nav-actions">
+      <a href="/checkout" class="nav-download-btn" id="btnNavLookup" style="background:rgba(255,255,255,0.14);color:#fed7aa;border-color:rgba(255,255,255,0.3);backdrop-filter:blur(10px);" title="Tra cứu mã bản quyền đã mua">
+        <span>🔍</span> <span id="t-nav-lookup">Tra Cứu Mã</span>
+      </a>
       <a href="/checkout" class="nav-download-btn" id="btnNavPricing" style="background:rgba(255,255,255,0.22);color:#fff;border-color:rgba(255,255,255,0.45);backdrop-filter:blur(10px);" title="Xem bảng giá nâng cấp PRO">
         <span>💎</span> <span id="t-nav-pro">Bản Quyền PRO</span>
       </a>
@@ -970,6 +973,7 @@
         btnBigDownloadMac: "Tải Bản Cài Đặt Cho macOS Ngay (.dmg)",
         supTitle: "Cần hỗ trợ kỹ thuật hoặc góp ý tính năng?",
         navDownload: "Tải Cho Windows (.exe)",
+        navLookup: "Tra Cứu Mã",
         navPro: "Bản Quyền PRO",
         supDl: "Tải Bản Cài Windows (.exe)"
       },
@@ -1013,6 +1017,7 @@
         btnBigDownloadMac: "Download macOS Installer Now (.dmg)",
         supTitle: "Need technical assistance or feature suggestions?",
         navDownload: "Download for Windows (.exe)",
+        navLookup: "License Lookup",
         navPro: "PRO Pricing",
         supDl: "Download for Windows (.exe)"
       }
@@ -1066,6 +1071,8 @@
       document.getElementById("t-sup-title").textContent = t.supTitle;
       const navDl = document.getElementById("t-nav-download");
       if (navDl) navDl.textContent = t.navDownload;
+      const navLookup = document.getElementById("t-nav-lookup");
+      if (navLookup) navLookup.textContent = t.navLookup;
       const supDl = document.getElementById("t-sup-dl");
       if (supDl) supDl.textContent = t.supDl;
 

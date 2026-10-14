@@ -1249,6 +1249,41 @@
 
     </div>
 
+    <!-- TRA CỨU MÃ BẢN QUYỀN ĐÃ MUA (LOOKUP LICENSE) -->
+    <div class="lookup-box" style="margin-top: 24px; max-width: 680px; width: 100%; background: rgba(255, 255, 255, 0.94); border-radius: 20px; border: 1.5px solid rgba(255, 255, 255, 0.6); box-shadow: var(--card-shadow); padding: 22px 26px; backdrop-filter: blur(12px);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:#1e293b;">
+          <span style="font-size:18px;">🔍</span>
+          <span id="t-lookup-title">Bạn đã mua nhưng cần lấy lại mã? Tra cứu ngay:</span>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#16a34a;background:#dcfce7;padding:3px 9px;border-radius:999px;">Tự động 24/7</span>
+      </div>
+      <p style="font-size:12px;color:#64748b;margin-bottom:12px;" id="t-lookup-sub">
+        Nhập Email PayPal hoặc Mã máy (Machine ID) bạn đã dùng khi thanh toán:
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" id="lookupInput" class="custom-input" placeholder="VD: tvdung.kts@gmail.com hoặc REC-..." style="font-size:13px;flex:1;min-width:240px;" />
+        <button type="button" class="btn-small-action" onclick="lookupLicenseKey()" style="background:#f97316;color:#fff;border-color:#ea580c;font-weight:700;padding:11px 18px;" id="btnLookupAction">
+          🔍 Tra cứu mã
+        </button>
+      </div>
+      <!-- Kết quả tra cứu -->
+      <div id="lookupResultBox" style="display:none;margin-top:14px;background:#0f172a;border:1px solid #7c3aed;border-radius:14px;padding:16px;color:#fff;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:700;color:#38bdf8;" id="lookupCustomerInfo">Khách hàng: ...</span>
+          <span style="font-size:11px;background:#10b981;color:#fff;font-weight:700;padding:2px 8px;border-radius:6px;" id="lookupPlanInfo">Vĩnh viễn</span>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">KHÓA BẢN QUYỀN CỦA BẠN:</div>
+        <div style="display:flex;align-items:center;gap:10px;background:#1e1b4b;padding:10px 14px;border-radius:10px;border:1px dashed #a855f7;">
+          <span id="lookupKeyText" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#fbbf24;word-break:break-all;flex:1;"></span>
+          <button type="button" onclick="copyLookupKey()" style="background:#f97316;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;">Sao chép</button>
+        </div>
+        <p style="font-size:11px;color:#cbd5e1;margin-top:10px;line-height:1.5;">
+          👉 Mở phần mềm <strong>Record-AutoZoom</strong>, bấm <strong>Vương Miện (👑)</strong> và dán mã này vào để kích hoạt.
+        </p>
+      </div>
+    </div>
+
     <!-- SUPPORT FOOTER BAR (EMAIL & FACEBOOK) -->
     <div class="support-bar">
       <div class="support-title-wrap">
@@ -1675,6 +1710,15 @@
     const machineIdInput = document.getElementById("machineIdInput");
     if (paramMachineId) {
       machineIdInput.value = paramMachineId;
+      // Tự động kiểm tra: nếu máy này đã từng thanh toán thì hiện ngay License Key
+      fetch(`/api/check-payment?machineId=${encodeURIComponent(paramMachineId)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.paid && data.licenseKey) {
+            showSuccess(data.licenseKey);
+          }
+        })
+        .catch(() => {});
     }
 
     let guideOpen = true;
@@ -1895,6 +1939,45 @@
       alert(currentLang === 'vi' 
         ? "Đã sao chép License Key!\n👉 Hãy mở phần mềm Record-AutoZoom trên máy tính, bấm Vương Miện (👑) và dán mã vào để kích hoạt!"
         : "Copied License Key!\n👉 Open Record-AutoZoom on your computer, click the Crown (👑) icon and paste this key to activate!");
+    }
+
+    async function lookupLicenseKey() {
+      const q = (document.getElementById("lookupInput")?.value || "").trim();
+      if (!q) {
+        alert(currentLang === 'vi' ? "Vui lòng nhập Email hoặc Mã máy để tra cứu!" : "Please enter your Email or Machine ID!");
+        return;
+      }
+      const btn = document.getElementById("btnLookupAction");
+      const origText = btn ? btn.innerHTML : "";
+      if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Đang tìm..."; }
+      try {
+        const res = await fetch(`/api/lookup-license?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const resBox = document.getElementById("lookupResultBox");
+        if (data.found && data.licenseKey) {
+          document.getElementById("lookupCustomerInfo").textContent = `${data.customerName || "Khách hàng"} (${data.maskedEmail || ""})`;
+          document.getElementById("lookupPlanInfo").textContent = data.plan || "PRO";
+          document.getElementById("lookupKeyText").textContent = data.licenseKey;
+          resBox.style.display = "block";
+          resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.8 } });
+        } else {
+          alert(data.message || (currentLang === 'vi' ? "Không tìm thấy mã phù hợp với thông tin đã nhập." : "No license found with this information."));
+        }
+      } catch (err) {
+        alert("Lỗi kết nối: " + err.message);
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = origText; }
+      }
+    }
+
+    function copyLookupKey() {
+      const k = document.getElementById("lookupKeyText")?.textContent;
+      if (!k) return;
+      navigator.clipboard.writeText(k);
+      alert(currentLang === 'vi' 
+        ? "Đã sao chép License Key!\n👉 Hãy mở Record-AutoZoom trên máy tính, bấm Vương Miện (👑) và dán mã vào để kích hoạt!" 
+        : "Copied License Key! Open Record-AutoZoom and paste to activate!");
     }
 
     // Khởi tạo trang
